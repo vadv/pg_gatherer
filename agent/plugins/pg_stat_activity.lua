@@ -10,6 +10,7 @@ local function main_rds(agent, manager)
     insert_metric(host, plugin, row[1], nil, nil, row[2], manager)
   end
 end
+if is_rds then return main_rds end
 
 -- with io/cpu statistics
 local function main(agent, manager)
@@ -42,8 +43,4 @@ local function main(agent, manager)
     insert_metric(host, plugin, row[1], nil, nil, jsonb, manager)
   end
 end
-
-local main_func = main
-if is_rds then main_func = main_rds end
-
-return main_func
+return main
