@@ -27,5 +27,5 @@ create or replace function agent.insert_metric(
     value_double float8,
     value_jsonb  jsonb) returns void AS $$
 insert into manager.metric(host, plugin, snapshot, value_bigint, value_double, value_jsonb)
-    values (md5($1)::uuid, md5($2)::uuid, $3, $4, $5, $6)
+    values (md5($1)::uuid, $2, $3, $4, $5, $6)
 $$ language 'sql' security definer;

@@ -29,6 +29,9 @@ is_rds = is_rds_func(agent)
 -- linux_helpers
 linux_helpers = dofile(filepath.join(current_dir, "helpers", "linux.lua"))
 
+-- counter_speed
+counter_speed = dofile(filepath.join(current_dir, "helpers", "counter_speed.lua"))
+
 -- load plugin files
 local plugins, plugins_exec_times = {}, {}
 for _, filename in pairs( filepath.glob( filepath.join(current_dir, "plugins", "*.lua") ) ) do

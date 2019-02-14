@@ -1,4 +1,4 @@
-create or replace function gatherer.block() returns setof jsonb AS $$
+create or replace function gatherer.pg_block() returns setof jsonb AS $$
     SELECT
     jsonb_build_object(
          'blocked_pid', blocked_locks.pid,

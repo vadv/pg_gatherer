@@ -12,7 +12,7 @@ create unique index host_token_idx on manager.host(agent_token);
 create table manager.metric (
     id           bigserial,
     host         uuid not null,
-    plugin       uuid not null,
+    plugin       text not null,
     ts           timestamp not null default current_timestamp,
     snapshot     bigint,
     value_bigint bigint,
