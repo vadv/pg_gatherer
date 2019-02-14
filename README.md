@@ -4,8 +4,8 @@ project is designed to collect and store statistical data on postgresql.
 
 # Architecture
 
-agent: target database
-manager: database in which information is stored
+* agent: target database
+* manager: database in which information is stored
 
 # Deploy
 
