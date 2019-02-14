@@ -51,7 +51,7 @@ local function main(agent, manager)
       if diff then insert_metric(host, plugin_base_name..".fork_rate", nil, nil, diff, nil, manager) end
     end
 
-    -- interupts
+    -- interrupts
     local intr = line:match("^intr (%d+)")
     if intr then
       local diff = counter_speed("intr", tonumber(intr))

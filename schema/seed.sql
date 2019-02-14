@@ -8,3 +8,7 @@ grant execute on all functions in schema gatherer to gatherer;
 insert into manager.host (name, agent_token) values ('localhost', 'Reech2ee');
 grant usage on schema agent to agent;
 grant execute on all functions in schema agent to agent;
+
+create user grafana_reader password 'grafana_reader_password';
+grant USAGE on SCHEMA manager to grafana_reader;
+grant SELECT on ALL tables in schema manager to grafana_reader;

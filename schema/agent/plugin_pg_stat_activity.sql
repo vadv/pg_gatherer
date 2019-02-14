@@ -16,8 +16,7 @@ create or replace function gatherer.pg_stat_activity(t int default 1) returns se
           'wait_event_type', wait_event_type::text,
           'wait_event', wait_event::text,
           'state', state,
-          'query', query::text,
-          'backend_type', backend_type::text
+          'query', query::text
         ) as result
     from
       pg_catalog.pg_stat_activity

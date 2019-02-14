@@ -69,7 +69,7 @@ end
 function helpers.gc_calc_diff()
     local new_calc_diff_t = {}
     local garbage_time = os.time() - (15*60)
-    for id, val in pairs(calc_diff_t) do
+    for id, val in pairs(helpers.calc_diff_t) do
         if val["touch"] > garbage_time then new_calc_diff_t[id] = val end
     end
     helpers.calc_diff_t = new_calc_diff_t

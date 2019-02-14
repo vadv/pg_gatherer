@@ -12,8 +12,8 @@ create unique index host_token_idx on manager.host(agent_token);
 create table manager.metric (
     id           bigserial,
     host         uuid not null,
-    plugin       text not null,
-    ts           timestamp not null default current_timestamp,
+    plugin       uuid not null,
+    ts           bigint not null default extract(epoch from current_timestamp)::bigint,
     snapshot     bigint,
     value_bigint bigint,
     value_double float8,

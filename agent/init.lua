@@ -53,7 +53,7 @@ while true do
   end
 
   -- sleep
-  local sleep_time = 5 - (time.unix() - now)
+  local sleep_time = 60 - (time.unix() - now)
   if sleep_time > 0 then
     time.sleep(sleep_time)
     print("[INFO] tick.")

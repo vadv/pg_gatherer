@@ -9,7 +9,7 @@ local function insert_metric(host, plugin, snapshot, value_bigint, value_double,
   end
   local query = string.format("select agent.insert_metric('%s', '%s', %s, %s, %s, %s)", host, plugin, snapshot, value_bigint, value_double, value_jsonb)
   local _, err = manager:exec(query)
-  if err then error(err) end
+  if err then error("exec query: "..query.." error: "..err) end
 end
 
 return insert_metric
