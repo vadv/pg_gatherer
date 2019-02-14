@@ -32,6 +32,9 @@ linux_helpers = dofile(filepath.join(current_dir, "helpers", "linux.lua"))
 -- counter_speed
 counter_speed = dofile(filepath.join(current_dir, "helpers", "counter_speed.lua"))
 
+-- counter_diff
+counter_diff = dofile(filepath.join(current_dir, "helpers", "counter_diff.lua"))
+
 -- load plugin files
 local plugins, plugins_exec_times = {}, {}
 for _, filename in pairs( filepath.glob( filepath.join(current_dir, "plugins", "*.lua") ) ) do
@@ -53,7 +56,7 @@ while true do
   end
 
   -- sleep
-  local sleep_time = 60 - (time.unix() - now)
+  local sleep_time = 5 - (time.unix() - now)
   if sleep_time > 0 then
     time.sleep(sleep_time)
     print("[INFO] tick.")
