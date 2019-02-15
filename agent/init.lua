@@ -19,20 +19,15 @@ if err then error(err) end
 local get_host = dofile(filepath.join(current_dir, "helpers", "get_host.lua"))
 host = get_host(config.token, manager)
 
--- insert_metric
-insert_metric = dofile(filepath.join(current_dir, "helpers", "insert_metric.lua"))
-
 -- is_rds
 local is_rds_func = dofile(filepath.join(current_dir, "helpers", "is_rds.lua"))
 is_rds = is_rds_func(agent)
 
--- linux_helpers
-linux_helpers = dofile(filepath.join(current_dir, "helpers", "linux.lua"))
-
--- counter_speed
+-- other global variables
+insert_metric = dofile(filepath.join(current_dir, "helpers", "insert_metric.lua"))
+linux_pid_stat = dofile(filepath.join(current_dir, "helpers", "linux_pid_stat.lua"))
+linux_disk_stat = dofile(filepath.join(current_dir, "helpers", "linux_disk_stat.lua"))
 counter_speed = dofile(filepath.join(current_dir, "helpers", "counter_speed.lua"))
-
--- counter_diff
 counter_diff = dofile(filepath.join(current_dir, "helpers", "counter_diff.lua"))
 
 -- load plugin files
