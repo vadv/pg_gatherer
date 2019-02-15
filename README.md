@@ -1,11 +1,13 @@
-# PG_GATHERER
+# pg_gatherer
 
-project is designed to collect and store statistical data on postgresql.
+project is designed to collect and store statistical data off postgresql to other postgresql.
 
 # Architecture
 
-* agent: target database
+* target: target database
 * manager: database in which information is stored
+
+![Architecture](/img/arch.png)
 
 # Deploy
 
@@ -19,8 +21,8 @@ psql -h manager -d manager -U postgres -1 -f ./schema/manager/functions.sql
 on target database:
 
 ```
-psql -h agent -d agent -U postgres -1 -f ./schema/manager/schema.sql
-psql -h agent -d agent -U postgres -1 -f ./schema/manager/plugin*_.sql
+psql -h target -d target -U postgres -1 -f ./schema/manager/schema.sql
+psql -h target -d target -U postgres -1 -f ./schema/manager/plugin*_.sql
 ```
 
 # Start
@@ -30,3 +32,10 @@ $ go get github.com/vadv/gopher-lua-libs/cmd/glua-libs
 $ vim ./agent/config.yaml
 $ glua-libs ./agent/init.lua
 ```
+
+# Examples
+
+![tables](/img/tables.png)
+![other-1](/img/other-1.png)
+![other-2](/img/other-2.png)
+![graphs](/img/graphs.png)
