@@ -9,6 +9,10 @@ project is designed to collect and store statistical data off postgresql to othe
 
 ![Architecture](/img/arch.png)
 
+# Agent
+
+Agent is golang-binary with plugins written in lua ( [vadv/gopher-lua-libs](https://github.com/vadv/gopher-lua-libs) ).
+
 # Deploy
 
 on manager database:
