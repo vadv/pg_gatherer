@@ -1,4 +1,4 @@
-local plugin = 'pg_block'
+local plugin = 'pg.block'
 
 local function main(agent, manager)
   local result, err = agent:query("select gatherer.snapshot_id(), * from gatherer.pg_block()")

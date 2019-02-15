@@ -23,3 +23,16 @@ create or replace function gatherer.pg_stat_activity(t int default 1) returns se
     where
         state <> 'idle' and extract(epoch from now() - state_change)::int > t;
 $$ language 'sql' security definer;
+
+create or replace function gatherer.pg_stat_activity_states(out state text, out count bigint) returns setof record AS $$
+with states as (
+  select * from unnest('{active,idle,idle in transaction,idle in transaction (aborted),fastpath function call}'::text[]) as state
+)
+    select
+        s.state,
+        count(a.pid) as count
+    from
+      states s
+      left join pg_catalog.pg_stat_activity a on s.state = a.state
+    group by s.state;
+$$ language 'sql' security definer;

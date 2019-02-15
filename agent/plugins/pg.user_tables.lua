@@ -1,6 +1,6 @@
 local json = require('json')
 
-local plugin = 'pg_stat_user_tables'
+local plugin = 'pg.user_tables'
 
 local function main(agent, manager)
   local result, err = agent:query("select gatherer.snapshot_id(), * from gatherer.pg_stat_user_tables()")
