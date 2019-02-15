@@ -58,7 +58,6 @@ local function main(agent, manager)
     for _, key in pairs({'read_bytes', 'write_bytes', 'read_ops', 'write_ops'}) do
       jsonb[key] = counter_speed(plugin..key..mountpoint, all_stats[dev][key])
     end
-    print(inspect(jsonb))
     local jsonb, err = json.encode(jsonb)
     if err then error(err) end
     insert_metric(host, plugin, nil, nil, nil, jsonb, manager)
