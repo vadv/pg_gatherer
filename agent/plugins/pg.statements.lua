@@ -28,7 +28,7 @@ local function main(agent, manager)
     jsonb.blk_read_time = counter_speed(key..".blk_read_time", jsonb.blk_read_time)
     jsonb.blk_write_time = counter_speed(key..".blk_write_time", jsonb.blk_write_time)
 
-    if not(jsonb.calls == nil) and (jsonb.calls > 0) then
+    if jsonb.calls and (jsonb.calls > 0) then
       local jsonb, err = json.encode(jsonb)
       if err then error(err) end
       insert_metric(host, plugin, row[1], nil, nil, jsonb, manager)
