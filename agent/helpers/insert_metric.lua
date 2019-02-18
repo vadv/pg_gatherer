@@ -1,15 +1,8 @@
 local function insert_metric(host, plugin, snapshot, value_bigint, value_double, value_jsonb, manager)
-  snapshot = snapshot or 'NULL'
-  value_bigint = value_bigint or 'NULL'
-  value_double = value_double or 'NULL'
-  if value_jsonb then
-    value_jsonb = string.format(" '%s'::jsonb ", value_jsonb)
-  else
-    value_jsonb = 'NULL'
-  end
-  local query = string.format("select agent.insert_metric('%s', '%s', %s, %s, %s, %s)", host, plugin, snapshot, value_bigint, value_double, value_jsonb)
-  local _, err = manager:exec(query)
-  if err then error("exec query: "..query.." error: "..err) end
+  local stmt, err = manager:stmt('select agent.insert_metric($1::text, $2::text, $3::bigint, $4::bigint, $5::float8, $6::jsonb)')
+  if err then error(err) end
+  local _, err = stmt:exec(host, plugin, snapshot, value_bigint, value_double, value_jsonb)
+  if err then error("exec error: "..err) end
 end
 
 return insert_metric

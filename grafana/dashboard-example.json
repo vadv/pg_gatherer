@@ -16,7 +16,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 33,
-  "iteration": 1550242663890,
+  "iteration": 1550490616804,
   "links": [],
   "panels": [
     {
@@ -123,10 +123,307 @@
       "datasource": "postgresql-apidb01",
       "fontSize": "100%",
       "gridPos": {
-        "h": 4,
+        "h": 8,
         "w": 24,
         "x": 0,
         "y": 8
+      },
+      "id": 24,
+      "links": [],
+      "pageSize": null,
+      "scroll": true,
+      "showHeader": true,
+      "sort": {
+        "col": null,
+        "desc": false
+      },
+      "styles": [
+        {
+          "alias": "Time",
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "pattern": "Time",
+          "type": "date"
+        },
+        {
+          "alias": "",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "decimals": 2,
+          "pattern": "/.*/",
+          "thresholds": [],
+          "type": "number",
+          "unit": "short"
+        }
+      ],
+      "targets": [
+        {
+          "application": {
+            "filter": ""
+          },
+          "format": "table",
+          "functions": [],
+          "group": {
+            "filter": ""
+          },
+          "host": {
+            "filter": ""
+          },
+          "item": {
+            "filter": ""
+          },
+          "metricColumn": "none",
+          "mode": 0,
+          "options": {
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          },
+          "rawQuery": true,
+          "rawSql": "select\r\n    value_jsonb->>'query' as \"query\",\r\n    sum(coalesce((value_jsonb->>'calls')::bigint, 0)) as \"calls\"\r\n    from manager.metric where\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.statements')::uuid AND\r\n        value_jsonb->>'query' <> 'BEGIN' AND\r\n        value_jsonb->>'query' <> 'BEGIN READ WRITE' AND\r\n        value_jsonb->>'query' <> 'COMMIT' AND\r\n        value_jsonb->>'query' <> 'ROLLBACK'\r\n    group by 1 order by 2 desc limit 10",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": {
+            "skipEmptyValues": false
+          },
+          "timeColumn": "time",
+          "triggers": {
+            "acknowledged": 2,
+            "count": true,
+            "minSeverity": 3
+          },
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "statements (most frequency)",
+      "transform": "table",
+      "type": "table"
+    },
+    {
+      "columns": [],
+      "datasource": "postgresql-apidb01",
+      "fontSize": "100%",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      },
+      "id": 25,
+      "links": [],
+      "pageSize": null,
+      "scroll": true,
+      "showHeader": true,
+      "sort": {
+        "col": null,
+        "desc": false
+      },
+      "styles": [
+        {
+          "alias": "Time",
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "pattern": "Time",
+          "type": "date"
+        },
+        {
+          "alias": "",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "decimals": 2,
+          "pattern": "/.*/",
+          "thresholds": [],
+          "type": "number",
+          "unit": "short"
+        }
+      ],
+      "targets": [
+        {
+          "application": {
+            "filter": ""
+          },
+          "format": "table",
+          "functions": [],
+          "group": {
+            "filter": ""
+          },
+          "host": {
+            "filter": ""
+          },
+          "item": {
+            "filter": ""
+          },
+          "metricColumn": "none",
+          "mode": 0,
+          "options": {
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          },
+          "rawQuery": true,
+          "rawSql": "select\r\n    value_jsonb->>'query' as \"query\",\r\n    TO_CHAR( sum(coalesce((value_jsonb->>'total_time')::float8, 0)) * interval '1 second' , 'HH24:MI:SS') as \"total_time\"\r\n    from manager.metric where\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.statements')::uuid AND\r\n        value_jsonb->>'query' <> 'BEGIN' AND\r\n        value_jsonb->>'query' <> 'BEGIN READ WRITE' AND\r\n        value_jsonb->>'query' <> 'COMMIT' AND\r\n        value_jsonb->>'query' <> 'ROLLBACK'\r\n    group by 1 order by 2 desc limit 10",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": {
+            "skipEmptyValues": false
+          },
+          "timeColumn": "time",
+          "triggers": {
+            "acknowledged": 2,
+            "count": true,
+            "minSeverity": 3
+          },
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "statements (most time)",
+      "transform": "table",
+      "type": "table"
+    },
+    {
+      "columns": [],
+      "datasource": "postgresql-apidb01",
+      "fontSize": "100%",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
+      "id": 26,
+      "links": [],
+      "pageSize": null,
+      "scroll": true,
+      "showHeader": true,
+      "sort": {
+        "col": null,
+        "desc": false
+      },
+      "styles": [
+        {
+          "alias": "Time",
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "pattern": "Time",
+          "type": "date"
+        },
+        {
+          "alias": "",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "decimals": 2,
+          "pattern": "/.*/",
+          "thresholds": [],
+          "type": "number",
+          "unit": "short"
+        }
+      ],
+      "targets": [
+        {
+          "application": {
+            "filter": ""
+          },
+          "format": "table",
+          "functions": [],
+          "group": {
+            "filter": ""
+          },
+          "host": {
+            "filter": ""
+          },
+          "item": {
+            "filter": ""
+          },
+          "metricColumn": "none",
+          "mode": 0,
+          "options": {
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          },
+          "rawQuery": true,
+          "rawSql": "select\r\n    value_jsonb->>'query' as \"query\",\r\n    sum(\r\n        coalesce((value_jsonb->>'shared_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_read')::float8, 0)\r\n    )*8/1024 as \"r(mb)\",\r\n    sum(\r\n        coalesce((value_jsonb->>'shared_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_dirtied')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_written')::float8, 0)\r\n    )*8/1024 as \"w(mb)\",\r\n    TO_CHAR( sum(coalesce((value_jsonb->>'blk_read_time')::float8, 0)) * interval '1 second' , 'HH24:MI:SS') as  \"r\",\r\n    TO_CHAR( sum(coalesce((value_jsonb->>'blk_write_time')::float8, 0)) * interval '1 second' , 'HH24:MI:SS') as  \"w\"\r\n    from manager.metric where\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.statements')::uuid\r\n    group by 1\r\n    having\r\n    sum(\r\n        coalesce((value_jsonb->>'shared_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'shared_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_dirtied')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_written')::float8, 0)\r\n    ) > 0\r\n    order by sum(\r\n        coalesce((value_jsonb->>'shared_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'shared_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_dirtied')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_written')::float8, 0)\r\n    ) desc",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": {
+            "skipEmptyValues": false
+          },
+          "timeColumn": "time",
+          "triggers": {
+            "acknowledged": 2,
+            "count": true,
+            "minSeverity": 3
+          },
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "statements (most disk)",
+      "transform": "table",
+      "type": "table"
+    },
+    {
+      "columns": [],
+      "datasource": "postgresql-apidb01",
+      "fontSize": "100%",
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 32
       },
       "id": 9,
       "links": [],
@@ -134,8 +431,8 @@
       "scroll": true,
       "showHeader": true,
       "sort": {
-        "col": 4,
-        "desc": true
+        "col": null,
+        "desc": false
       },
       "styles": [
         {
@@ -225,7 +522,7 @@
         "h": 6,
         "w": 24,
         "x": 0,
-        "y": 12
+        "y": 36
       },
       "id": 23,
       "links": [],
@@ -327,7 +624,7 @@
         "h": 10,
         "w": 8,
         "x": 0,
-        "y": 18
+        "y": 42
       },
       "id": 10,
       "legend": {
@@ -478,7 +775,7 @@
         "h": 10,
         "w": 8,
         "x": 8,
-        "y": 18
+        "y": 42
       },
       "id": 12,
       "legend": {
@@ -629,7 +926,7 @@
         "h": 10,
         "w": 8,
         "x": 16,
-        "y": 18
+        "y": 42
       },
       "id": 11,
       "legend": {
@@ -780,7 +1077,7 @@
         "h": 10,
         "w": 8,
         "x": 0,
-        "y": 28
+        "y": 52
       },
       "id": 20,
       "legend": {
@@ -931,7 +1228,7 @@
         "h": 10,
         "w": 8,
         "x": 8,
-        "y": 28
+        "y": 52
       },
       "id": 21,
       "legend": {
@@ -1081,7 +1378,7 @@
         "h": 10,
         "w": 8,
         "x": 16,
-        "y": 28
+        "y": 52
       },
       "id": 22,
       "legend": {
@@ -1232,7 +1529,7 @@
         "h": 10,
         "w": 6,
         "x": 0,
-        "y": 38
+        "y": 62
       },
       "id": 14,
       "legend": {
@@ -1383,7 +1680,7 @@
         "h": 10,
         "w": 6,
         "x": 6,
-        "y": 38
+        "y": 62
       },
       "id": 15,
       "legend": {
@@ -1534,7 +1831,7 @@
         "h": 10,
         "w": 6,
         "x": 12,
-        "y": 38
+        "y": 62
       },
       "id": 16,
       "legend": {
@@ -1685,7 +1982,7 @@
         "h": 10,
         "w": 6,
         "x": 18,
-        "y": 38
+        "y": 62
       },
       "id": 17,
       "legend": {
@@ -1836,7 +2133,7 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 48
+        "y": 72
       },
       "id": 2,
       "legend": {
@@ -2117,7 +2414,7 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 48
+        "y": 72
       },
       "id": 4,
       "legend": {
@@ -2249,7 +2546,7 @@
         "h": 9,
         "w": 8,
         "x": 0,
-        "y": 58
+        "y": 82
       },
       "id": 6,
       "legend": {
@@ -2381,7 +2678,7 @@
         "h": 9,
         "w": 8,
         "x": 8,
-        "y": 58
+        "y": 82
       },
       "id": 18,
       "legend": {
@@ -2513,7 +2810,7 @@
         "h": 9,
         "w": 8,
         "x": 16,
-        "y": 58
+        "y": 82
       },
       "id": 19,
       "legend": {
@@ -2642,7 +2939,7 @@
         "h": 6,
         "w": 24,
         "x": 0,
-        "y": 67
+        "y": 91
       },
       "id": 13,
       "links": [],
@@ -2767,7 +3064,7 @@
     ]
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-20m",
     "to": "now"
   },
   "timepicker": {
@@ -2798,5 +3095,5 @@
   "timezone": "",
   "title": "pg_gatherer",
   "uid": "Q1TigQumk",
-  "version": 39
+  "version": 42
 }

@@ -39,7 +39,15 @@ $ glua-libs ./agent/init.lua
 
 # Examples
 
-![tables](/img/tables.png)
-![other-1](/img/other-1.png)
-![other-2](/img/other-2.png)
-![graphs](/img/graphs.png)
+![activity](/img/activity.png)
+![statements-freq](/img/statements-freq.png)
+![statements-disk](/img/statements-disk.png)
+![statements-total-time](/img/statements-total-time.png)
+![blocks](/img/blocks.png)
+![databases](/img/databases.png)
+![rows-statistics](/img/rows-statistics.png)
+![disk-read-per-table](/img/disk-read-per-table.png)
+![bgwriter-status](/img/bgwriter-status.png)
+![linux-metrics-1](/img/linux-metrics-1.png)
+![linux-metrics-2](/img/linux-metrics-2.png)
+![vacuum-activity](/img/vacuum-activity.png)

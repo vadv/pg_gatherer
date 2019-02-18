@@ -42,7 +42,7 @@ while true do
 
   local now = time.unix()
   for name, f in pairs(plugins) do
-    local _, err = agent:exec("SET statement_timeout TO 1000;")
+    local _, err = agent:exec("SET statement_timeout TO 2000;")
     if err then print("set execution timeout:", err) end
     plugins_exec_times[name] = time.unix()
     local ok, err = pcall(f, agent, manager)
@@ -51,7 +51,7 @@ while true do
   end
 
   -- sleep
-  local sleep_time = 5 - (time.unix() - now)
+  local sleep_time = 10 - (time.unix() - now)
   if sleep_time > 0 then
     time.sleep(sleep_time)
     print("[INFO] tick.")
