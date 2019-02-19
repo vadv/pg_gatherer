@@ -40,7 +40,6 @@ $ glua-libs ./agent/init.lua
 # Examples
 
 ![activity](/img/activity.png)
-![statements-freq](/img/statements-freq.png)
 ![statements-disk](/img/statements-disk.png)
 ![statements-total-time](/img/statements-total-time.png)
 ![blocks](/img/blocks.png)
