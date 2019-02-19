@@ -1,63 +1,21 @@
 local filepath = require("filepath")
-local inspect = require("inspect")
-local db = require("db")
 local time = require("time")
 
 local current_dir = filepath.dir(debug.getinfo(1).source)
 
--- load config
-local get_config = dofile(filepath.join(current_dir, "helpers", "get_config.lua"))
-local config = get_config( filepath.join(current_dir, "config.yaml") )
+-- init config
+local helpers = dofile(filepath.join(current_dir, "helpers", "init.lua"))
+helpers.config.load(filepath.join(current_dir, "config.yaml"))
 
--- make postgres connections
-local agent, err = db.open("postgres", config.connections.agent)
-if err then error(err) end
-local manager, err = db.open("postgres", config.connections.manager)
-if err then error(err) end
+local plugins = dofile(filepath.join(current_dir, "plugins", "init.lua"))
 
--- get host
-local get_host = dofile(filepath.join(current_dir, "helpers", "get_host.lua"))
-host = get_host(config.token, manager)
-
--- is_rds
-local is_rds_func = dofile(filepath.join(current_dir, "helpers", "is_rds.lua"))
-is_rds = is_rds_func(agent)
-
--- other global variables
-insert_metric = dofile(filepath.join(current_dir, "helpers", "insert_metric.lua"))
-linux_pid_stat = dofile(filepath.join(current_dir, "helpers", "linux_pid_stat.lua"))
-linux_disk_stat = dofile(filepath.join(current_dir, "helpers", "linux_disk_stat.lua"))
-counter_speed = dofile(filepath.join(current_dir, "helpers", "counter_speed.lua"))
-counter_diff = dofile(filepath.join(current_dir, "helpers", "counter_diff.lua"))
-
--- load plugin files
-local plugins, plugins_exec_times = {}, {}
-for _, filename in pairs( filepath.glob( filepath.join(current_dir, "plugins", "*.lua") ) ) do
-  local plugin_name = filepath.basename(filename)
-  plugins[plugin_name] = dofile(filename)
-end
-
--- start supervisor
 while true do
-
-  local now = time.unix()
-  for name, f in pairs(plugins) do
-    local _, err = agent:exec("SET statement_timeout TO 2000;")
-    if err then print("set execution timeout:", err) end
-    plugins_exec_times[name] = time.unix()
-    local ok, err = pcall(f, agent, manager)
-    if not ok then print("plugin ", name, " error: ", err) end
-    plugins_exec_times[name] = time.unix() - plugins_exec_times[name]
+  time.sleep(1)
+  for name, plugin in pairs(plugins) do
+    if not plugin:is_running() then
+      print("plugin", name, "error:", tostring(plugin:error()), "restart it")
+      plugin:run()
+    end
   end
-
-  -- sleep
-  local sleep_time = 10 - (time.unix() - now)
-  if sleep_time > 0 then
-    time.sleep(sleep_time)
-    print("[INFO] tick.")
-  else
-    print("[ERROR] execution time too big: ", inspect(plugins_exec_times))
-    time.sleep(1)
-  end
-
+  print("tick")
 end

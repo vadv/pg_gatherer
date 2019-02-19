@@ -4,7 +4,7 @@ local data = {
   -- key = {value = value, unixts = unixts}
 }
 
-local function counter_speed(key, value)
+local function speed(key, value)
   if not value then return nil end
   local prev = data[key]
   local now = time.unix()
@@ -20,4 +20,4 @@ local function counter_speed(key, value)
   return (value_diff / time_diff)
 end
 
-return counter_speed
+return speed

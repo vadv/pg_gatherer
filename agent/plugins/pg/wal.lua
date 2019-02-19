@@ -1,6 +1,7 @@
-local plugin = 'pg.block'
+local time = require("time")
+local plugin = 'pg.wal'
 
-local function main(agent, manager)
+local function collect()
   local result, err = agent:query("select gatherer.snapshot_id(), * from gatherer.pg_block()")
   if err then error(err) end
   for _, row in pairs(result.rows) do
@@ -8,4 +9,6 @@ local function main(agent, manager)
   end
 end
 
-return main
+while true do
+  time.sleep(10)
+end
