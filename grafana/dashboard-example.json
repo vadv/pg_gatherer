@@ -16,7 +16,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 33,
-  "iteration": 1550490616804,
+  "iteration": 1550606102464,
   "links": [],
   "panels": [
     {
@@ -83,7 +83,7 @@
             "skipEmptyValues": false
           },
           "rawQuery": true,
-          "rawSql": "select\r\n    value_jsonb->>'query_id' as \"query_id\",\r\n    min(to_timestamp(ts) AT TIME ZONE 'UTC') as \"first seen\",\r\n    max(to_timestamp(ts) AT TIME ZONE 'UTC') as \"last seen\",\r\n    TO_CHAR( (max(ts) - min(ts))::bigint * interval '1 second' , 'HH24:MI:SS') as \"duration\",\r\n    max(value_jsonb->>'query') as \"query\",\r\n    (max(value_jsonb->>'rchar')::float8)/1024/1024/1024 as \"read GB\",\r\n    (max(value_jsonb->>'wchar')::float8)/1024/1024/1024 as \"write GB\",\r\n    (max(value_jsonb->>'utime')::float8)/100 as \"Utime\",\r\n    (max(value_jsonb->>'stime')::float8)/100 as \"Stime\"\r\n    from manager.metric where\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.activity')::uuid\r\n    group by 1 order by 4 desc",
+          "rawSql": "select\r\n    value_jsonb->>'query_id' as \"query_id\",\r\n    min(to_timestamp(ts) AT TIME ZONE 'UTC') as \"first seen\",\r\n    max(to_timestamp(ts) AT TIME ZONE 'UTC') as \"last seen\",\r\n    TO_CHAR( (max(ts) - min(ts))::bigint * interval '1 second' , 'HH24:MI:SS') as \"duration\",\r\n    max(value_jsonb->>'query') as \"query\",\r\n    pg_size_pretty((max(value_jsonb->>'rchar')::float8)::bigint) as \"read\",\r\n    pg_size_pretty((max(value_jsonb->>'wchar')::float8)::bigint) as \"write\",\r\n    (max(value_jsonb->>'utime')::float8)/100 as \"cpu_user\",\r\n    (max(value_jsonb->>'stime')::float8)/100 as \"cpu_system\"\r\n    from manager.metric where\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.activity')::uuid\r\n    group by 1 order by max(value_jsonb->>'rchar')::float8 desc nulls last",
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
@@ -127,105 +127,6 @@
         "w": 24,
         "x": 0,
         "y": 8
-      },
-      "id": 24,
-      "links": [],
-      "pageSize": null,
-      "scroll": true,
-      "showHeader": true,
-      "sort": {
-        "col": null,
-        "desc": false
-      },
-      "styles": [
-        {
-          "alias": "Time",
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "pattern": "Time",
-          "type": "date"
-        },
-        {
-          "alias": "",
-          "colorMode": null,
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "decimals": 2,
-          "pattern": "/.*/",
-          "thresholds": [],
-          "type": "number",
-          "unit": "short"
-        }
-      ],
-      "targets": [
-        {
-          "application": {
-            "filter": ""
-          },
-          "format": "table",
-          "functions": [],
-          "group": {
-            "filter": ""
-          },
-          "host": {
-            "filter": ""
-          },
-          "item": {
-            "filter": ""
-          },
-          "metricColumn": "none",
-          "mode": 0,
-          "options": {
-            "showDisabledItems": false,
-            "skipEmptyValues": false
-          },
-          "rawQuery": true,
-          "rawSql": "select\r\n    value_jsonb->>'query' as \"query\",\r\n    sum(coalesce((value_jsonb->>'calls')::bigint, 0)) as \"calls\"\r\n    from manager.metric where\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.statements')::uuid AND\r\n        value_jsonb->>'query' <> 'BEGIN' AND\r\n        value_jsonb->>'query' <> 'BEGIN READ WRITE' AND\r\n        value_jsonb->>'query' <> 'COMMIT' AND\r\n        value_jsonb->>'query' <> 'ROLLBACK'\r\n    group by 1 order by 2 desc limit 10",
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "column"
-              }
-            ]
-          ],
-          "table": {
-            "skipEmptyValues": false
-          },
-          "timeColumn": "time",
-          "triggers": {
-            "acknowledged": 2,
-            "count": true,
-            "minSeverity": 3
-          },
-          "where": [
-            {
-              "name": "$__timeFilter",
-              "params": [],
-              "type": "macro"
-            }
-          ]
-        }
-      ],
-      "title": "statements (most frequency)",
-      "transform": "table",
-      "type": "table"
-    },
-    {
-      "columns": [],
-      "datasource": "postgresql-apidb01",
-      "fontSize": "100%",
-      "gridPos": {
-        "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 16
       },
       "id": 25,
       "links": [],
@@ -281,7 +182,7 @@
             "skipEmptyValues": false
           },
           "rawQuery": true,
-          "rawSql": "select\r\n    value_jsonb->>'query' as \"query\",\r\n    TO_CHAR( sum(coalesce((value_jsonb->>'total_time')::float8, 0)) * interval '1 second' , 'HH24:MI:SS') as \"total_time\"\r\n    from manager.metric where\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.statements')::uuid AND\r\n        value_jsonb->>'query' <> 'BEGIN' AND\r\n        value_jsonb->>'query' <> 'BEGIN READ WRITE' AND\r\n        value_jsonb->>'query' <> 'COMMIT' AND\r\n        value_jsonb->>'query' <> 'ROLLBACK'\r\n    group by 1 order by 2 desc limit 10",
+          "rawSql": "select\r\n    value_jsonb->>'query' as \"query\",\r\n    sum( coalesce( (value_jsonb->>'calls')::bigint, 0 ) ) as \"calls\",\r\n    TO_CHAR( sum(coalesce((value_jsonb->>'total_time')::float8, 0)) * interval '1 second' , 'HH24:MI:SS') as \"total_time\"\r\n    from manager.metric where\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.statements')::uuid AND\r\n        value_jsonb->>'query' <> 'BEGIN' AND\r\n        value_jsonb->>'query' <> 'BEGIN READ WRITE' AND\r\n        value_jsonb->>'query' <> 'COMMIT' AND\r\n        value_jsonb->>'query' <> 'ROLLBACK'\r\n    group by 1 order by 3 desc limit 10",
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
@@ -324,7 +225,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 24
+        "y": 16
       },
       "id": 26,
       "links": [],
@@ -380,7 +281,7 @@
             "skipEmptyValues": false
           },
           "rawQuery": true,
-          "rawSql": "select\r\n    value_jsonb->>'query' as \"query\",\r\n    sum(\r\n        coalesce((value_jsonb->>'shared_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_read')::float8, 0)\r\n    )*8/1024 as \"r(mb)\",\r\n    sum(\r\n        coalesce((value_jsonb->>'shared_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_dirtied')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_written')::float8, 0)\r\n    )*8/1024 as \"w(mb)\",\r\n    TO_CHAR( sum(coalesce((value_jsonb->>'blk_read_time')::float8, 0)) * interval '1 second' , 'HH24:MI:SS') as  \"r\",\r\n    TO_CHAR( sum(coalesce((value_jsonb->>'blk_write_time')::float8, 0)) * interval '1 second' , 'HH24:MI:SS') as  \"w\"\r\n    from manager.metric where\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.statements')::uuid\r\n    group by 1\r\n    having\r\n    sum(\r\n        coalesce((value_jsonb->>'shared_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'shared_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_dirtied')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_written')::float8, 0)\r\n    ) > 0\r\n    order by sum(\r\n        coalesce((value_jsonb->>'shared_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'shared_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_dirtied')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_written')::float8, 0)\r\n    ) desc",
+          "rawSql": "select\r\n    value_jsonb->>'query' as \"query\",\r\n    sum( coalesce( (value_jsonb->>'calls')::bigint, 0 ) ) as \"calls\",\r\n    pg_size_pretty(\r\n      (sum(\r\n        coalesce((value_jsonb->>'shared_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_read')::float8, 0)\r\n      )*8*1024)::bigint\r\n    ) as \"r (b)\",\r\n    pg_size_pretty(\r\n      (sum(\r\n        coalesce((value_jsonb->>'shared_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_dirtied')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_written')::float8, 0)\r\n      )*8/1024)::bigint\r\n    ) as \"w (b)\",\r\n    TO_CHAR( sum(coalesce((value_jsonb->>'blk_read_time')::float8, 0)) * interval '1 second' , 'HH24:MI:SS') as  \"r(s)\",\r\n    TO_CHAR( sum(coalesce((value_jsonb->>'blk_write_time')::float8, 0)) * interval '1 second' , 'HH24:MI:SS') as  \"w(s)\"\r\n    from manager.metric where\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.statements')::uuid\r\n    group by 1\r\n    having\r\n    sum(\r\n        coalesce((value_jsonb->>'shared_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'shared_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_dirtied')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_written')::float8, 0)\r\n    ) > 0\r\n    order by sum(\r\n        coalesce((value_jsonb->>'shared_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'shared_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_dirtied')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_written')::float8, 0)\r\n    ) desc",
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
@@ -423,7 +324,7 @@
         "h": 4,
         "w": 24,
         "x": 0,
-        "y": 32
+        "y": 24
       },
       "id": 9,
       "links": [],
@@ -522,7 +423,7 @@
         "h": 6,
         "w": 24,
         "x": 0,
-        "y": 36
+        "y": 28
       },
       "id": 23,
       "links": [],
@@ -624,7 +525,7 @@
         "h": 10,
         "w": 8,
         "x": 0,
-        "y": 42
+        "y": 34
       },
       "id": 10,
       "legend": {
@@ -677,7 +578,7 @@
             "skipEmptyValues": false
           },
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  ts AS \"time\",\r\n  value_jsonb->>'full_table_name' as \"table\",\r\n  sum((value_jsonb->>'seq_tup_read')::float8) as \"rows\"\r\nFROM manager.metric\r\nWHERE\r\n  $__unixEpochFilter(snapshot) AND\r\n  host = md5('$host')::uuid AND\r\n  plugin = md5('pg.user_tables')::uuid\r\nGROUP BY 1,2\r\nHAVING sum( coalesce((value_jsonb->>'seq_tup_read')::float8, 0)) > 10\r\nORDER BY 1",
+          "rawSql": "WITH tables AS(\r\n    SELECT\r\n        m.value_jsonb->>'full_table_name' as \"table\",\r\n        sum( coalesce((m.value_jsonb->>'seq_tup_read')::float8, 0) )  as \"rows\"\r\n    FROM manager.metric m\r\n    WHERE\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.user_tables')::uuid\r\n    GROUP BY 1\r\n    ORDER BY 2 DESC\r\n    LIMIT 20\r\n)\r\n\r\nSELECT\r\n  m.ts AS \"time\",\r\n  m.value_jsonb->>'full_table_name' as \"table\",\r\n  sum( coalesce((m.value_jsonb->>'seq_tup_read')::float8, 0) ) as \"rows\"\r\nFROM manager.metric m\r\nINNER JOIN tables t ON t.table = m.value_jsonb->>'full_table_name'\r\nWHERE\r\n  $__unixEpochFilter(ts) AND\r\n  host = md5('$host')::uuid AND\r\n  plugin = md5('pg.user_tables')::uuid\r\nGROUP BY 1,2\r\nORDER BY 1",
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
@@ -775,7 +676,7 @@
         "h": 10,
         "w": 8,
         "x": 8,
-        "y": 42
+        "y": 34
       },
       "id": 12,
       "legend": {
@@ -828,7 +729,7 @@
             "skipEmptyValues": false
           },
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  ts AS \"time\",\r\n  value_jsonb->>'full_table_name' as \"table\",\r\n  sum((value_jsonb->>'idx_tup_fetch')::float8) as \"rows\"\r\nFROM manager.metric\r\nWHERE\r\n  $__unixEpochFilter(snapshot) AND\r\n  host = md5('$host')::uuid AND\r\n  plugin = md5('pg.user_tables')::uuid\r\nGROUP BY 1,2\r\nHAVING sum( coalesce((value_jsonb->>'idx_tup_fetch')::float8, 0)) > 1\r\nORDER BY 1",
+          "rawSql": "WITH tables AS(\r\n    SELECT\r\n        m.value_jsonb->>'full_table_name' as \"table\",\r\n        sum( coalesce((m.value_jsonb->>'idx_tup_fetch')::float8, 0) )  as \"rows\"\r\n    FROM manager.metric m\r\n    WHERE\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.user_tables')::uuid\r\n    GROUP BY 1\r\n    ORDER BY 2 DESC\r\n    LIMIT 20\r\n)\r\n\r\nSELECT\r\n  m.ts AS \"time\",\r\n  m.value_jsonb->>'full_table_name' as \"table\",\r\n  sum( coalesce((m.value_jsonb->>'idx_tup_fetch')::float8, 0) ) as \"rows\"\r\nFROM manager.metric m\r\nINNER JOIN tables t ON t.table = m.value_jsonb->>'full_table_name'\r\nWHERE\r\n  $__unixEpochFilter(ts) AND\r\n  host = md5('$host')::uuid AND\r\n  plugin = md5('pg.user_tables')::uuid\r\nGROUP BY 1,2\r\nORDER BY 1",
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
@@ -926,7 +827,7 @@
         "h": 10,
         "w": 8,
         "x": 16,
-        "y": 42
+        "y": 34
       },
       "id": 11,
       "legend": {
@@ -979,7 +880,7 @@
             "skipEmptyValues": false
           },
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  ts AS \"time\",\r\n  value_jsonb->>'full_table_name' as \"table\",\r\n  sum((value_jsonb->>'n_tup_ins')::float8 + (value_jsonb->>'n_tup_upd')::float8 + (value_jsonb->>'n_tup_del')::float8 + (value_jsonb->>'n_tup_hot_upd')::float8) as \"rows\"\r\nFROM manager.metric\r\nWHERE\r\n  $__unixEpochFilter(snapshot) AND\r\n  host = md5('$host')::uuid AND\r\n  plugin = md5('pg.user_tables')::uuid\r\nGROUP BY 1,2\r\nHAVING sum((value_jsonb->>'n_tup_ins')::float8 + (value_jsonb->>'n_tup_upd')::float8 + (value_jsonb->>'n_tup_del')::float8 + (value_jsonb->>'n_tup_hot_upd')::float8) > 1\r\nORDER BY 1",
+          "rawSql": "WITH tables AS(\r\n    SELECT\r\n        m.value_jsonb->>'full_table_name' as \"table\",\r\n        sum( coalesce((m.value_jsonb->>'n_tup_ins')::float8, 0) + coalesce((value_jsonb->>'n_tup_upd')::float8, 0) + coalesce((value_jsonb->>'n_tup_del')::float8, 0) + coalesce((value_jsonb->>'n_tup_hot_upd')::float8, 0) )\r\n    FROM manager.metric m\r\n    WHERE\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.user_tables')::uuid\r\n    GROUP BY 1\r\n    ORDER BY 2 DESC\r\n    LIMIT 20\r\n)\r\n\r\nSELECT\r\n  m.ts AS \"time\",\r\n  m.value_jsonb->>'full_table_name' as \"table\",\r\n  sum( coalesce((m.value_jsonb->>'n_tup_ins')::float8, 0) + coalesce((value_jsonb->>'n_tup_upd')::float8, 0) + coalesce((value_jsonb->>'n_tup_del')::float8, 0) + coalesce((value_jsonb->>'n_tup_hot_upd')::float8, 0) ) as \"rows\"\r\nFROM manager.metric m\r\nINNER JOIN tables t ON t.table = m.value_jsonb->>'full_table_name'\r\nWHERE\r\n  $__unixEpochFilter(ts) AND\r\n  host = md5('$host')::uuid AND\r\n  plugin = md5('pg.user_tables')::uuid\r\nGROUP BY 1,2\r\nORDER BY 1\r\n",
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
@@ -1077,7 +978,7 @@
         "h": 10,
         "w": 8,
         "x": 0,
-        "y": 52
+        "y": 44
       },
       "id": 20,
       "legend": {
@@ -1130,7 +1031,7 @@
             "skipEmptyValues": false
           },
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  ts AS \"time\",\r\n  value_jsonb->>'full_table_name' as \"table\",\r\n  sum(coalesce((value_jsonb->>'heap_blks_read')::float8, 0)) * 8 * 1024 as \"heap\"\r\nFROM manager.metric\r\nWHERE\r\n  $__unixEpochFilter(snapshot) AND\r\n  host = md5('$host')::uuid AND\r\n  plugin = md5('pg.user_tables.io')::uuid\r\nGROUP BY 1,2\r\nHAVING sum(coalesce((value_jsonb->>'heap_blks_read')::float8, 0)) > 0\r\nORDER BY 1",
+          "rawSql": "WITH tables AS(\r\n    SELECT\r\n        m.value_jsonb->>'full_table_name' as \"table\",\r\n        sum( coalesce((m.value_jsonb->>'heap_blks_read')::float8, 0) )  as \"rows\"\r\n    FROM manager.metric m\r\n    WHERE\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.user_tables.io')::uuid\r\n    GROUP BY 1\r\n    ORDER BY 2 DESC\r\n    LIMIT 20\r\n)\r\n\r\nSELECT\r\n  m.ts AS \"time\",\r\n  m.value_jsonb->>'full_table_name' as \"table\",\r\n  sum( coalesce((m.value_jsonb->>'heap_blks_read')::float8, 0) )  * 8 * 1024 as \"heap\"\r\nFROM manager.metric m\r\nINNER JOIN tables t ON t.table = m.value_jsonb->>'full_table_name'\r\nWHERE\r\n  $__unixEpochFilter(ts) AND\r\n  host = md5('$host')::uuid AND\r\n  plugin = md5('pg.user_tables.io')::uuid\r\nGROUP BY 1,2\r\nORDER BY 1\r\n",
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
@@ -1228,7 +1129,7 @@
         "h": 10,
         "w": 8,
         "x": 8,
-        "y": 52
+        "y": 44
       },
       "id": 21,
       "legend": {
@@ -1280,7 +1181,7 @@
             "skipEmptyValues": false
           },
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  ts AS \"time\",\r\n  value_jsonb->>'full_table_name' as \"table\",\r\n  sum(coalesce((value_jsonb->>'toast_blks_read')::float8, 0)) * 8 * 1024 as \"toast\"\r\nFROM manager.metric\r\nWHERE\r\n  $__unixEpochFilter(snapshot) AND\r\n  host = md5('$host')::uuid AND\r\n  plugin = md5('pg.user_tables.io')::uuid\r\nGROUP BY 1,2\r\nHAVING sum(coalesce((value_jsonb->>'toast_blks_read')::float8, 0)) > 0\r\nORDER BY 1",
+          "rawSql": "WITH tables AS(\r\n    SELECT\r\n        m.value_jsonb->>'full_table_name' as \"table\",\r\n        sum( coalesce((m.value_jsonb->>'toast_blks_read')::float8, 0) )  as \"rows\"\r\n    FROM manager.metric m\r\n    WHERE\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.user_tables.io')::uuid\r\n    GROUP BY 1\r\n    ORDER BY 2 DESC\r\n    LIMIT 20\r\n)\r\n\r\nSELECT\r\n  m.ts AS \"time\",\r\n  m.value_jsonb->>'full_table_name' as \"table\",\r\n  sum( coalesce((m.value_jsonb->>'toast_blks_read')::float8, 0) )  * 8 * 1024 as \"heap\"\r\nFROM manager.metric m\r\nINNER JOIN tables t ON t.table = m.value_jsonb->>'full_table_name'\r\nWHERE\r\n  $__unixEpochFilter(ts) AND\r\n  host = md5('$host')::uuid AND\r\n  plugin = md5('pg.user_tables.io')::uuid\r\nGROUP BY 1,2\r\nORDER BY 1\r\n",
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
@@ -1378,7 +1279,7 @@
         "h": 10,
         "w": 8,
         "x": 16,
-        "y": 52
+        "y": 44
       },
       "id": 22,
       "legend": {
@@ -1431,7 +1332,7 @@
             "skipEmptyValues": false
           },
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  ts AS \"time\",\r\n  value_jsonb->>'full_table_name' as \"table\",\r\n  sum(coalesce((value_jsonb->>'tidx_blks_read')::float8, 0)) * 8 * 1024 as \"idx\"\r\nFROM manager.metric\r\nWHERE\r\n  $__unixEpochFilter(snapshot) AND\r\n  host = md5('$host')::uuid AND\r\n  plugin = md5('pg.user_tables.io')::uuid\r\nGROUP BY 1,2\r\nHAVING sum(coalesce((value_jsonb->>'tidx_blks_read')::float8, 0)) > 0\r\nORDER BY 1",
+          "rawSql": "WITH tables AS(\r\n    SELECT\r\n        m.value_jsonb->>'full_table_name' as \"table\",\r\n        sum( coalesce((m.value_jsonb->>'tidx_blks_read')::float8, 0) )  as \"rows\"\r\n    FROM manager.metric m\r\n    WHERE\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.user_tables.io')::uuid\r\n    GROUP BY 1\r\n    ORDER BY 2 DESC\r\n    LIMIT 20\r\n)\r\n\r\nSELECT\r\n  m.ts AS \"time\",\r\n  m.value_jsonb->>'full_table_name' as \"table\",\r\n  sum( coalesce((m.value_jsonb->>'tidx_blks_read')::float8, 0) )  * 8 * 1024 as \"heap\"\r\nFROM manager.metric m\r\nINNER JOIN tables t ON t.table = m.value_jsonb->>'full_table_name'\r\nWHERE\r\n  $__unixEpochFilter(ts) AND\r\n  host = md5('$host')::uuid AND\r\n  plugin = md5('pg.user_tables.io')::uuid\r\nGROUP BY 1,2\r\nORDER BY 1\r\n",
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
@@ -1529,7 +1430,7 @@
         "h": 10,
         "w": 6,
         "x": 0,
-        "y": 62
+        "y": 54
       },
       "id": 14,
       "legend": {
@@ -1680,7 +1581,7 @@
         "h": 10,
         "w": 6,
         "x": 6,
-        "y": 62
+        "y": 54
       },
       "id": 15,
       "legend": {
@@ -1831,7 +1732,7 @@
         "h": 10,
         "w": 6,
         "x": 12,
-        "y": 62
+        "y": 54
       },
       "id": 16,
       "legend": {
@@ -1982,7 +1883,7 @@
         "h": 10,
         "w": 6,
         "x": 18,
-        "y": 62
+        "y": 54
       },
       "id": 17,
       "legend": {
@@ -2133,7 +2034,7 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 72
+        "y": 64
       },
       "id": 2,
       "legend": {
@@ -2414,7 +2315,7 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 72
+        "y": 64
       },
       "id": 4,
       "legend": {
@@ -2546,7 +2447,7 @@
         "h": 9,
         "w": 8,
         "x": 0,
-        "y": 82
+        "y": 74
       },
       "id": 6,
       "legend": {
@@ -2678,7 +2579,7 @@
         "h": 9,
         "w": 8,
         "x": 8,
-        "y": 82
+        "y": 74
       },
       "id": 18,
       "legend": {
@@ -2810,7 +2711,7 @@
         "h": 9,
         "w": 8,
         "x": 16,
-        "y": 82
+        "y": 74
       },
       "id": 19,
       "legend": {
@@ -2939,7 +2840,7 @@
         "h": 6,
         "w": 24,
         "x": 0,
-        "y": 91
+        "y": 83
       },
       "id": 13,
       "links": [],
@@ -3095,5 +2996,5 @@
   "timezone": "",
   "title": "pg_gatherer",
   "uid": "Q1TigQumk",
-  "version": 42
+  "version": 54
 }
