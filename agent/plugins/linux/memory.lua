@@ -20,7 +20,7 @@ local function collect()
   metric_insert(plugin, nil, nil, nil, jsonb)
 end
 
--- supervisor
+-- run collector to infinity
 while true do
   collect()
   time.sleep(10)

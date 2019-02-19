@@ -39,7 +39,7 @@ local function collect()
   end
 end
 
--- supervisor
+-- run collector to infinity
 while true do
   collect()
   time.sleep(60)
