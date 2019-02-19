@@ -11,7 +11,7 @@ local plugins = dofile(filepath.join(current_dir, "plugins", "init.lua"))
 
 -- start supervisor
 while true do
-  time.sleep(10)
+  time.sleep(5)
   for name, plugin in pairs(plugins) do
     if not plugin:is_running() then
       print("plugin", name, "error:", tostring(plugin:error()), "restart it")

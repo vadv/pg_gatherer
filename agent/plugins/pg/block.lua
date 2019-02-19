@@ -16,8 +16,5 @@ local function collect()
   end
 end
 
--- run collector to infinity
-while true do
-  collect()
-  time.sleep(1)
-end
+-- run collect
+helpers.runner.run_every(collect, 5)

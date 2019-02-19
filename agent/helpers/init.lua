@@ -24,6 +24,10 @@ helpers.metric.insert = dofile(filepath.join(current_dir, "metric", "insert.lua"
 helpers.rds = {}
 helpers.rds.is_rds = dofile(filepath.join(current_dir, "rds", "is_rds.lua"))
 
+-- runner
+helpers.runner = {}
+helpers.runner.run_every = dofile(filepath.join(current_dir, "runner", "run_every.lua"))
+
 if os.getenv("CONFIG_INITILIZED") == "TRUE" then
   helpers.connections = {}
   helpers.connections.manager = dofile(filepath.join(current_dir, "connections", "manager.lua"))

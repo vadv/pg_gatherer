@@ -72,10 +72,7 @@ local function collect_with_linux()
 end
 
 
--- supervisor
 local collect_func = collect_with_linux
 if helpers.is_rds then collect_func = collect_rds end
-while true do
-  collect_func()
-  time.sleep(10)
-end
+-- run collect
+helpers.runner.run_every(collect_func, 10)

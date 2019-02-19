@@ -38,8 +38,5 @@ local function collect()
   end
 end
 
--- run collector to infinity
-while true do
-  collect()
-  time.sleep(30)
-end
+-- run collect
+helpers.runner.run_every(collect, 60)
