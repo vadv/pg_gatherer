@@ -1,6 +1,6 @@
 # pg_gatherer
 
-project is designed to collect and store statistical data off postgresql to other postgresql.
+project is designed to collect and store statistical data of postgresql into other postgresql.
 
 # Architecture
 
