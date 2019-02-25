@@ -1,10 +1,14 @@
 create or replace function gatherer.pg_block() returns setof jsonb AS $$
     SELECT
     jsonb_build_object(
+         'blocked_query_id', md5(blocked_activity.query || blocked_activity.query_start::text)::UUID,
          'blocked_pid', blocked_locks.pid,
          'blocked_user', blocked_activity.usename,
+         'blocked_duration', extract(epoch from now() - blocked_activity.query_start)::int,
+         'blocking_query_id', md5(blocking_activity.query || blocking_activity.query_start::text)::UUID,
          'blocking_pid', blocking_locks.pid,
          'blocking_user', blocking_activity.usename,
+         'blocking_duration', extract(epoch from now() - blocking_activity.query_start)::int,
          'blocked_statement', blocked_activity.query,
          'current_statement_in_blocking_process', blocking_activity.query,
          'blocked_application', blocked_activity.application_name,

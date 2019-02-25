@@ -5,7 +5,8 @@ local current_dir = filepath.dir(debug.getinfo(1).source)
 
 -- init config
 local helpers = dofile(filepath.join(current_dir, "helpers", "init.lua"))
-helpers.config.load(filepath.join(current_dir, "config.yaml"))
+local config_file = os.getenv("CONFIG_FILE") or filepath.join(current_dir, "config.yaml")
+helpers.config.load(config_file)
 
 local plugins = dofile(filepath.join(current_dir, "plugins", "init.lua"))
 
