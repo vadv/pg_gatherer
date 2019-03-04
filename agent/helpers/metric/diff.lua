@@ -27,7 +27,7 @@ local function diff(key, value)
     data = new_data
   end
 
-  return value - prev
+  return value - prev.value
 end
 
 return diff
