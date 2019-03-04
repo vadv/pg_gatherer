@@ -19,7 +19,7 @@ local function diff(key, value)
 
   -- compress
   counter = counter + 1
-  if counter % 100 = 0 then
+  if counter % 100 == 0 then
     local new_data = {}
     for key, v in pairs(data) do
       if now - 300 > v.unixts then new_data[key] = v end
