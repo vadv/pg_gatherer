@@ -16,12 +16,24 @@ create or replace function gatherer.pg_stat_activity(t int default 1) returns se
           'wait_event_type', wait_event_type::text,
           'wait_event', wait_event::text,
           'state', state,
-          'query', quote_ident(query)::text
+          'query', query::text
         ) as result
     from
       pg_catalog.pg_stat_activity
     where
         state <> 'idle' and extract(epoch from now() - state_change)::int > t;
+$$ language 'sql' security definer;
+
+create or replace function gatherer.pg_stat_activity_waits(out count bigint, out wait_event text, out wait_event_type text) returns setof record AS $$
+    select
+        count(a.pid)::bigint as count,
+        a.wait_event::text as wait_event,
+        a.wait_event_type::text as wait_event_type
+    from
+      pg_catalog.pg_stat_activity a
+    where
+        state <> 'idle'
+    group by a.wait_event, a.wait_event_type
 $$ language 'sql' security definer;
 
 create or replace function gatherer.pg_stat_activity_states(out state text, out count bigint) returns setof record AS $$

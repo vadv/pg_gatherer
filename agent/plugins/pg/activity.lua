@@ -28,6 +28,16 @@ local function collect_rds()
   local jsonb, err = json.encode(jsonb)
   if err then error(err) end
   metric_insert(plugin..".states", nil, nil, nil, jsonb)
+
+  local result, err = agent:query("select count, wait_event, wait_event_type from gatherer.pg_stat_activity_waits()")
+  if err then error(err) end
+  local jsonb = {}
+  for _, row in pairs(result.rows) do
+    jsonb[ row[1] ] = tonumber(row[2])
+  end
+  local jsonb, err = json.encode(jsonb)
+  if err then error(err) end
+  metric_insert(plugin..".waits", nil, nil, nil, jsonb)
 end
 
 -- with io/cpu statistics
