@@ -5,7 +5,7 @@ local db = storage.open(os.getenv("STORAGE_PATH"), os.getenv("STORAGE_MODE"))
 
 local function save(key, value)
   local data = {value = value, unixts = time.unix()}
-  local err = db:set(key, data, 2*60*60)
+  local err = db:set(key, data, 5*60)
   if err then error(err) end
 end
 
