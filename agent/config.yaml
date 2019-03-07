@@ -6,3 +6,4 @@ connections:
 
 storage:
   path: /tmp/pg_gatherer
+  mode: disk
