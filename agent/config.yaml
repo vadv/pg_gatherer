@@ -3,3 +3,6 @@ token: Reech2ee
 connections:
   agent: postgresql://gatherer:gatherer_password@localhost/agent?connect_timeout=10&application_name=pg_gatherer&sslmode=disable
   manager: postgresql://agent:agent_password@localhost/manager?connect_timeout=10&application_name=pg_gatherer&sslmode=disable
+
+storage:
+  path: /tmp/pg_gatherer

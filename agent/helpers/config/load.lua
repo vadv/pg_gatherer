@@ -27,6 +27,8 @@ local function override_config_from_env(config)
   config.connections = config.connections or {}
   config.connections.agent = config.connections.agent or os.getenv("CONNECTION_AGENT")
   config.connections.manager = config.connections.manager or os.getenv("CONNECTION_MANAGER")
+  config.storage = config.storage or {}
+  config.storage.path = config.storage.path or os.getenv("STORAGE_PATH") or "/tmp/pg_gatherer"
 end
 
 -- helpers for set config to env
@@ -40,6 +42,7 @@ local function save_config_to_env(config)
   os.setenv("CONNECTION_AGENT", config.connections.agent)
   os.setenv("CONNECTION_MANAGER", config.connections.manager)
   os.setenv("CONFIG_FILENAME", config.filename)
+  os.setenv("STORAGE_PATH", config.storage.path)
 end
 
 local function load(filename)
