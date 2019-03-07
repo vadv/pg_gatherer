@@ -1,7 +1,7 @@
 local time = require("time")
 local storage = require("storage")
 
-local db = storage.open(os.getenv("CONFIG_STORAGE"), "disk")
+local db = storage.open(os.getenv("STORAGE_PATH"), "disk")
 
 local function save(key, value)
   local data = {value = value, unixts = time.unix()}
