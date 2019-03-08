@@ -1,35 +1,31 @@
 local time = require("time")
-local storage = require("storage")
 
-local db, err = storage.open(os.getenv("STORAGE_PATH"), os.getenv("STORAGE_MODE"))
-if err then error(err) end
-
-local function save(key, value)
-  local data = {value = value, unixts = time.unix()}
-  local err = db:set(key, data, 5*60)
-  if err then error(err) end
-end
+local counter = 0
+local data = {
+  -- key = {value=value, unixts=now}
+}
 
 local function diff(key, value)
 
   if not value then return nil end
-
+  local prev = data[key]
   local now = time.unix()
+  data[key] = {value = value, unixts = now}
 
-  local prev, found, err = db:get(key)
-  if err then error(err) end
-  if not found then
-    save(key, value)
-    return
-  end
-
+  -- first run
+  if not prev then return nil end
   -- overflow
-  if prev.value > value then
-    save(key, value)
-    return
-  end
+  if prev.value > value then return nil end
 
-  save(key, value)
+  -- compress
+  counter = counter + 1
+  if counter % 100 == 0 then
+    local new_data = {}
+    for key, v in pairs(data) do
+      if now - 300 > v.unixts then new_data[key] = v end
+    end
+    data = new_data
+  end
 
   return value - prev.value
 end
