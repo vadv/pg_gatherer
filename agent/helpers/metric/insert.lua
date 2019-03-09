@@ -5,9 +5,8 @@ local function insert(host, plugin, snapshot, value_bigint, value_double, value_
   if err then error(err) end
   local _, err = stmt:exec(host, plugin, snapshot, value_bigint, value_double, value_jsonb)
   if err then error("exec error: "..err) end
-  -- clear plans cache
-  count = count + 1
-  if count % 10 == 0 then manager:exec('DISCARD PLANS') end
+  local err = stmt:close()
+  if err then error(err) end
 end
 
 return insert
