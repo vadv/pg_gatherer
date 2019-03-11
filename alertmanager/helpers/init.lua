@@ -20,3 +20,5 @@ if os.getenv("CONFIG_INITILIZED") == "TRUE" then
   helpers.query.create_alert = dofile(filepath.join(current_dir, "query", "create_alert.lua"))
   helpers.query.resolve_alert = dofile(filepath.join(current_dir, "query", "resolve_alert.lua"))
 end
+
+return helpers

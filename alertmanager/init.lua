@@ -9,7 +9,7 @@ local config_file = os.getenv("CONFIG_FILE") or filepath.join(current_dir, "conf
 helpers.config.load(config_file)
 
 local senders = dofile(filepath.join(current_dir, "sender", "init.lua"))
-local generators = dofile(filepath.join(current_dir, "generators", "init.lua"))
+local generators = dofile(filepath.join(current_dir, "generator", "init.lua"))
 
 
 -- start supervisor

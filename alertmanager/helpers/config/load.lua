@@ -37,7 +37,7 @@ local function save_config_to_env(config)
 
   local current_dir = filepath.dir(debug.getinfo(1).source)
   os.setenv("CONFIG_INIT", filepath.join(current_dir, "..", "init.lua"))
-  os.setenv("TELEGRAM_TOKEN", config.telegram.token)
+  if config.telegram.token then os.setenv("TELEGRAM_TOKEN", config.telegram.token) end
   os.setenv("CONNECTION_MANAGER", config.connections.manager)
   os.setenv("CONFIG_FILENAME", config.filename)
 end
