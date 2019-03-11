@@ -1,4 +1,5 @@
 local time = require("time")
+local json = require("json")
 local plugin = 'pg.replication_slots'
 
 local helpers = dofile(os.getenv("CONFIG_INIT"))
