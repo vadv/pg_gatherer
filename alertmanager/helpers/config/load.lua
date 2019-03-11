@@ -27,7 +27,9 @@ local function override_config_from_env(config)
   config.connections.manager = config.connections.manager or os.getenv("CONNECTION_MANAGER")
 
   config.telegram = config.telegram or {}
+  config.telegram.enabled = config.telegram.enabled or os.getenv("TELEGRAM_ENABLED")
   config.telegram.token = config.telegram.token or os.getenv("TELEGRAM_TOKEN")
+  config.telegram.token = config.telegram.chat or os.getenv("TELEGRAM_CHAT")
 end
 
 -- helpers for set config to env
@@ -37,7 +39,11 @@ local function save_config_to_env(config)
 
   local current_dir = filepath.dir(debug.getinfo(1).source)
   os.setenv("CONFIG_INIT", filepath.join(current_dir, "..", "init.lua"))
-  if config.telegram.token then os.setenv("TELEGRAM_TOKEN", config.telegram.token) end
+  if config.telegram.enabled then
+    os.setenv("TELEGRAM_ENABLED", config.telegram.token)
+    os.setenv("TELEGRAM_TOKEN", config.telegram.token)
+    os.setenv("TELEGRAM_CHAT", config.telegram.chat)
+  end
   os.setenv("CONNECTION_MANAGER", config.connections.manager)
   os.setenv("CONFIG_FILENAME", config.filename)
 end

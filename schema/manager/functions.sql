@@ -36,14 +36,14 @@ create or replace function manager.create_alert_if_needed(
     key text,
     info jsonb) returns void AS $$
     insert into manager.alert(host, key, info)
-        select md5($1)::uuid, $2, $3
+        select $1, $2, $3
         where
-            not exists (select 1 from manager.alert where host = md5($1)::uuid and key = $2 );
+            not exists (select 1 from manager.alert where host = $1 and key = $2 );
     update manager.alert set info = $3
         where id in
             ( select id from manager.alert a
                 where
-                    host = md5($1)::uuid and key = $2
+                    host = $1 and key = $2
                     and md5(coalesce(a.info::text, ' ')) <> md5(coalesce($3::text, ' '))
             );
 $$ language 'sql' security definer;
@@ -56,12 +56,12 @@ declare
     info jsonb;
     created_at bigint;
 begin
-    created_at := (select a.created_at from manager.alert a where a.host = md5($1)::uuid and a.key = $2 limit 1);
+    created_at := (select a.created_at from manager.alert a where a.host = $1 and a.key = $2 limit 1);
     if created_at is not null then
-        info := (select a.info from manager.alert a where a.host = md5($1)::uuid and a.key = $2 limit 1);
-        delete from manager.alert a where a.host = md5($1)::uuid and a.key = $2;
+        info := (select a.info from manager.alert a where a.host = $1 and a.key = $2 limit 1);
+        delete from manager.alert a where a.host = $1 and a.key = $2;
         insert into manager.alert_history (host, key, created_at, ended_at, info)
-            values (md5($1)::uuid, $2, created_at, extract(epoch from current_timestamp)::bigint, info);
+            values ($1, $2, created_at, extract(epoch from current_timestamp)::bigint, info);
     end if;
 end
 $$ language 'plpgsql' security definer;

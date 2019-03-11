@@ -1,10 +1,13 @@
 connections:
   manager: postgresql://manager:manager_password@localhost/manager?connect_timeout=10&application_name=pg_gatherer&sslmode=disable
 
-plugins:
+senders:
 
   telegram:
+    enabled: true
+    chat: xxx
     token: xxxx
 
   prometheus_alert_manager:
+    enabled: false
     url: http://localhost:9093/api/v1/alerts

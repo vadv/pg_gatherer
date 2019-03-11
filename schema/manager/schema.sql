@@ -24,7 +24,7 @@ create table manager.metric (
 -- alerts
 create table manager.alert (
     id serial primary key,
-    host uuid not null,
+    host text not null,
     created_at bigint not null default extract(epoch from current_timestamp)::bigint,
     key text not null,
     info jsonb
@@ -34,7 +34,7 @@ create unique index manager_alert_uniq_idx on manager.alert(host, key);
 -- alerts history
 create table manager.alert_history (
     id bigserial primary key,
-    host uuid not null,
+    host text not null,
     key text not null,
     created_at bigint not null default extract(epoch from current_timestamp)::bigint,
     ended_at bigint not null,

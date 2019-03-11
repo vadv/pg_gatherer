@@ -1,4 +1,5 @@
 local json = require("json")
+local inspect = require("inspect")
 local helpers = dofile(os.getenv("CONFIG_INIT"))
 
 local manager = helpers.connections.manager
@@ -14,30 +15,25 @@ end
 
 local alert_key = "gatherer agent is not running for host"
 
+local stmt, err = manager:stmt("select max(ts), extract(epoch from current_timestamp)::bigint from manager.metric where host = md5($1::text)::uuid and plugin = md5('pg.healthcheck')::uuid")
+if err then error(err) end
+
 function collect()
-
-  local stmt, err = manager:stmt("select max(ts) from manager.metric where host = md5($1::text)::uuid")
-  if err then error(err) end
-
   for _, host in pairs(get_hosts()) do
 
     local result, err = stmt:query(host)
     if err then error(err) end
-
     local info = {}
     local jsonb, err = json.encode(info)
     if err then error(err) end
-    if result.rows[1][1] > 1 then
+    if (result.rows[1] == nil) or (result.rows[1][1] == nil)
+      or math.abs(result.rows[1][2] - result.rows[1][1]) > 5*60 then
       create_alert(host, alert_key, jsonb)
     else
       resolve_alert(host, alert_key)
     end
 
   end
-
-  local err = stmt:close()
-  if err then error(err) end
-
 end
 
-helpers.runner.run_every(collect, 2)
+helpers.runner.run_every(collect, 5)
