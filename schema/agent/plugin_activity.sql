@@ -24,16 +24,19 @@ create or replace function gatherer.pg_stat_activity(t int default 1) returns se
         state <> 'idle' and extract(epoch from now() - state_change)::int > t;
 $$ language 'sql' security definer;
 
-create or replace function gatherer.pg_stat_activity_waits(out count bigint, out wait_event text, out wait_event_type text) returns setof record AS $$
+create or replace function gatherer.pg_stat_activity_waits() returns setof jsonb AS $$
     select
-        count(a.pid)::bigint as count,
-        a.wait_event::text as wait_event,
-        a.wait_event_type::text as wait_event_type
+      jsonb_build_object(
+        'state', a.state::text,
+        'wait_event', a.wait_event::text,
+        'wait_event_type', a.wait_event_type::text,
+        'count', count(a.pid)::bigint
+      )  as result
     from
       pg_catalog.pg_stat_activity a
     where
-        state <> 'idle'
-    group by a.wait_event, a.wait_event_type
+        state <> 'idle' and a.wait_event is not null
+    group by a.wait_event, a.wait_event_type, a.state
 $$ language 'sql' security definer;
 
 create or replace function gatherer.pg_stat_activity_states(out state text, out count bigint) returns setof record AS $$

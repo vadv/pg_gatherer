@@ -11,12 +11,14 @@ if helpers.is_rds then
 else
   -- load linux
   for _, filename in pairs( filepath.glob( filepath.join(current_dir, "linux", "*.lua") ) ) do
+    print("load linux plugin", filename)
     plugins[filename] = plugin.do_file(filename)
   end
 end
 
 -- load pg
 for _, filename in pairs( filepath.glob( filepath.join(current_dir, "pg", "*.lua") ) ) do
+  print("load pg plugin", filename)
   plugins[filename] = plugin.do_file(filename)
 end
 

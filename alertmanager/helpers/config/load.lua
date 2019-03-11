@@ -22,10 +22,12 @@ local function override_config_from_env(config)
   if os.getenv("CONFIG_INITILIZED") == "TRUE" then return end
 
   config = config or {}
-  config.token = config.token or os.getenv("TOKEN")
+
   config.connections = config.connections or {}
-  config.connections.agent = config.connections.agent or os.getenv("CONNECTION_AGENT")
   config.connections.manager = config.connections.manager or os.getenv("CONNECTION_MANAGER")
+
+  config.telegram = config.telegram or {}
+  config.telegram.token = config.telegram.token or os.getenv("TELEGRAM_TOKEN")
 end
 
 -- helpers for set config to env
@@ -35,8 +37,7 @@ local function save_config_to_env(config)
 
   local current_dir = filepath.dir(debug.getinfo(1).source)
   os.setenv("CONFIG_INIT", filepath.join(current_dir, "..", "init.lua"))
-  os.setenv("TOKEN", config.token)
-  os.setenv("CONNECTION_AGENT", config.connections.agent)
+  os.setenv("TELEGRAM_TOKEN", config.telegram.token)
   os.setenv("CONNECTION_MANAGER", config.connections.manager)
   os.setenv("CONFIG_FILENAME", config.filename)
 end

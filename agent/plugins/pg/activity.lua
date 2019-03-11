@@ -13,7 +13,7 @@ end
 
 -- sql queries only
 local function collect_rds()
-  local result, err = agent:query("select gatherer.snapshot_id(), * from gatherer.pg_stat_activity(1)")
+  local result, err = agent:query("select gatherer.snapshot_id(10), * from gatherer.pg_stat_activity(1)")
   if err then error(err) end
   for _, row in pairs(result.rows) do
     metric_insert(plugin, row[1], nil, nil, row[2])
@@ -29,20 +29,16 @@ local function collect_rds()
   if err then error(err) end
   metric_insert(plugin..".states", nil, nil, nil, jsonb)
 
-  local result, err = agent:query("select count, wait_event, wait_event_type from gatherer.pg_stat_activity_waits()")
+  local result, err = agent:query("select gatherer.snapshot_id(10), * from gatherer.pg_stat_activity_waits()")
   if err then error(err) end
-  local jsonb = {}
   for _, row in pairs(result.rows) do
-    jsonb[ row[1] ] = tonumber(row[2])
+    metric_insert(plugin..".waits", row[1], nil, nil, row[2])
   end
-  local jsonb, err = json.encode(jsonb)
-  if err then error(err) end
-  metric_insert(plugin..".waits", nil, nil, nil, jsonb)
 end
 
 -- with io/cpu statistics
 local function collect_with_linux()
-  local result, err = agent:query("select gatherer.snapshot_id(), * from gatherer.pg_stat_activity(1)")
+  local result, err = agent:query("select gatherer.snapshot_id(10), * from gatherer.pg_stat_activity(1)")
   if err then error(err) end
   for _, row in pairs(result.rows) do
     local jsonb, err = json.decode(row[2])
@@ -70,6 +66,7 @@ local function collect_with_linux()
     if err then error(err) end
     metric_insert(plugin, row[1], nil, nil, jsonb)
   end
+
   local result, err = agent:query("select state, count from gatherer.pg_stat_activity_states()")
   if err then error(err) end
   local jsonb = {}
@@ -79,6 +76,12 @@ local function collect_with_linux()
   local jsonb, err = json.encode(jsonb)
   if err then error(err) end
   metric_insert(plugin..".states", nil, nil, nil, jsonb)
+
+  local result, err = agent:query("select gatherer.snapshot_id(10), * from gatherer.pg_stat_activity_waits()")
+  if err then error(err) end
+  for _, row in pairs(result.rows) do
+    metric_insert(plugin..".waits", row[1], nil, nil, row[2])
+  end
 end
 
 
