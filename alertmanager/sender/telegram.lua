@@ -3,6 +3,7 @@ local telegram = require("telegram")
 local http = require("http")
 local humanize = require("humanize")
 local storage = require("storage")
+local json = require("json")
 
 local helpers = dofile(os.getenv("CONFIG_INIT"))
 local manager = helpers.connections.manager
@@ -19,7 +20,7 @@ end
 
 print("start telegram sender")
 
-local cache, err = cache.open(os.getenv("CACHE_PATH"))
+local cache, err = storage.open(os.getenv("CACHE_PATH"))
 if err then error(err) end
 
 local client = http.client({})
@@ -62,7 +63,7 @@ function collect()
 
         -- set key
         local ttl = ( 10 - (info.priority or 0) ) * 60
-        local err = cache:set(cache_key, ttl)
+        local err = cache:set(cache_key, 1, ttl)
         if err then error(err) end
       end
     end
