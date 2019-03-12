@@ -1,18 +1,49 @@
+create or replace function agent.create_parititons_for_host(host text, year int) returns void AS $$
+declare
+    main_table_name text;
+    year_date date;
+
+    interval_begin interval;
+    interval_end interval;
+
+    month_name text;
+    begin_at int;
+    end_at int;
+    partition_table_name text;
+    partition_index_name text;
+begin
+    main_table_name := 'manager.' || quote_ident('metric_' || host);
+    year_date := ( select to_date( year ||'-1-1', 'YYYY-MM-DD') );
+
+    for month_counter IN 1..12 loop
+        month_name := (select lpad(month_counter::text, 2, '0') );
+        partition_table_name := main_table_name || '_' || year || '_' || month_name;
+        partition_index_name := quote_ident('metric_' || host) || '_' || year || '_' || month_name || '_idx' ;
+        interval_begin := ( select (month_counter - 1 || ' month')::interval  );
+        interval_end := ( select (month_counter || ' month')::interval - interval '1 second'  );
+        begin_at := (select extract(epoch from date_trunc('year', year_date) + interval_begin ));
+        end_at   := (select extract(epoch from date_trunc('year', year_date) + interval_end   ));
+        execute 'create table if not exists ' || partition_table_name || ' partition of ' || main_table_name || ' for values from ('||  begin_at ||') to (' || end_at || ')';
+        execute 'create index if not exists ' || partition_index_name || ' on ' || partition_table_name || ' (plugin, ts desc)';
+    end loop;
+
+end
+$$ language 'plpgsql' security definer;
+
 -- check token for client
 create or replace function agent.get_host(token text) returns text AS $$
 declare
     host text;
     table_name text;
-    index_name text;
     host_id text;
 begin
     host := (select name from manager.host where agent_token = token limit 1);
     if host is not null then
         host_id := quote_literal(md5(host));
         table_name := 'manager.' || quote_ident('metric_' || host);
-        index_name := quote_ident('idx_metric_' || host || '_ts_plugin');
-        execute 'create table if not exists ' || table_name  || ' partition of manager.metric for values in (' || host_id || ')';
-        execute 'create index if not exists ' || index_name  || ' on ' || table_name || ' (ts, plugin)';
+        execute 'create table if not exists ' || table_name  || ' partition of manager.metric for values in (' || host_id || ') partition by range(ts)';
+        -- only current year
+        perform agent.create_parititons_for_host(host, extract(year from now())::int);
     end if;
     return host;
 end
