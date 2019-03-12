@@ -16,17 +16,11 @@ if not(os.getenv("TELEGRAM_ENABLED") == "true") then
   end
 end
 
+print("start telegram sender")
+
 local client = http.client({})
 local telegram_bot = telegram.bot(os.getenv("TELEGRAM_TOKEN"), client)
-local telegram_chat = os.getenv("TELEGRAM_CHAT")
-
-local cache = {
-  -- host+key = { created_at = time, notify_at = time }
-}
-local cache_counter = 0
-function cache.get(host, key)
-  -- body
-end
+local telegram_chat = tonumber(os.getenv("TELEGRAM_CHAT"))
 
 local stmt, err = manager:stmt("select key, info, created_at from manager.alert where host = $1")
 if err then error(err) end
@@ -39,19 +33,19 @@ function collect()
 
       -- format message
       local message = [[
-Host:    %s
-Problem: %s
-Age:     %s
+*Host*:    `%s`
+*Problem*: `%s`
+*Created*: `%s`
 ]]
       message = string.format(message, host, row[1], humanize.time(row[3]))
 
       -- send message
       local _, err = telegram_bot:sendMessage({
         chat_id = telegram_chat,
-        text = message
+        text = message,
+        parse_mode = "Markdown"
       })
       if err then error(err) end
-
     end
   end
 end

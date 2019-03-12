@@ -2,6 +2,7 @@ local goos = require("goos")
 local yaml = require("yaml")
 local ioutil = require("ioutil")
 local filepath = require("filepath")
+local inspect = require("inspect")
 
 -- read config file and ovveride from env variables
 local function read_config_from_file(filename)
@@ -26,10 +27,11 @@ local function override_config_from_env(config)
   config.connections = config.connections or {}
   config.connections.manager = config.connections.manager or os.getenv("CONNECTION_MANAGER")
 
-  config.telegram = config.telegram or {}
-  config.telegram.enabled = config.telegram.enabled or os.getenv("TELEGRAM_ENABLED")
-  config.telegram.token = config.telegram.token or os.getenv("TELEGRAM_TOKEN")
-  config.telegram.token = config.telegram.chat or os.getenv("TELEGRAM_CHAT")
+  config.senders = config.senders or {}
+  config.senders.telegram = config.senders.telegram or {}
+  config.senders.telegram.enabled = config.senders.telegram.enabled or os.getenv("TELEGRAM_ENABLED")
+  config.senders.telegram.token = config.senders.telegram.token or os.getenv("TELEGRAM_TOKEN")
+  config.senders.telegram.chat = config.senders.telegram.chat or os.getenv("TELEGRAM_CHAT")
 end
 
 -- helpers for set config to env
@@ -39,10 +41,10 @@ local function save_config_to_env(config)
 
   local current_dir = filepath.dir(debug.getinfo(1).source)
   os.setenv("CONFIG_INIT", filepath.join(current_dir, "..", "init.lua"))
-  if config.telegram.enabled then
-    os.setenv("TELEGRAM_ENABLED", config.telegram.token)
-    os.setenv("TELEGRAM_TOKEN", config.telegram.token)
-    os.setenv("TELEGRAM_CHAT", config.telegram.chat)
+  if config.senders.telegram.enabled then
+    os.setenv("TELEGRAM_ENABLED", tostring(config.senders.telegram.enabled))
+    os.setenv("TELEGRAM_TOKEN", config.senders.telegram.token)
+    os.setenv("TELEGRAM_CHAT", tostring(config.senders.telegram.chat))
   end
   os.setenv("CONNECTION_MANAGER", config.connections.manager)
   os.setenv("CONFIG_FILENAME", config.filename)
