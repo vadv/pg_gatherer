@@ -24,6 +24,7 @@ function collect()
     local result, err = stmt:query(host)
     if err then error(err) end
     local info = {}
+    info["priority"] = 5
     local jsonb, err = json.encode(info)
     if err then error(err) end
     if (result.rows[1] == nil) or (result.rows[1][1] == nil)

@@ -2,6 +2,7 @@ local time = require("time")
 local telegram = require("telegram")
 local http = require("http")
 local humanize = require("humanize")
+local storage = require("storage")
 
 local helpers = dofile(os.getenv("CONFIG_INIT"))
 local manager = helpers.connections.manager
@@ -18,6 +19,9 @@ end
 
 print("start telegram sender")
 
+local cache, err = cache.open(os.getenv("CACHE_PATH"))
+if err then error(err) end
+
 local client = http.client({})
 local telegram_bot = telegram.bot(os.getenv("TELEGRAM_TOKEN"), client)
 local telegram_chat = tonumber(os.getenv("TELEGRAM_CHAT"))
@@ -31,21 +35,36 @@ function collect()
     if err then error(err) end
     for _, row in pairs(result.rows) do
 
-      -- format message
-      local message = [[
-*Host*:    `%s`
-*Problem*: `%s`
-*Created*: `%s`
-]]
-      message = string.format(message, host, row[1], humanize.time(row[3]))
-
-      -- send message
-      local _, err = telegram_bot:sendMessage({
-        chat_id = telegram_chat,
-        text = message,
-        parse_mode = "Markdown"
-      })
+      local cache_key = host .. row[1]
+      local _, found, err = cache:get(cache_key)
       if err then error(err) end
+
+      if not found then
+
+        local info, err = json.decode(row[2])
+        if err then error(err) end
+
+        -- format message
+        local message = [[
+  *Host*:    `%s`
+  *Problem*: `%s`
+  *Created*: `%s`
+  ]]
+        message = string.format(message, host, row[1], humanize.time(row[3]))
+
+        -- send message
+        local _, err = telegram_bot:sendMessage({
+          chat_id = telegram_chat,
+          text = message,
+          parse_mode = "Markdown"
+        })
+        if err then error(err) end
+
+        -- set key
+        local ttl = ( 10 - (info.priority or 0) ) * 60
+        local err = cache:set(cache_key, ttl)
+        if err then error(err) end
+      end
     end
   end
 end
