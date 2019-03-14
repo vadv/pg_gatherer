@@ -47,11 +47,6 @@ local function save_config_to_env(config)
 
   local current_dir = filepath.dir(debug.getinfo(1).source)
   os.setenv("CONFIG_INIT", filepath.join(current_dir, "..", "init.lua"))
-  if config.senders.telegram.enabled then
-    os.setenv("TELEGRAM_ENABLED", tostring(config.senders.telegram.enabled))
-    os.setenv("TELEGRAM_TOKEN", config.senders.telegram.token)
-    os.setenv("TELEGRAM_CHAT", tostring(config.senders.telegram.chat))
-  end
   os.setenv("CONNECTION_MANAGER", config.connections.manager)
   os.setenv("CONFIG_FILENAME", config.filename)
   os.setenv("CACHE_PATH", config.cache_path)

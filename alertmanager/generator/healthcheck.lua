@@ -6,11 +6,14 @@ local manager = helpers.connections.manager
 local function get_hosts()
   return helpers.query.get_hosts(helpers.connections.manager)
 end
-local function create_alert(host, key, info)
+local function create_alert(host, key, severity, info)
   helpers.query.create_alert(host, key, info, helpers.connections.manager)
 end
-local function resolve_alert(host, key)
+local function resolve_alert(host, key, severity)
   helpers.query.resolve_alert(host, key, helpers.connections.manager)
+end
+local function get_severity_for_host(host, key)
+  helpers.query.get_severity_for_host(host, key, helpers.connections.manager)
 end
 
 local alert_key = "gatherer agent is not running for host"

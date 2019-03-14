@@ -10,6 +10,10 @@ senders:
     chat: xxx
     token: xxxx
 
-  prometheus_alert_manager:
+  pagerduty:
     enabled: false
-    url: http://localhost:9093/api/v1/alerts
+    routing_keys:
+      critical: xxx
+      error:    xxx
+      warning:  xxx
+      info:     xxx

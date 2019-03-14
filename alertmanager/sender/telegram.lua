@@ -11,7 +11,7 @@ local function get_hosts()
   return helpers.query.get_hosts(helpers.connections.manager)
 end
 
-if not(os.getenv("TELEGRAM_ENABLED") == "true") then
+if not(config.senders.telegram.enabled) then
   while true do
     -- disable telegram
     time.sleep(60)
@@ -20,17 +20,30 @@ end
 
 print("start telegram sender")
 
-local cache, err = storage.open(os.getenv("CACHE_PATH"))
+local cache, err = storage.open(config.cache_path)
 if err then error(err) end
 
 local client = http.client({})
-local telegram_bot = telegram.bot(os.getenv("TELEGRAM_TOKEN"), client)
-local telegram_chat = tonumber(os.getenv("TELEGRAM_CHAT"))
+local telegram_bot = telegram.bot(config.senders.telegram.token, client)
+local telegram_chat = tonumber(config.senders.telegram.chat)
 
-local stmt, err = manager:stmt("select key, info, created_at from manager.alert where host = $1")
+local stmt, err = manager:stmt("select key, severity, info, created_at from manager.alert where host = $1")
 if err then error(err) end
 
-function collect()
+local function severity_to_int(severity)
+  if severity == 'critial' then
+    return 5
+  elseif severity == 'error' then
+    return 4
+  elseif severity == 'warning' then
+    return 3
+  elseif severity == 'info' then
+    return 2
+  end
+  return 1
+end
+
+local function collect()
   for _, host in pairs(get_hosts()) do
     local result, err = stmt:query(host)
     if err then error(err) end
@@ -42,7 +55,7 @@ function collect()
 
       if not found then
 
-        local info, err = json.decode(row[2])
+        local info, err = json.decode(row[3])
         if err then error(err) end
 
         -- format message
@@ -62,7 +75,7 @@ function collect()
         if err then error(err) end
 
         -- set key
-        local ttl = ( 10 - (info.priority or 0) ) * 60
+        local ttl = ( 10 - (severity_to_int(row[2]) or 9) ) * 60
         local err = cache:set(cache_key, 1, ttl)
         if err then error(err) end
       end
