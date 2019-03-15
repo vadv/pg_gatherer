@@ -1,0 +1,30 @@
+[Unit]
+Description=pg_gatherer manager
+
+[Service]
+User=root
+SyslogIdentifier=pg_gatherer manager
+
+Restart=always
+RestartSec=5
+KillSignal=SIGTERM
+TimeoutStopSec=5
+
+#MemoryAccounting=true
+#MemoryMax=1G
+
+Environment="CONNECTION_MANAGER=postgresql://manager:password@manager/gatherer?connect_timeout=10&application_name=pg_gatherer&sslmode=disable"
+Environment="CACHE_PATH=/var/tmp/pg_gatherer_manager.cache"
+
+# telegram
+Environment="TELEGRAM_ENABLED=true"
+Environment="TELEGRAM_TOKEN=111111:xxxxx"
+Environment="TELEGRAM_CHAT=1111"
+
+# pagerduty
+Environment="PAGERDUTY_ENABLED=true"
+Environment="PAGERDUTY_RK_DEFAULT=xxxxxxxxxxxx"
+Environment="PAGERDUTY_RK_CTITICAL=xxxxxxxxxxx"
+Environment="PAGERDUTY_RK_ERROR=xxxxxxxxxxx"
+
+ExecStart=/usr/local/bin/glua-libs /opt/pg_gatherer/alertmanager/init.lua
