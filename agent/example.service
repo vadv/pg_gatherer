@@ -1,6 +1,9 @@
 [Unit]
 Description=pg_gatherer agent
 
+[Install]
+WantedBy=multi-user.target
+
 [Service]
 User=root
 SyslogIdentifier=pg_gatherer agent
