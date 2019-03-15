@@ -55,7 +55,7 @@ local function save_config_to_env(config)
   local current_dir = filepath.dir(debug.getinfo(1).source)
   os.setenv("CONFIG_INIT", filepath.join(current_dir, "..", "init.lua"))
   os.setenv("CONNECTION_MANAGER", config.connections.manager)
-  os.setenv("CONFIG_FILENAME", config.filename)
+  if config.filename then os.setenv("CONFIG_FILENAME", config.filename) end
   os.setenv("CACHE_PATH", config.cache_path)
 end
 

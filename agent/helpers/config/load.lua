@@ -5,7 +5,7 @@ local filepath = require("filepath")
 -- read config file and ovveride from env variables
 local function read_config_from_file(filename)
   local config = {}
-  if not filename then return end
+  if not filename then return config end
   local data, err = ioutil.read_file(filename)
   if err then error(err) end
   config, err = yaml.decode(data)
@@ -36,7 +36,7 @@ local function save_config_to_env(config)
   os.setenv("TOKEN", config.token)
   os.setenv("CONNECTION_AGENT", config.connections.agent)
   os.setenv("CONNECTION_MANAGER", config.connections.manager)
-  os.setenv("CONFIG_FILENAME", config.filename)
+  if config.filename then os.setenv("CONFIG_FILENAME", config.filename) end
 end
 
 local function load(filename)
