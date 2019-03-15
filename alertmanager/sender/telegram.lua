@@ -14,7 +14,8 @@ local function get_hosts()
   return helpers.query.get_hosts(helpers.connections.manager)
 end
 
-if not(config.senders.telegram.enabled) then
+if not(config.senders.telegram) or not(config.senders.telegram.enabled) then
+  print("disable telegram sender")
   while true do
     -- disable telegram
     time.sleep(60)

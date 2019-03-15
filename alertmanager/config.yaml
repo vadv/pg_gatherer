@@ -13,7 +13,8 @@ senders:
   pagerduty:
     enabled: false
     routing_keys:
+      default:  xxx
       critical: xxx
       error:    xxx
-      warning:  xxx
-      info:     xxx
+#      warning:  xxx
+#      info:     xxx

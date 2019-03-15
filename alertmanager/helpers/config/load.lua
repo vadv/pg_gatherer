@@ -30,6 +30,15 @@ local function override_config_from_env(config)
   config.senders.telegram.token = config.senders.telegram.token or os.getenv("TELEGRAM_TOKEN")
   config.senders.telegram.chat = config.senders.telegram.chat or os.getenv("TELEGRAM_CHAT")
 
+  config.senders.pagerduty = config.senders.pagerduty or {}
+  config.senders.pagerduty.rk = config.senders.pagerduty.rk or {}
+  config.senders.pagerduty.enabled = config.senders.pagerduty.enabled or os.getenv("PAGERDUTY_ENABLED")
+  config.senders.pagerduty.rk.default = config.senders.pagerduty.rk.default or os.getenv("PAGERDUTY_RK_DEFAULT")
+  config.senders.pagerduty.rk.critical = config.senders.pagerduty.rk.critical or os.getenv("PAGERDUTY_RK_CTITICAL") or config.senders.pagerduty.rk.default
+  config.senders.pagerduty.rk.error = config.senders.pagerduty.rk.error or os.getenv("PAGERDUTY_RK_ERROR") or config.senders.pagerduty.rk.default
+  config.senders.pagerduty.rk.warning = config.senders.pagerduty.rk.warning or os.getenv("PAGERDUTY_RK_WARNING") or config.senders.pagerduty.rk.default
+  config.senders.pagerduty.rk.info = config.senders.pagerduty.rk.info or os.getenv("PAGERDUTY_RK_INFO") or config.senders.pagerduty.rk.default
+
   if os.getenv("CONFIG_INITILIZED") == "TRUE" then return end
 
   -- connections

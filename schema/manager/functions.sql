@@ -71,12 +71,13 @@ create or replace function manager.create_alert_if_needed(
     key text,
     severity manager.severity,
     info jsonb) returns void AS $$
-    -- insert
     insert into manager.alert(host, key, severity)
         select $1, $2, least(p.max, $3)
             from manager.host h
                 left join manager.severity_policy p on h.severity_policy_id = p.id
-                where not exists (select 1 from manager.alert where host = $1 and key = $2 );
+                where
+                    h.name = $1
+                    and not exists (select 1 from manager.alert a where a.host = $1 and a.key = $2 );
 
     -- update
     update manager.alert set info = $4

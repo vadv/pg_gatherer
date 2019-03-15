@@ -16,6 +16,7 @@ create table manager.host (
     severity_policy_id  int null references manager.severity_policy(id)
 );
 create unique index host_token_idx on manager.host(agent_token);
+alter table manager.host add constraint allow_symbols check(name ~ '^[a-zA-Z0-9_]+$');
 
 -- metric data
 create table manager.metric (
@@ -50,4 +51,4 @@ create table manager.alert_history (
     ended_at bigint not null,
     info jsonb
 );
-create unique index manager_alert_history_uniq_idx on manager.alert(host, key, created_at);
+create unique index manager_alert_history_uniq_idx on manager.alert_history(host, key, created_at);

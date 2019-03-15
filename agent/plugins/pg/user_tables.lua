@@ -34,18 +34,13 @@ local function collect()
     jsonb.n_dead_tup = jsonb.n_dead_tup or 0
     jsonb.n_mod_since_analyze = helpers.metric.speed(table_name..".n_mod_since_analyze", jsonb.n_mod_since_analyze)
 
-    if jsonb.vacuum_count and jsonb.autovacuum_count and jsonb.analyze_count and
-        jsonb.autoanalyze_count and jsonb.seq_scan and jsonb.seq_tup_read and jsonb.idx_scan and
-        jsonb.idx_tup_fetch and jsonb.idx_tup_fetch and jsonb.n_tup_ins and jsonb.n_tup_upd and
-        jsonb.n_tup_del and jsonb.n_tup_hot_upd then
-       if jsonb.vacuum_count + jsonb.autovacuum_count + jsonb.analyze_count +
-        jsonb.autoanalyze_count + jsonb.seq_scan + jsonb.seq_tup_read + jsonb.idx_scan +
-        jsonb.idx_tup_fetch + jsonb.idx_tup_fetch + jsonb.n_tup_ins + jsonb.n_tup_upd +
-        jsonb.n_tup_del + jsonb.n_tup_hot_upd > 0 then
-          local jsonb, err = json.encode(jsonb)
-          if err then error(err) end
-          metric_insert(plugin, row[1], nil, nil, jsonb)
-       end
+    if jsonb.vacuum_count or jsonb.autovacuum_count or jsonb.analyze_count or
+        jsonb.autoanalyze_count or jsonb.seq_scan or jsonb.seq_tup_read or jsonb.idx_scan or
+        jsonb.idx_tup_fetch or jsonb.idx_tup_fetch or jsonb.n_tup_ins or jsonb.n_tup_upd or
+        jsonb.n_tup_del or jsonb.n_tup_hot_upd then
+        local jsonb, err = json.encode(jsonb)
+        if err then error(err) end
+        metric_insert(plugin, row[1], nil, nil, jsonb)
     end
   end
 

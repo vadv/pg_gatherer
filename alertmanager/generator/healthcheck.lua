@@ -9,8 +9,8 @@ end
 local function create_alert(host, key, severity, info)
   helpers.query.create_alert(host, key, severity, info, helpers.connections.manager)
 end
-local function resolve_alert(host, key, severity)
-  helpers.query.resolve_alert(host, key, severity, helpers.connections.manager)
+local function resolve_alert(host, key)
+  helpers.query.resolve_alert(host, key, helpers.connections.manager)
 end
 local function get_severity_for_host(host, key)
   helpers.query.get_severity_for_host(host, key, helpers.connections.manager)
