@@ -33,6 +33,7 @@ local function collect()
     jsonb.n_live_tup = jsonb.n_live_tup or 0
     jsonb.n_dead_tup = jsonb.n_dead_tup or 0
     jsonb.n_mod_since_analyze = helpers.metric.speed(table_name..".n_mod_since_analyze", jsonb.n_mod_since_analyze)
+    jsonb.relpages = jsonb.relpages or 0
 
     if jsonb.vacuum_count or jsonb.autovacuum_count or jsonb.analyze_count or
         jsonb.autoanalyze_count or jsonb.seq_scan or jsonb.seq_tup_read or jsonb.idx_scan or
