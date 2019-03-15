@@ -1,4 +1,3 @@
-local goos = require("goos")
 local yaml = require("yaml")
 local ioutil = require("ioutil")
 local filepath = require("filepath")
@@ -6,12 +5,11 @@ local filepath = require("filepath")
 -- read config file and ovveride from env variables
 local function read_config_from_file(filename)
   local config = {}
-  if goos.stat(filename) then
-    local data, err = ioutil.read_file(filename)
-    if err then error(err) end
-    config, err = yaml.decode(data)
-    if err then error(err) end
-  end
+  if not filename then return end
+  local data, err = ioutil.read_file(filename)
+  if err then error(err) end
+  config, err = yaml.decode(data)
+  if err then error(err) end
   config.filename = filename
   return config
 end
