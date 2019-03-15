@@ -4,6 +4,7 @@ local http = require("http")
 local humanize = require("humanize")
 local storage = require("storage")
 local json = require("json")
+local crypto = require("crypto")
 
 
 
@@ -53,7 +54,7 @@ local function collect()
     if err then error(err) end
     for _, row in pairs(result.rows) do
 
-      local cache_key = host .. row[1]
+      local cache_key = crypto.md5(host .. row[1] .. "telegram")
       local _, found, err = cache:get(cache_key)
       if err then error(err) end
 

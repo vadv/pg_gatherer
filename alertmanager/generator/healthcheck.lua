@@ -16,7 +16,7 @@ local function get_severity_for_host(host, key)
   helpers.query.get_severity_for_host(host, key, helpers.connections.manager)
 end
 
-local alert_key = "gatherer agent is not running for host"
+local alert_key = "gatherer agent is not running"
 
 local stmt, err = manager:stmt("select max(ts), extract(epoch from current_timestamp)::bigint from manager.metric where host = md5($1::text)::uuid and plugin = md5('pg.healthcheck')::uuid")
 if err then error(err) end

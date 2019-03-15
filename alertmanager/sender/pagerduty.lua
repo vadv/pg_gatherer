@@ -3,6 +3,7 @@ local storage = require("storage")
 local http = require("http")
 local json = require("json")
 local crypto = require("crypto")
+local inspect = require("inspect")
 
 local helpers = dofile(os.getenv("CONFIG_INIT"))
 local config = helpers.config.load(os.getenv("CONFIG_FILENAME"))
@@ -21,25 +22,27 @@ end
 
 print("start pagerduty sender")
 
-local cache, err = storage.open(config.cache_path)
-if err then error(err) end
-
-local stmt, err = manager:stmt("select key, severity, info, created_at from manager.alert where host = $1")
-if err then error(err) end
-
-
 local http_client = http.client({})
 local function send(info)
   local jsonb, err = json.encode(info)
   if err then error(err) end
   local request, err = http.request("POST", "https://events.pagerduty.com/v2/enqueue", jsonb)
-  if err then error end
+  if err then error(err) end
   request:header_set("Content-Type", "application/json")
   request:header_set("Accept", "application/vnd.pagerduty+json;version=2")
   request:header_set("Authorization", "Token token="..os.getenv("PAGERDUTY_TOKEN"))
   local result, err = http_client:do_request(request)
   if err then error(err) end
+  if result.code > 300  then
+    error("response : "..inspect(result))
+  end
 end
+
+local cache, err = storage.open(config.cache_path)
+if err then error(err) end
+
+local stmt, err = manager:stmt("select key, severity, info, created_at from manager.alert where host = $1")
+if err then error(err) end
 
 local function collect()
   for _, host in pairs(get_hosts()) do
@@ -47,7 +50,7 @@ local function collect()
     if err then error(err) end
     for _, row in pairs(result.rows) do
 
-      local cache_key = host .. row[1]
+      local cache_key = crypto.md5(host .. row[1] .. "pagerduty")
       local _, found, err = cache:get(cache_key)
       if err then error(err) end
 
@@ -55,17 +58,25 @@ local function collect()
         -- send
         local info, err = json.encode(row[3])
         if err then error(err) end
+        local key = row[1]
+        local severity = row[2]
+        local rk = config.senders.pagerduty.rk[severity]
         local jsonb = {
-          routing_key = config.senders.pagerduty.rk[severity],
-          dedup_key = crypto.md5(row[1]..host),
+          routing_key = rk,
+          dedup_key = crypto.md5(key..host),
+          event_action = "trigger",
           payload = {
-            summary = row[1] .. " on host " .. host,
+            summary = key .. " [" .. host.. "]",
+            source = "pg_gatherer on "..host,
             severity = severity,
             component = "postgresql",
             custom_details = info.custom_details
           }
         }
         send(jsonb)
+        print("sended to pagerduty", inspect(jsonb))
+        local err = cache:set(cache_key, 1, 60)
+        if err then error(err) end
       end
     end
   end
