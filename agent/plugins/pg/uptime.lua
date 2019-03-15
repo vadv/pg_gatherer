@@ -12,7 +12,7 @@ local function collect()
   local result, err = agent:query("select gatherer.uptime()")
   if err then error(err) end
   for _, row in pairs(result.rows) do
-    metric_insert(plugin, nil, row[2], nil, nil)
+    metric_insert(plugin, nil, row[1], nil, nil)
   end
 end
 

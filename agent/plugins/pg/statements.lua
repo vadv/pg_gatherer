@@ -21,7 +21,6 @@ local function collect()
 
     jsonb.calls = helpers.metric.diff(key..".calls", jsonb.calls)
     jsonb.rows = helpers.metric.diff(key..".rows", jsonb.rows)
-    jsonb.total_time = helpers.metric.diff(key..".total_time", jsonb.total_time)
     jsonb.shared_blks_hit = helpers.metric.diff(key..".shared_blks_hit", jsonb.shared_blks_hit)
     jsonb.shared_blks_read = helpers.metric.diff(key..".shared_blks_read", jsonb.shared_blks_read)
     jsonb.shared_blks_dirtied = helpers.metric.diff(key..".shared_blks_dirtied", jsonb.shared_blks_dirtied)
