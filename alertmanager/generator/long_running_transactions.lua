@@ -13,9 +13,21 @@ local function resolve_alert(host, key)
   helpers.query.resolve_alert(host, key, helpers.connections.manager)
 end
 
-local alert_key = "gatherer agent is not running"
+local alert_key = "long running transactions"
 
-local stmt, err = manager:stmt("select max(ts), extract(epoch from current_timestamp)::bigint from manager.metric where host = md5($1::text)::uuid and plugin = md5('pg.healthcheck')::uuid")
+local stmt, err = manager:stmt([[
+  select
+    value_jsonb
+  from
+    manager.metric
+  where
+    host = md5($1::text)::uuid
+    and plugin = md5('pg.healthcheck')::uuid
+    and ts > (extract(epoch from current_timestamp)::bigint - 20 * 60)
+    and (value_jsonb->>'state_change_duration')::bigint > 20 * 60
+  limit 1
+]]
+
 if err then error(err) end
 
 function collect()
@@ -23,11 +35,13 @@ function collect()
 
     local result, err = stmt:query(host)
     if err then error(err) end
-    local info = {}
-    local jsonb, err = json.encode(info)
-    if err then error(err) end
-    if (result.rows[1] == nil) or (result.rows[1][1] == nil)
-      or math.abs(result.rows[1][2] - result.rows[1][1]) > 5*60 then
+
+    if not(result.rows[1] == nil) and not(result.rows[1][1] == nil) then
+      local info, err = json.decode(result.rows[1][1])
+      if err then error(err) end
+      local jsonb = {custom_details=info}
+      local jsonb, err = json.encode(jsonb)
+      if err then error(err) end
       create_alert(host, alert_key, 'critical', jsonb)
     else
       resolve_alert(host, alert_key)
