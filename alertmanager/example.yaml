@@ -12,6 +12,7 @@ senders:
 
   pagerduty:
     enabled: false
+    token: xxxx
     routing_keys:
       default:  xxx
       critical: xxx

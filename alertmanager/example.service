@@ -26,6 +26,7 @@ Environment="TELEGRAM_CHAT=1111"
 
 # pagerduty
 Environment="PAGERDUTY_ENABLED=true"
+Environment="PAGERDUTY_TOKEN=xxxx"
 Environment="PAGERDUTY_RK_DEFAULT=xxxxxxxxxxxx"
 Environment="PAGERDUTY_RK_CTITICAL=xxxxxxxxxxx"
 Environment="PAGERDUTY_RK_ERROR=xxxxxxxxxxx"

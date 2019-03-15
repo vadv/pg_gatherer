@@ -30,6 +30,7 @@ local function override_config_from_env(config)
 
   config.senders.pagerduty = config.senders.pagerduty or {}
   config.senders.pagerduty.rk = config.senders.pagerduty.rk or {}
+  config.senders.pagerduty.token = config.senders.pagerduty.token or os.getenv("PAGERDUTY_TOKEN")
   config.senders.pagerduty.enabled = config.senders.pagerduty.enabled or os.getenv("PAGERDUTY_ENABLED")
   config.senders.pagerduty.rk.default = config.senders.pagerduty.rk.default or os.getenv("PAGERDUTY_RK_DEFAULT")
   config.senders.pagerduty.rk.critical = config.senders.pagerduty.rk.critical or os.getenv("PAGERDUTY_RK_CTITICAL") or config.senders.pagerduty.rk.default

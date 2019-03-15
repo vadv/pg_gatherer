@@ -21,7 +21,7 @@ create or replace function gatherer.pg_stat_activity(t int default 1) returns se
     from
       pg_catalog.pg_stat_activity
     where
-        state <> 'idle' and extract(epoch from now() - state_change)::int > t;
+        state <> 'idle' and query is not null and extract(epoch from now() - state_change)::int > t;
 $$ language 'sql' security definer;
 
 create or replace function gatherer.pg_stat_activity_waits() returns setof jsonb AS $$
