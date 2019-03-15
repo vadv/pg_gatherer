@@ -13,7 +13,7 @@ local function resolve_alert(host, key)
   helpers.query.resolve_alert(host, key, helpers.connections.manager)
 end
 
-local alert_key = "long running transactions"
+local alert_key = "replication slots too big"
 
 local stmt, err = manager:stmt([[
   select
@@ -22,9 +22,9 @@ local stmt, err = manager:stmt([[
     manager.metric
   where
     host = md5($1::text)::uuid
-    and plugin = md5('pg.activity')::uuid
-    and ts > (extract(epoch from current_timestamp)::bigint - 20 * 60)
-    and (value_jsonb->>'state_change_duration')::bigint > 20 * 60
+    and plugin = md5('pg.replication_slots')::uuid
+    and ts > (extract(epoch from current_timestamp)::bigint - 10 * 60)
+  order by ts desc
   limit 1
 ]])
 
@@ -39,10 +39,23 @@ function collect()
     if not(result.rows[1] == nil) and not(result.rows[1][1] == nil) then
       local info, err = json.decode(result.rows[1][1])
       if err then error(err) end
-      local jsonb = {custom_details=info}
-      local jsonb, err = json.encode(jsonb)
-      if err then error(err) end
-      create_alert(host, alert_key, 'critical', jsonb)
+
+      -- calc max_size
+      local max_size = 0
+      for _, size in pairs(info) do
+        if size > max_size then max_size = size end
+      end
+
+      local trigger_value = 1024 * 1024 * 1024
+      if max_size > trigger_value then
+        -- alert
+        local jsonb = {custom_details=info}
+        local jsonb, err = json.encode(jsonb)
+        if err then error(err) end
+        create_alert(host, alert_key, 'critical', jsonb)
+      else
+        resolve_alert(host, alert_key)
+      end
     else
       resolve_alert(host, alert_key)
     end

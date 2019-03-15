@@ -56,7 +56,7 @@ local function collect()
 
       if not found then
         -- send
-        local info, err = json.encode(row[3])
+        local info, err = json.decode(row[3])
         if err then error(err) end
         local key = row[1]
         local severity = row[2]
