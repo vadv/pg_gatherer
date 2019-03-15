@@ -60,14 +60,11 @@ local function collect()
     jsonb.tidx_blks_read = helpers.metric.speed(table_name..".tidx_blks_read", jsonb.tidx_blks_read)
     jsonb.tidx_blks_hit = helpers.metric.speed(table_name..".tidx_blks_hit", jsonb.tidx_blks_hit)
 
-    if jsonb.heap_blks_read and jsonb.heap_blks_hit and jsonb.idx_blks_read and jsonb.idx_blks_hit and
-        jsonb.toast_blks_read and jsonb.toast_blks_hit and jsonb.tidx_blks_read and jsonb.tidx_blks_hit then
-       if jsonb.heap_blks_read + jsonb.heap_blks_hit + jsonb.idx_blks_read + jsonb.idx_blks_hit +
-        jsonb.toast_blks_read + jsonb.toast_blks_hit + jsonb.tidx_blks_read + jsonb.tidx_blks_hit > 0 then
-          local jsonb, err = json.encode(jsonb)
-          if err then error(err) end
-          metric_insert(plugin..".io", row[1], nil, nil, jsonb)
-       end
+    if jsonb.heap_blks_read or jsonb.heap_blks_hit or jsonb.idx_blks_read or jsonb.idx_blks_hit or
+        jsonb.toast_blks_read or jsonb.toast_blks_hit or jsonb.tidx_blks_read or jsonb.tidx_blks_hit then
+        local jsonb, err = json.encode(jsonb)
+        if err then error(err) end
+        metric_insert(plugin..".io", row[1], nil, nil, jsonb)
     end
   end
 
