@@ -5,7 +5,10 @@ local humanize = require("humanize")
 local storage = require("storage")
 local json = require("json")
 
+
+
 local helpers = dofile(os.getenv("CONFIG_INIT"))
+local config = helpers.config.load(os.getenv("CONFIG_FILENAME"))
 local manager = helpers.connections.manager
 local function get_hosts()
   return helpers.query.get_hosts(helpers.connections.manager)
@@ -55,16 +58,18 @@ local function collect()
 
       if not found then
 
-        local info, err = json.decode(row[3])
-        if err then error(err) end
-
+        local info = {}
+        if row[3] then
+          info, err = json.decode(row[3])
+          if err then error(err) end
+        end
         -- format message
         local message = [[
   *Host*:    `%s`
   *Problem*: `%s`
   *Created*: `%s`
   ]]
-        message = string.format(message, host, row[1], humanize.time(row[3]))
+        message = string.format(message, host, row[1], humanize.time(row[4]))
 
         -- send message
         local _, err = telegram_bot:sendMessage({

@@ -20,14 +20,6 @@ end
 -- helpers for override config from env
 local function override_config_from_env(config)
 
-  if os.getenv("CONFIG_INITILIZED") == "TRUE" then return end
-
-  config = config or {}
-
-  -- connections
-  config.connections = config.connections or {}
-  config.connections.manager = config.connections.manager or os.getenv("CONNECTION_MANAGER")
-
   -- cache
   config.cache_path = config.cache_path or os.getenv("CACHE_PATH") or '/var/tmp/pg_gatherer.cache'
 
@@ -37,6 +29,12 @@ local function override_config_from_env(config)
   config.senders.telegram.enabled = config.senders.telegram.enabled or os.getenv("TELEGRAM_ENABLED")
   config.senders.telegram.token = config.senders.telegram.token or os.getenv("TELEGRAM_TOKEN")
   config.senders.telegram.chat = config.senders.telegram.chat or os.getenv("TELEGRAM_CHAT")
+
+  if os.getenv("CONFIG_INITILIZED") == "TRUE" then return end
+
+  -- connections
+  config.connections = config.connections or {}
+  config.connections.manager = config.connections.manager or os.getenv("CONNECTION_MANAGER")
 
 end
 

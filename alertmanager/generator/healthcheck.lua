@@ -7,10 +7,10 @@ local function get_hosts()
   return helpers.query.get_hosts(helpers.connections.manager)
 end
 local function create_alert(host, key, severity, info)
-  helpers.query.create_alert(host, key, info, helpers.connections.manager)
+  helpers.query.create_alert(host, key, severity, info, helpers.connections.manager)
 end
 local function resolve_alert(host, key, severity)
-  helpers.query.resolve_alert(host, key, helpers.connections.manager)
+  helpers.query.resolve_alert(host, key, severity, helpers.connections.manager)
 end
 local function get_severity_for_host(host, key)
   helpers.query.get_severity_for_host(host, key, helpers.connections.manager)
@@ -27,12 +27,11 @@ function collect()
     local result, err = stmt:query(host)
     if err then error(err) end
     local info = {}
-    info["priority"] = 5
     local jsonb, err = json.encode(info)
     if err then error(err) end
     if (result.rows[1] == nil) or (result.rows[1][1] == nil)
       or math.abs(result.rows[1][2] - result.rows[1][1]) > 5*60 then
-      create_alert(host, alert_key, jsonb)
+      create_alert(host, alert_key, 'critical', jsonb)
     else
       resolve_alert(host, alert_key)
     end
