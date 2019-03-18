@@ -13,7 +13,7 @@ local function resolve_alert(host, key)
   helpers.query.resolve_alert(host, key, helpers.connections.manager)
 end
 local function unixts()
-  helpers.query.unixts(helpers.connections.manager)
+  return helpers.query.unixts(helpers.connections.manager)
 end
 
 local alert_key = "too many waits events"
