@@ -29,7 +29,7 @@ local stmt, err = manager:stmt([[
       host = md5($1::text)::uuid
       and plugin = md5('pg.activity.waits')::uuid
       and ts > ( $2 - (10 * 60) )
-      and ts < ( $2 )
+      and ts < $2
       and value_jsonb->>'state' <> 'idle in transaction'
     group by ts
     order by ts desc
