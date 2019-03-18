@@ -19,7 +19,7 @@ create or replace function gatherer.pg_databases() returns setof jsonb AS $$
           'temp_bytes', d.temp_bytes,
           'deadlocks', d.deadlocks,
           'blk_read_time', d.blk_read_time,
-          'blk_write_time', d.blk_write_time,
+          'blk_write_time', d.blk_write_time
         ) as result
     from
         pg_catalog.pg_stat_database d

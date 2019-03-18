@@ -23,7 +23,7 @@ local function speed(key, value)
   if counter % 100 == 0 then
     local new_data = {}
     for key, v in pairs(data) do
-      if now - 60*60 > v.unixts then new_data[key] = v end
+      if v.unixts > now - 60*60 then new_data[key] = v end
     end
     data = new_data
   end
