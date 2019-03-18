@@ -24,7 +24,7 @@ local function speed(key, value)
 
   -- compress
   counter = counter + 1
-  if counter % 100 == 0 then
+  if counter % 1000 == 0 then
     local new_data = {}
     for hash_key, v in pairs(data) do
       if v.unixts > now - 60*60 then new_data[hash_key] = v end
