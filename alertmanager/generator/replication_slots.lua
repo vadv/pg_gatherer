@@ -12,6 +12,9 @@ end
 local function resolve_alert(host, key)
   helpers.query.resolve_alert(host, key, helpers.connections.manager)
 end
+local function unixts()
+  helpers.query.unixts(helpers.connections.manager)
+end
 
 local alert_key = "replication slots too big"
 
@@ -23,7 +26,8 @@ local stmt, err = manager:stmt([[
   where
     host = md5($1::text)::uuid
     and plugin = md5('pg.replication_slots')::uuid
-    and ts > (extract(epoch from current_timestamp)::bigint - 10 * 60)
+    and ts > ($2 - 10 * 60)
+    and ts < $2
   order by ts desc
   limit 1
 ]])
@@ -31,9 +35,12 @@ local stmt, err = manager:stmt([[
 if err then error(err) end
 
 function collect()
+
+  local current_unixts = unixts()
+
   for _, host in pairs(get_hosts()) do
 
-    local result, err = stmt:query(host)
+    local result, err = stmt:query(host, current_unixts)
     if err then error(err) end
 
     if not(result.rows[1] == nil) and not(result.rows[1][1] == nil) then
