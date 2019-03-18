@@ -24,7 +24,7 @@ local stmt, err = manager:stmt([[
     host = md5($1::text)::uuid
     and plugin = md5('pg.activity')::uuid
     and ts > (extract(epoch from current_timestamp)::bigint - 2 * 60)
-    and (value_jsonb->>'state_change_duration')::bigint > 20 * 60,
+    and (value_jsonb->>'state_change_duration')::bigint > 20 * 60
     and (value_jsonb->>'backend_type' <> 'autovacuum worker')
     and not (value_jsonb->>'query' ~ '^autovacuum: VACUUM')
   limit 1
