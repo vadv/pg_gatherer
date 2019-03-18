@@ -1,7 +1,7 @@
 local time = require("time")
 local crypto = require("crypto")
 
-local counter = 0
+local last_gc = time.unix()
 local data = {
   -- key = {value=value, unixts=now}
 }
@@ -21,13 +21,13 @@ local function diff(key, value)
   if prev.value > value then return nil end
 
   -- compress
-  counter = counter + 1
-  if counter % 1000 == 0 then
+  if now - 360 > last_gc then
     local new_data = {}
     for hash_key, v in pairs(data) do
       if v.unixts > now - 60*60 then new_data[hash_key] = v end
     end
     data = new_data
+    last_gc = now
   end
 
   return value - prev.value
