@@ -52,4 +52,4 @@ function collect()
   end
 end
 
-helpers.runner.run_every(collect, 5)
+helpers.runner.run_every(collect, 60)

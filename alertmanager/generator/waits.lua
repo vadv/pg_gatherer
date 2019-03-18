@@ -13,19 +13,27 @@ local function resolve_alert(host, key)
   helpers.query.resolve_alert(host, key, helpers.connections.manager)
 end
 
-local alert_key = "replication slots too big"
+local alert_key = "too many waits events"
 
 local stmt, err = manager:stmt([[
+  with sum_waits as (
+    select
+      snapshot as snapshot,
+      sum( coalesce( (value_jsonb->>'count')::bigint, 0) ) as waits
+    from
+      manager.metric
+    where
+      host = md5('wallet_master')::uuid
+      and plugin = md5('pg.activity.waits')::uuid
+      and snapshot > (extract(epoch from current_timestamp)::bigint - 10 * 60)
+      and value_jsonb->>'state' <> 'idle in transaction'
+    group by snapshot
+    order by snapshot desc
+)
   select
-    value_jsonb
+    percentile_cont(0.9) within group (order by waits asc)
   from
-    manager.metric
-  where
-    host = md5($1::text)::uuid
-    and plugin = md5('pg.replication_slots')::uuid
-    and ts > (extract(epoch from current_timestamp)::bigint - 10 * 60)
-  order by ts desc
-  limit 1
+    sum_waits
 ]])
 
 if err then error(err) end
@@ -37,22 +45,15 @@ function collect()
     if err then error(err) end
 
     if not(result.rows[1] == nil) and not(result.rows[1][1] == nil) then
-      local info, err = json.decode(result.rows[1][1])
-      if err then error(err) end
-
-      -- calc max_size
-      local max_size = 0
-      for _, size in pairs(info) do
-        if size > max_size then max_size = size end
-      end
-
-      local trigger_value = 1024 * 1024 * 1024
-      if max_size > trigger_value then
-        -- alert
-        local jsonb = {custom_details=info}
-        local jsonb, err = json.encode(jsonb)
+      if result.rows[1][1] > 50 then
+        local jsonb = {
+          custom_details = {
+            percentile_90 = result.rows[1][1]
+          }
+        }
+        local info, err = json.encode(jsonb)
         if err then error(err) end
-        create_alert(host, alert_key, 'critical', jsonb)
+        create_alert(host, alert_key, 'critical', info)
       else
         resolve_alert(host, alert_key)
       end
