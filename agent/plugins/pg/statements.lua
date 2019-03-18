@@ -31,9 +31,9 @@ local function collect()
     jsonb.local_blks_written = helpers.metric.diff(key..".local_blks_written", jsonb.local_blks_written)
     jsonb.temp_blks_read = helpers.metric.diff(key..".temp_blks_read", jsonb.temp_blks_read)
     jsonb.temp_blks_written = helpers.metric.diff(key..".temp_blks_written", jsonb.temp_blks_written)
-    jsonb.total_time = helpers.metric.speed(key..".total_time", jsonb.total_time)
-    jsonb.blk_read_time = helpers.metric.speed(key..".blk_read_time", jsonb.blk_read_time)
-    jsonb.blk_write_time = helpers.metric.speed(key..".blk_write_time", jsonb.blk_write_time)
+    jsonb.total_time = helpers.metric.diff(key..".total_time", jsonb.total_time)
+    jsonb.blk_read_time = helpers.metric.diff(key..".blk_read_time", jsonb.blk_read_time)
+    jsonb.blk_write_time = helpers.metric.diff(key..".blk_write_time", jsonb.blk_write_time)
 
     if jsonb.calls and (jsonb.calls > 0) then
       local jsonb, err = json.encode(jsonb)
