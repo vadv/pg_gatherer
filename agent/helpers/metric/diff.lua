@@ -27,7 +27,7 @@ local function diff(key, value)
       if v.unixts > now - 60*60 then new_data[hash_key] = v end
     end
     data = new_data
-    last_gc = now
+    last_gc = now + math.random(60)
   end
 
   return value - prev.value
