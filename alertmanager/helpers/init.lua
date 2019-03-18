@@ -19,6 +19,7 @@ if os.getenv("CONFIG_INITILIZED") == "TRUE" then
   helpers.query.get_hosts = dofile(filepath.join(current_dir, "query", "get_hosts.lua"))
   helpers.query.create_alert = dofile(filepath.join(current_dir, "query", "create_alert.lua"))
   helpers.query.resolve_alert = dofile(filepath.join(current_dir, "query", "resolve_alert.lua"))
+  helpers.query.unixts = dofile(filepath.join(current_dir, "query", "unixts.lua"))
 end
 
 return helpers

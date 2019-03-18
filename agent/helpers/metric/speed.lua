@@ -1,4 +1,5 @@
 local time = require("time")
+local crypto = require("crypto")
 
 local counter = 0
 local data = {
@@ -6,10 +7,13 @@ local data = {
 }
 
 local function speed(key, value)
+
+  local hash_key = crypto.md5(key)
+
   if not value then return nil end
-  local prev = data[key]
+  local prev = data[hash_key]
   local now = time.unix()
-  data[key] = { value = value, unixts = now }
+  data[hash_key] = { value = value, unixts = now }
   -- first run
   if not prev then return nil end
   -- overflow
@@ -22,8 +26,8 @@ local function speed(key, value)
   counter = counter + 1
   if counter % 100 == 0 then
     local new_data = {}
-    for key, v in pairs(data) do
-      if v.unixts > now - 60*60 then new_data[key] = v end
+    for hash_key, v in pairs(data) do
+      if v.unixts > now - 60*60 then new_data[hash_key] = v end
     end
     data = new_data
   end
