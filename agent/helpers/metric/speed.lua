@@ -24,11 +24,18 @@ local function speed(key, value)
 
   -- compress
   if now - 360 > last_gc then
+    local old_size, new_size = 0, 0
     local new_data = {}
     for hash_key, v in pairs(data) do
-      if v.unixts > now - 60*60 then new_data[hash_key] = v end
+      old_size = old_size + 1
+      if v.unixts > now - 10*60 then
+        new_size = new_size + 1
+        new_data[hash_key] = v
+      end
     end
+    print("speed db compressed, old size:", old_size, "new size: ", new_size)
     data = new_data
+    collectgarbage()
     last_gc = now + math.random(60)
   end
 
