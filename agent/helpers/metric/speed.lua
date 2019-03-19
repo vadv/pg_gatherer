@@ -1,43 +1,40 @@
 local time = require("time")
-local crypto = require("crypto")
+local storage = require("storage")
 
-local last_gc = time.unix()
-local data = {
-  -- key = {value = value, unixts = unixts}
-}
+local db, err = storage.open(os.getenv("CACHE_PATH"), "badger")
+if err then error(err) end
+
+local function save(key, value)
+  local data = {value = value, unixts = time.unix()}
+  local err = db:set(key, data, 5*60)
+  if err then error(err) end
+end
 
 local function speed(key, value)
 
-  local hash_key = crypto.md5(key)
-
   if not value then return nil end
-  local prev = data[hash_key]
+
   local now = time.unix()
-  data[hash_key] = { value = value, unixts = now }
-  -- first run
-  if not prev then return nil end
+
+  local prev, found, err = db:get(key)
+  if err then error(err) end
+  if not found then
+    save(key, value)
+    return
+  end
+
   -- overflow
-  if prev.value > value then return nil end
+  if prev.value > value then
+    save(key, value)
+    return
+  end
+
+
   -- calc
   local time_diff = now - prev.unixts
   local value_diff = value - prev.value
 
-  -- compress
-  if now - 360 > last_gc then
-    local old_size, new_size = 0, 0
-    local new_data = {}
-    for hash_key, v in pairs(data) do
-      old_size = old_size + 1
-      if v.unixts > now - 10*60 then
-        new_size = new_size + 1
-        new_data[hash_key] = v
-      end
-    end
-    print("speed db compressed, old size:", old_size, "new size: ", new_size)
-    data = new_data
-    collectgarbage()
-    last_gc = now + math.random(60)
-  end
+  save(key, value)
 
   -- value
   return (value_diff / time_diff)

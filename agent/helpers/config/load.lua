@@ -20,10 +20,11 @@ local function override_config_from_env(config)
   if os.getenv("CONFIG_INITILIZED") == "TRUE" then return end
 
   config = config or {}
-  config.token = config.token or os.getenv("TOKEN")
+  config.token = os.getenv("TOKEN") or config.token
   config.connections = config.connections or {}
-  config.connections.agent = config.connections.agent or os.getenv("CONNECTION_AGENT")
-  config.connections.manager = config.connections.manager or os.getenv("CONNECTION_MANAGER")
+  config.connections.agent = os.getenv("CONNECTION_AGENT") or config.connections.agent
+  config.connections.manager = os.getenv("CONNECTION_MANAGER") or config.connections.manager
+  config.cache_path = config.cache_path or os.getenv("CACHE_PATH") or "/var/tmp/pg_gatherer"
 end
 
 -- helpers for set config to env
