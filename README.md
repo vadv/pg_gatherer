@@ -39,6 +39,7 @@ $ glua-libs ./agent/init.lua
 
 # Examples
 
+![common](/img/common-stats.png)
 ![activity](/img/activity.png)
 ![statements-disk](/img/statements-disk.png)
 ![statements-total-time](/img/statements-total-time.png)
