@@ -10,6 +10,12 @@ helpers.config.load(config_file)
 
 local plugins = dofile(filepath.join(current_dir, "plugins", "init.lua"))
 
+if os.getenv("DEBUG_ADDR") then
+  local pprof = require("pprof")
+  local pp = pprof.create(os.getenv("DEBUG_ADDR"))
+  pp:start()
+end
+
 -- start supervisor
 while true do
   time.sleep(5)
