@@ -12,8 +12,8 @@ local plugins = dofile(filepath.join(current_dir, "plugins", "init.lua"))
 
 if os.getenv("DEBUG_ADDR") then
   local pprof = require("pprof")
-  local pp = pprof.create(os.getenv("DEBUG_ADDR"))
-  pp:start()
+  local pp = pprof.register(os.getenv("DEBUG_ADDR"))
+  pp:enable()
 end
 
 -- start supervisor
