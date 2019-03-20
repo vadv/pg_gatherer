@@ -25,8 +25,8 @@ helpers.runner.run_every = dofile(filepath.join(current_dir, "runner", "run_ever
 if os.getenv("CONFIG_INITILIZED") == "TRUE" then
   helpers.connections = {}
   helpers.connections.manager = dofile(filepath.join(current_dir, "connections", "manager.lua"))
-  helpers.connections.agent = dofile(filepath.join(current_dir, "connections", "agent.lua"))
-  helpers.is_rds = helpers.rds.is_rds( helpers.connections.agent )
+  helpers.connections.get_agent_connection = dofile(filepath.join(current_dir, "connections", "get_agent_connection.lua"))
+  helpers.is_rds = helpers.rds.is_rds( helpers.connections.get_agent_connection() )
   helpers.host = helpers.config.host( os.getenv("TOKEN"), helpers.connections.manager )
   helpers.metric = {}
   helpers.metric.speed = dofile(filepath.join(current_dir, "metric", "speed.lua"))

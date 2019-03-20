@@ -11,7 +11,8 @@ declare
     partition_table_name text;
     partition_index_name text;
 begin
-    main_table_name := 'manager.' || quote_ident('metric_' || host);
+    main_table_name := (select (md5(host))::text);
+    main_table_name := 'manager.metric_' || main_table_name;
     year_date := ( select to_date( year ||'-1-1', 'YYYY-MM-DD') );
 
     min_month_counter := 0;
@@ -44,7 +45,8 @@ begin
     host := (select name from manager.host where agent_token = token limit 1);
     if host is not null then
         host_id := quote_literal(md5(host));
-        table_name := 'manager.' || quote_ident('metric_' || host);
+        table_name := (select (md5(host))::text);
+        table_name := 'manager.metric_' || table_name);
         execute 'create table if not exists ' || table_name  || ' partition of manager.metric for values in (' || host_id || ') partition by range(ts)';
         -- only current year
         perform agent.create_parititons_for_host(host, extract(year from now())::int);

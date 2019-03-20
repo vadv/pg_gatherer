@@ -10,13 +10,13 @@ insert into manager.severity_policy(max) values( 'warning'::manager.severity );
 
 -- host
 create table manager.host (
-    name                text not null primary key,
-    agent_token         text not null,
-    maintenance         bool not null default false,
-    severity_policy_id  int null references manager.severity_policy(id)
+    name                text   not null primary key,
+    agent_token         text   not null,
+    databases           text[] not null,
+    maintenance         bool   not null default false,
+    severity_policy_id  int    null references manager.severity_policy(id)
 );
 create unique index host_token_idx on manager.host(agent_token);
-alter table manager.host add constraint allow_symbols check(name ~ '^[a-zA-Z0-9_]+$');
 
 -- metric data
 create table manager.metric (

@@ -1,6 +1,7 @@
 create or replace function gatherer.pg_block() returns setof jsonb AS $$
     SELECT
     jsonb_build_object(
+         'current_database', current_database(),
          'blocked_query_id', md5(blocked_activity.query || blocked_activity.query_start::text)::UUID,
          'blocked_pid', blocked_locks.pid,
          'blocked_user', blocked_activity.usename,

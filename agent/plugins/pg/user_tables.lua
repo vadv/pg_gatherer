@@ -4,13 +4,14 @@ local plugin = 'pg.user_tables'
 
 local helpers = dofile(os.getenv("CONFIG_INIT"))
 
-local agent = helpers.connections.agent
 local function metric_insert(key, snapshot, value_bigint, value_double, value_jsonb)
   helpers.metric.insert(helpers.host, key, snapshot, value_bigint, value_double, value_jsonb, helpers.connections.manager)
 end
+local db_list = helpers.connections.get_monitored_db_list(helpers.connections.manager, helpers.host)
 
-local function collect()
+local function collect_for_db(dbname)
 
+  local agent = helpers.connections.get_agent_connection(dbname)
   local result, err = agent:query("select gatherer.snapshot_id(), * from gatherer.pg_stat_user_tables()")
   if err then error(err) end
   for _, row in pairs(result.rows) do
@@ -69,6 +70,11 @@ local function collect()
     end
   end
 
+end
+
+
+local function collect()
+  for _, db in pairs(db_list) do collect_for_db(db) end
 end
 
 -- run collect

@@ -2,7 +2,7 @@ create or replace function gatherer.pg_stat_user_tables() returns setof jsonb AS
     select
         jsonb_build_object(
           'relid', relid::bigint,
-          'full_table_name', p.schemaname || '.' || p.relname,
+          'full_table_name', current_database() || '.' || p.schemaname || '.' || p.relname,
           'last_vacuum', extract(epoch from p.last_vacuum)::bigint,
           'last_autovacuum', extract(epoch from p.last_autovacuum)::bigint,
           'last_analyze', extract(epoch from p.last_analyze)::bigint,
@@ -34,7 +34,7 @@ create or replace function gatherer.pg_statio_user_tables() returns setof jsonb 
     select
         jsonb_build_object(
           'relid', relid::bigint,
-          'full_table_name', schemaname || '.' || relname,
+          'full_table_name', current_database() || '.' || schemaname || '.' || relname,
           'heap_blks_read', heap_blks_read,
           'heap_blks_hit', heap_blks_hit,
           'idx_blks_read', idx_blks_read,

@@ -40,10 +40,20 @@ local function save_config_to_env(config)
   if config.filename then os.setenv("CONFIG_FILENAME", config.filename) end
 end
 
+local function check_config(config)
+  if not string.match(config.connections.manager, "^postgresql://") then
+    error("connections must be in format: postgresql://")
+  end
+  if not string.match(config.connections.agent, "^postgresql://") then
+    error("connections must be in format: postgresql://")
+  end
+end
+
 local function load(filename)
   local config = read_config_from_file(filename)
   override_config_from_env(config)
   save_config_to_env(config)
+  check_config(config)
   os.setenv("CONFIG_INITILIZED", "TRUE")
   return config
 end
