@@ -46,7 +46,7 @@ begin
     if host is not null then
         host_id := quote_literal(md5(host));
         table_name := (select (md5(host))::text);
-        table_name := 'manager.metric_' || table_name);
+        table_name := 'manager.metric_' || table_name;
         execute 'create table if not exists ' || table_name  || ' partition of manager.metric for values in (' || host_id || ') partition by range(ts)';
         -- only current year
         perform agent.create_parititons_for_host(host, extract(year from now())::int);
@@ -54,6 +54,11 @@ begin
     return host;
 end
 $$ language 'plpgsql' security definer;
+
+-- db list
+create or replace function agent.get_databases(host text) returns setof text AS $$
+    select unnest(databases) from manager.host where name = $1;
+$$ language 'sql' security definer;
 
 -- insert data
 create or replace function agent.insert_metric(

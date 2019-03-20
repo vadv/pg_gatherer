@@ -1,4 +1,5 @@
-create or replace function gatherer.pg_databases() returns setof jsonb AS $$
+drop function if exists gatherer.pg_databases;
+create function gatherer.pg_databases() returns setof jsonb AS $$
     select
         jsonb_build_object(
           'datname', d.datname::text,

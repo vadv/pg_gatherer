@@ -17,14 +17,14 @@ end
 local function get_agent_connection(dbname)
 
   local conn_string = build_agent_connection_string(dbname)
-  if connections[dbname] then
-    return connections[dbname]
+  if connections[conn_string] then
+    return connections[conn_string]
   end
 
   local agent, err = db.open("postgres", conn_string, {shared=true})
   if err then error(err) end
-  connections[dbname] = agent
-  return connections[dbname]
+  connections[conn_string] = agent
+  return connections[conn_string]
 
 end
 

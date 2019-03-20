@@ -5,7 +5,8 @@ grant usage on schema gatherer to gatherer;
 grant execute on all functions in schema gatherer to gatherer;
 
 -- manager
-insert into manager.host (name, agent_token) values ('localhost', 'Reech2ee');
+insert into manager.host (name, agent_token, databases) values ('localhost', 'Reech2ee', '{postgres}'::text[]);
+create user agent password 'agent_password';
 grant usage on schema agent to agent;
 grant execute on all functions in schema agent to agent;
 create user manager with password 'manager_password';

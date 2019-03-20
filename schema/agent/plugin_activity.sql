@@ -1,4 +1,5 @@
-create or replace function gatherer.pg_stat_activity(t int default 1) returns setof jsonb AS $$
+drop function if exists gatherer.pg_stat_activity;
+create function gatherer.pg_stat_activity(t int default 1) returns setof jsonb AS $$
 declare
     pg_version_num integer;
 begin
@@ -59,7 +60,8 @@ begin
 end
 $$ language 'plpgsql' security definer;
 
-create or replace function gatherer.pg_stat_activity_waits() returns setof jsonb AS $$
+drop function if exists gatherer.pg_stat_activity_waits;
+create function gatherer.pg_stat_activity_waits() returns setof jsonb AS $$
     select
       jsonb_build_object(
         'state', a.state::text,
@@ -74,7 +76,8 @@ create or replace function gatherer.pg_stat_activity_waits() returns setof jsonb
     group by a.wait_event, a.wait_event_type, a.state
 $$ language 'sql' security definer;
 
-create or replace function gatherer.pg_stat_activity_states(out state text, out count bigint) returns setof record AS $$
+drop function if exists gatherer.pg_stat_activity_states;
+create function gatherer.pg_stat_activity_states(out state text, out count bigint) returns setof record AS $$
 with states as (
   select * from unnest('{active,idle,idle in transaction,idle in transaction (aborted),fastpath function call}'::text[]) as state
 )

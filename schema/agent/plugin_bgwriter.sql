@@ -1,4 +1,5 @@
-create or replace function gatherer.pg_stat_bgwriter() returns setof jsonb AS $$
+drop function if exists gatherer.pg_stat_bgwriter;
+create function gatherer.pg_stat_bgwriter() returns setof jsonb AS $$
     select
         jsonb_build_object(
 

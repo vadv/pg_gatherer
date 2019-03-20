@@ -13,28 +13,48 @@ project is designed to collect and store statistical data of postgresql into oth
 
 Agent is golang-binary with plugins written in lua ( [vadv/gopher-lua-libs](https://github.com/vadv/gopher-lua-libs) ).
 
+# AlertManager
+
+AlertManager is also lua-pluginable. Currently supports telegram and PagerDuty only.
+
 # Deploy
 
 on manager database:
 
 ```
-psql -h manager -d manager -U postgres -1 -f ./schema/manager/schema.sql
-psql -h manager -d manager -U postgres -1 -f ./schema/manager/functions.sql
+$ psql -h manager -d manager -U postgres -1 -f ./schema/manager/schema.sql
+$ psql -h manager -d manager -U postgres -1 -f ./schema/manager/functions.sql
 ```
 
 on target database:
 
 ```
-psql -h target -d target -U postgres -1 -f ./schema/manager/schema.sql
-psql -h target -d target -U postgres -1 -f ./schema/manager/plugin*_.sql
+$ psql -h target -d target -U postgres -1 -f ./schema/agent/init.sql
+$ psql -h target -d target -U postgres -1 -f ./schema/agent/plugin*_.sql
+
+or
+
+$ AGENT_PRIV_CONNECTION="host=target user=postgres" glua-libs ./schema/agent/deploy.lua
 ```
 
-# Start
+# Seed
+
+```sql
+insert into manager.host (token, agent_token, databases, maintenance, severity_policy_id)
+    values ( 'hostname', 'token-key', '{"dbname"}'::text[], f, null);
+```
+
+# Start Agent
 
 ```
 $ go get github.com/vadv/gopher-lua-libs/cmd/glua-libs
-$ vim ./agent/config.yaml
-$ glua-libs ./agent/init.lua
+$ TOKEN=xxx CONNECTION_AGENT=xxx CONNECTION_MANAGER=xxx glua-libs ./agent/init.lua
+```
+
+# Start AlertManager
+
+```
+$ CONNECTION_MANAGER=xxx PAGERDUTY_TOKEN=xxx PAGERDUTY_RK_DEFAULT=xxx glua-libs ./alertmanager/init.lua
 ```
 
 # Examples

@@ -1,6 +1,6 @@
 create extension if not exists pg_stat_statements ;
-
-create or replace function gatherer.pg_stat_statements() returns setof jsonb AS $$
+drop function if exists gatherer.pg_stat_statements;
+create function gatherer.pg_stat_statements() returns setof jsonb AS $$
     select
         jsonb_build_object(
           'current_database', current_database(),

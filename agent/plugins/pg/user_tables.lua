@@ -7,7 +7,7 @@ local helpers = dofile(os.getenv("CONFIG_INIT"))
 local function metric_insert(key, snapshot, value_bigint, value_double, value_jsonb)
   helpers.metric.insert(helpers.host, key, snapshot, value_bigint, value_double, value_jsonb, helpers.connections.manager)
 end
-local db_list = helpers.connections.get_monitored_db_list(helpers.connections.manager, helpers.host)
+local db_list = helpers.connections.get_databases(helpers.connections.manager, helpers.host)
 
 local function collect_for_db(dbname)
 

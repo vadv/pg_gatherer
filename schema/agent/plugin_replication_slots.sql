@@ -1,4 +1,5 @@
-create or replace function gatherer.pg_replication_slots(out slot_name text, out size bigint) returns setof record AS $$
+drop function if exists gatherer.pg_replication_slots;
+create function gatherer.pg_replication_slots(out slot_name text, out size bigint) returns setof record AS $$
 declare
     pg_version_num integer;
     pg_is_in_recovery boolean;

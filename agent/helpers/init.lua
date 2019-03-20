@@ -26,6 +26,7 @@ if os.getenv("CONFIG_INITILIZED") == "TRUE" then
   helpers.connections = {}
   helpers.connections.manager = dofile(filepath.join(current_dir, "connections", "manager.lua"))
   helpers.connections.get_agent_connection = dofile(filepath.join(current_dir, "connections", "get_agent_connection.lua"))
+  helpers.connections.get_databases = dofile(filepath.join(current_dir, "connections", "get_databases.lua"))
   helpers.is_rds = helpers.rds.is_rds( helpers.connections.get_agent_connection() )
   helpers.host = helpers.config.host( os.getenv("TOKEN"), helpers.connections.manager )
   helpers.metric = {}

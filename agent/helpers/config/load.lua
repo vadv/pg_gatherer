@@ -37,6 +37,7 @@ local function save_config_to_env(config)
   os.setenv("TOKEN", config.token)
   os.setenv("CONNECTION_AGENT", config.connections.agent)
   os.setenv("CONNECTION_MANAGER", config.connections.manager)
+  os.setenv("CACHE_PATH", config.cache_path)
   if config.filename then os.setenv("CONFIG_FILENAME", config.filename) end
 end
 

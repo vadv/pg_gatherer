@@ -1,4 +1,5 @@
-create or replace function gatherer.pg_stat_user_tables() returns setof jsonb AS $$
+drop function if exists gatherer.pg_stat_user_tables;
+create function gatherer.pg_stat_user_tables() returns setof jsonb AS $$
     select
         jsonb_build_object(
           'relid', relid::bigint,
@@ -30,7 +31,8 @@ create or replace function gatherer.pg_stat_user_tables() returns setof jsonb AS
       inner join pg_catalog.pg_class c on c.oid = p.relid;
 $$ language 'sql' security definer;
 
-create or replace function gatherer.pg_statio_user_tables() returns setof jsonb AS $$
+drop function if exists gatherer.pg_statio_user_tables;
+create function gatherer.pg_statio_user_tables() returns setof jsonb AS $$
     select
         jsonb_build_object(
           'relid', relid::bigint,

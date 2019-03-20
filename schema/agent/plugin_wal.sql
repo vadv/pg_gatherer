@@ -1,4 +1,5 @@
-create or replace function gatherer.pg_wal_position(
+drop function if exists gatherer.pg_wal_position;
+create function gatherer.pg_wal_position(
     out wal_position bigint
     , out pg_is_in_recovery boolean
     , out time_lag float8

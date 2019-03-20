@@ -1,4 +1,5 @@
-create or replace function gatherer.pg_block() returns setof jsonb AS $$
+drop function if exists gatherer.pg_block;
+create function gatherer.pg_block() returns setof jsonb AS $$
     SELECT
     jsonb_build_object(
          'current_database', current_database(),
