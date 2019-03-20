@@ -32,6 +32,14 @@ local function save_config_to_env(config)
 
   if os.getenv("CONFIG_INITILIZED") == "TRUE" then return end
 
+  if (not os.getenv("CONNECTION_AGENT")) and (not config.connections.agent) then
+    error("please setup agent connection")
+  end
+
+  if (not os.getenv("CONNECTION_MANAGER")) and (not config.connections.manager) then
+    error("please setup manager connection")
+  end
+
   local current_dir = filepath.dir(debug.getinfo(1).source)
   os.setenv("CONFIG_INIT", filepath.join(current_dir, "..", "init.lua"))
   os.setenv("TOKEN", config.token)
