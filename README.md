@@ -68,7 +68,7 @@ WITH top_20_tables AS(
         sum( coalesce((m.value_jsonb->>'heap_blks_read')::float8, 0) )  as "rows"
     FROM manager.metric m
     WHERE
-        $__unixEpochFilter(ts) AND
+        $__unixEpochFilter(snapshot) AND
         host = md5('$host')::uuid AND
         plugin = md5('pg.user_tables.io')::uuid
     GROUP BY 1
@@ -77,13 +77,13 @@ WITH top_20_tables AS(
 )
 
 SELECT
-  m.ts AS "time",
+  m.snapshot AS "time",
   m.value_jsonb->>'full_table_name' as "table",
   sum( coalesce((m.value_jsonb->>'heap_blks_read')::float8, 0) )  * 8 * 1024 as "heap"
 FROM manager.metric m
 INNER JOIN top_20_tables t ON t.table = m.value_jsonb->>'full_table_name'
 WHERE
-  $__unixEpochFilter(ts) AND
+  $__unixEpochFilter(snapshot) AND
   host = md5('$host')::uuid AND
   plugin = md5('pg.user_tables.io')::uuid
 GROUP BY 1,2
@@ -91,6 +91,19 @@ ORDER BY 1
 ```
 
 or use the sql language to find problem :)
+
+```sql
+SELECT
+  snapshot as "time",
+  sum( coalesce((value_jsonb->>'seq_scan')::float8, 0) )
+from manager.metric where
+  ts > 1500000000 AND
+  host = md5('$host')::uuid AND
+  plugin = md5('pg.user_tables')::uuid AND
+  coalesce((value_jsonb->>'relpages')::bigint, 0)> (256*1024*1024) / (8*1024)
+group by snapshot
+order by snapshot;
+```
 
 ![common](/img/common-stats.png)
 ![databases](/img/databases.png)
