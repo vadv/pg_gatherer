@@ -3,7 +3,6 @@ drop function if exists gatherer.pg_stat_statements;
 create function gatherer.pg_stat_statements() returns setof jsonb AS $$
     select
         jsonb_build_object(
-          'current_database', current_database(),
           'queryid', queryid::bigint,
           'dbname', d.datname::text,
           'user', pg_catalog.pg_get_userbyid(userid)::text,

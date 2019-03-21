@@ -10,6 +10,7 @@ create user agent password 'agent_password';
 grant usage on schema agent to agent;
 grant execute on all functions in schema agent to agent;
 create user manager with password 'manager_password';
+grant usage on schema manager to manager;
 grant SELECT ON ALL tables in schema  manager to manager;
 grant execute on all functions in schema manager to manager;
 alter default privileges in schema manager grant select ON tables TO manager ;

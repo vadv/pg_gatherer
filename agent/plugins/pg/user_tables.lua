@@ -72,6 +72,9 @@ local function collect_for_db(dbname)
 
 end
 
+for _, db in pairs(db_list) do
+  print("enable ", plugin, "for database: ", db)
+end
 
 local function collect()
   for _, db in pairs(db_list) do collect_for_db(db) end

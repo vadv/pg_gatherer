@@ -23,7 +23,7 @@ begin
     for month_counter IN min_month_counter..12 loop
         month_name := (select lpad(month_counter::text, 2, '0') );
         partition_table_name := main_table_name || '_' || year || '_' || month_name;
-        partition_index_name := quote_ident('metric_' || host) || '_' || year || '_' || month_name || '_idx' ;
+        partition_index_name := 'metric_' || md5(host)::text || '_' || year || '_' || month_name || '_idx' ;
         interval_begin := ( select (month_counter - 1 || ' month')::interval  );
         interval_end := ( select (month_counter || ' month')::interval - interval '1 second'  );
         begin_at := (select extract(epoch from date_trunc('year', year_date) + interval_begin ));
