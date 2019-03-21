@@ -11,8 +11,8 @@ local function get_databases(manager, host)
   local result, err = stmt:query(host)
   if err then error(err) end
   local db = {}
-  for k, db in pairs(result.rows) do
-    table.insert(db, v)
+  for k, v in pairs(result.rows) do
+    table.insert(db, v[1])
   end
   return db
 end
