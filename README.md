@@ -41,7 +41,7 @@ $ AGENT_PRIV_CONNECTION="host=target user=postgres" glua-libs ./schema/agent/dep
 
 ```sql
 insert into manager.host (token, agent_token, databases, maintenance, severity_policy_id)
-    values ( 'hostname', 'token-key', '{"dbname"}'::text[], f, null);
+    values ( 'hostname', 'token-key', '{"dbname"}'::text[], false, null);
 ```
 
 # Start Agent
@@ -57,17 +57,51 @@ $ TOKEN=xxx CONNECTION_AGENT=xxx CONNECTION_MANAGER=xxx glua-libs ./agent/init.l
 $ CONNECTION_MANAGER=xxx PAGERDUTY_TOKEN=xxx PAGERDUTY_RK_DEFAULT=xxx glua-libs ./alertmanager/init.lua
 ```
 
-# Examples
+# Metrics
 
 ![common](/img/common-stats.png)
-![activity](/img/activity.png)
-![statements-disk](/img/statements-disk.png)
-![statements-total-time](/img/statements-total-time.png)
-![blocks](/img/blocks.png)
 ![databases](/img/databases.png)
-![rows-statistics](/img/rows-statistics.png)
-![disk-read-per-table](/img/disk-read-per-table.png)
-![bgwriter-status](/img/bgwriter-status.png)
-![linux-metrics-1](/img/linux-metrics-1.png)
-![linux-metrics-2](/img/linux-metrics-2.png)
+![backends status](/img/backends-status.png)
+![backends waits](/img/backends-waits.png)
+![statements](/img/statements.png)
+![locks](/img/locks.png)
+![long queries](/img/long-queries.png)
+![read per table](/img/read-per-table.png)
+![tuples per table](/img/tuples-per-table.png)
+![seq scans per table](/img/seq-scans-per-table.png)
+![cpu](/img/cpu.png)
+![disk](/img/disk.png)
+![memory](/img/memory.png)
 ![vacuum-activity](/img/vacuum-activity.png)
+![buffers-write](/img/buffers-write.png)
+
+Also, you can easily to add new metrics to dashboard grafana using sql:
+
+```sql
+WITH top_20_tables AS(
+    SELECT
+        m.value_jsonb->>'full_table_name' as "table",
+        sum( coalesce((m.value_jsonb->>'heap_blks_read')::float8, 0) )  as "rows"
+    FROM manager.metric m
+    WHERE
+        $__unixEpochFilter(ts) AND
+        host = md5('$host')::uuid AND
+        plugin = md5('pg.user_tables.io')::uuid
+    GROUP BY 1
+    ORDER BY 2 DESC
+    LIMIT 20
+)
+
+SELECT
+  m.ts AS "time",
+  m.value_jsonb->>'full_table_name' as "table",
+  sum( coalesce((m.value_jsonb->>'heap_blks_read')::float8, 0) )  * 8 * 1024 as "heap"
+FROM manager.metric m
+INNER JOIN top_20_tables t ON t.table = m.value_jsonb->>'full_table_name'
+WHERE
+  $__unixEpochFilter(ts) AND
+  host = md5('$host')::uuid AND
+  plugin = md5('pg.user_tables.io')::uuid
+GROUP BY 1,2
+ORDER BY 1
+```
