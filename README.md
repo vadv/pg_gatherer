@@ -98,7 +98,7 @@ SELECT
   sum( coalesce((value_jsonb->>'seq_scan')::float8, 0) )
 from manager.metric where
   ts > 1500000000 AND
-  host = md5('$host')::uuid AND
+  host = md5('hostname')::uuid AND
   plugin = md5('pg.user_tables')::uuid AND
   coalesce((value_jsonb->>'relpages')::bigint, 0)> (256*1024*1024) / (8*1024)
 group by snapshot
