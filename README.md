@@ -59,23 +59,7 @@ $ CONNECTION_MANAGER=xxx PAGERDUTY_TOKEN=xxx PAGERDUTY_RK_DEFAULT=xxx glua-libs 
 
 # Metrics
 
-![common](/img/common-stats.png)
-![databases](/img/databases.png)
-![backends status](/img/backends-status.png)
-![backends waits](/img/backends-waits.png)
-![statements](/img/statements.png)
-![locks](/img/locks.png)
-![long queries](/img/long-queries.png)
-![read per table](/img/read-per-table.png)
-![tuples per table](/img/tuples-per-table.png)
-![seq scans per table](/img/seq-scans-per-table.png)
-![cpu](/img/cpu.png)
-![disk](/img/disk.png)
-![memory](/img/memory.png)
-![vacuum-activity](/img/vacuum-activity.png)
-![buffers-write](/img/buffers-write.png)
-
-Also, you can easily to add new metrics to dashboard grafana using sql:
+You can easily to add new metrics to dashboard grafana using sql:
 
 ```sql
 WITH top_20_tables AS(
@@ -105,3 +89,21 @@ WHERE
 GROUP BY 1,2
 ORDER BY 1
 ```
+
+or use the sql language to find problem :)
+
+![common](/img/common-stats.png)
+![databases](/img/databases.png)
+![backends status](/img/backends-status.png)
+![backends waits](/img/backends-waits.png)
+![statements](/img/statements.png)
+![locks](/img/locks.png)
+![long queries](/img/long-queries.png)
+![read per table](/img/read-per-table.png)
+![tuples per table](/img/tuples-per-table.png)
+![seq scans per table](/img/seq-scans-per-table.png)
+![cpu](/img/cpu.png)
+![disk](/img/disk.png)
+![memory](/img/memory.png)
+![vacuum-activity](/img/vacuum-activity.png)
+![buffers-write](/img/buffers-write.png)
