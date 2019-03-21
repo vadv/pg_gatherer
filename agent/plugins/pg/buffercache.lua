@@ -20,6 +20,7 @@ local function collect_for_db(dbname)
   per_usage["0"], per_usage["1"], per_usage["2"] = 0, 0, 0
   per_usage["3"], per_usage["4"], per_usage["5"] = 0, 0, 0
   local per_dirty = {dirty = 0, clean = 0}
+  local snapshot = 0
 
   for _, row in pairs(result.rows) do
     local jsonb, err = json.decode(row[2])
@@ -29,6 +30,7 @@ local function collect_for_db(dbname)
       local usagecount = tostring(jsonb.usagecount)
       local isdirty = jsonb.isdirty
       local buffers = jsonb.buffers
+      snapshot = row[1]
 
       if full_table_name and not(usagecount == nil) and not(isdirty == nil) and not(buffers == nil) then
 
@@ -54,16 +56,16 @@ local function collect_for_db(dbname)
 
   local jsonb, err = json.encode(per_table)
   if err then error(err) end
-  metric_insert(plugin..".relation", row[1], nil, nil, jsonb)
+  metric_insert(plugin..".relation", snapshot, nil, nil, jsonb)
   per_table = nil
 
   local jsonb, err = json.encode(per_usage)
   if err then error(err) end
-  metric_insert(plugin..".usage", row[1], nil, nil, jsonb)
+  metric_insert(plugin..".usage", snapshot, nil, nil, jsonb)
 
   local jsonb, err = json.encode(per_dirty)
   if err then error(err) end
-  metric_insert(plugin..".dirty", row[1], nil, nil, jsonb)
+  metric_insert(plugin..".dirty", snapshot, nil, nil, jsonb)
 
 end
 
