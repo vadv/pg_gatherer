@@ -12,7 +12,9 @@ grant execute on all functions in schema agent to agent;
 create user manager with password 'manager_password';
 grant SELECT ON ALL tables in schema  manager to manager;
 grant execute on all functions in schema manager to manager;
+alter default privileges in schema manager grant select ON tables TO manager ;
 
 create user grafana_reader password 'grafana_reader_password';
 grant USAGE on SCHEMA manager to grafana_reader;
 grant SELECT on ALL tables in schema manager to grafana_reader;
+ alter default privileges in schema manager grant select ON tables TO grafana_reader ;
