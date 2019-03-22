@@ -1,6 +1,7 @@
 create extension if not exists pg_buffercache ;
 drop function if exists gatherer.pg_buffer_cache_uses;
 create function gatherer.pg_buffer_cache_uses() returns setof jsonb AS $$
+    set local work_mem to '128MB';
     select
         jsonb_build_object(
           'full_relation_name', current_database() || '.' || n.nspname || '.' || c.relname,
