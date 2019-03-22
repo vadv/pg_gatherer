@@ -1,5 +1,3 @@
-local json = require('json')
-local time = require('time')
 local plugin = 'pg.buffercache'
 
 local helpers = dofile(os.getenv("CONFIG_INIT"))
@@ -15,57 +13,9 @@ local function collect_for_db(dbname)
   local result, err = agent:query("select gatherer.snapshot_id(300), * from gatherer.pg_buffer_cache_uses()")
   if err then error(err) end
 
-  local per_table = {}
-  local per_usage = {}
-  per_usage["0"], per_usage["1"], per_usage["2"] = 0, 0, 0
-  per_usage["3"], per_usage["4"], per_usage["5"] = 0, 0, 0
-  local per_dirty = {dirty = 0, clean = 0}
-  local snapshot = 0
-
   for _, row in pairs(result.rows) do
-    local jsonb, err = json.decode(row[2])
-    if err then error(err) end
-
-      local full_table_name = jsonb.full_table_name
-      local usagecount = tostring(jsonb.usagecount)
-      local isdirty = jsonb.isdirty
-      local buffers = jsonb.buffers
-      snapshot = row[1]
-
-      if full_table_name and not(usagecount == nil) and not(isdirty == nil) and not(buffers == nil) then
-
-        -- count buffers per table
-        if not per_table[full_table_name] then
-          per_table[full_table_name] = buffers
-        else
-          per_table[full_table_name] = per_table[full_table_name] + buffers
-        end
-
-        -- count buffers usagecount
-        per_usage[ tostring(usagecount) ] = per_usage[ tostring(usagecount) ] + buffers
-
-        -- count buffers dirty
-        if isdirty then
-          per_dirty.dirty = per_dirty.dirty + buffers
-        else
-          per_dirty.clean = per_dirty.clean + buffers
-        end
-
-      end
+    metric_insert(plugin, row[1], nil, nil, row[2])
   end
-
-  local jsonb, err = json.encode(per_table)
-  if err then error(err) end
-  metric_insert(plugin..".relation", snapshot, nil, nil, jsonb)
-  per_table = nil
-
-  local jsonb, err = json.encode(per_usage)
-  if err then error(err) end
-  metric_insert(plugin..".usage", snapshot, nil, nil, jsonb)
-
-  local jsonb, err = json.encode(per_dirty)
-  if err then error(err) end
-  metric_insert(plugin..".dirty", snapshot, nil, nil, jsonb)
 
 end
 
