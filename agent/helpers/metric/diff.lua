@@ -104,7 +104,7 @@ local function diff(key, value)
 
   save(key, value)
 
-  return value - value
+  return value - prev
 end
 
 return diff

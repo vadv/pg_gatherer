@@ -24,5 +24,6 @@ create function gatherer.pg_stat_statements() returns setof jsonb AS $$
         ) as result
     from
       pg_stat_statements s
-      inner join pg_database d on s.dbid = d.oid;
+      inner join pg_database d on s.dbid = d.oid
+    where not(query ~ '^SAVEPOINT ') and not(query ~ '^RELEASE SAVEPOINT');
 $$ language 'sql' security definer;
