@@ -1,3 +1,4 @@
 #!/bin/sh -ex
-docker build -t gatherer:latest -f Dockerfile.example .
-docker run --rm -t -v $(pwd):/app -i gatherer bash
+pushd `dirname "$(readlink -f "$0")"`
+docker build -t pg_gatherer:latest -f Dockerfile.example .
+docker run --rm -t -v $(pwd):/app -i pg_gatherer bash
