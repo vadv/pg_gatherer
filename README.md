@@ -34,7 +34,7 @@ $ psql -h target -d target -U postgres -1 -f ./schema/agent/plugin*_.sql
 
 or
 
-$ AGENT_PRIV_CONNECTION="host=target user=postgres" glua-libs ./schema/agent/deploy.lua
+$ AGENT_PRIV="host=target user=postgres" glua-libs ./schema/agent/deploy.lua
 ```
 
 # Seed
@@ -48,13 +48,14 @@ insert into manager.host (token, agent_token, main_connection, additional_connec
 
 ```
 $ go get --tags 'sqlite' github.com/vadv/gopher-lua-libs/cmd/glua-libs
-$ TOKEN=xxx MANAGER=xxx glua-libs ./agent/init.lua
+$ TOKEN=xxx MANAGER="host=xxx" glua-libs ./agent/init.lua
 ```
 
 # Start AlertManager
 
 ```
-$ MANAGER=xxx PAGERDUTY_TOKEN=xxx PAGERDUTY_RK_DEFAULT=xxx glua-libs ./alertmanager/init.lua
+$ go get --tags 'sqlite' github.com/vadv/gopher-lua-libs/cmd/glua-libs
+$ MANAGER="host=xxx" PAGERDUTY_TOKEN=xxx PAGERDUTY_RK_DEFAULT=xxx glua-libs ./alertmanager/init.lua
 ```
 
 # Metrics
