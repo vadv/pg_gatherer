@@ -17,7 +17,6 @@ TimeoutStopSec=5
 #MemoryMax=1G
 
 Environment="TOKEN=coreveNgoh7u"
-Environment="CONNECTION_AGENT=postgresql://agent_monitoring_db:password@monitored_host/db?connect_timeout=10&application_name=pg_gatherer&sslmode=disable"
-Environment="CONNECTION_MANAGER=postgresql://agent:password@manager_host/gatherer?connect_timeout=10&application_name=pg_gatherer&sslmode=disable"
+Environment="MANAGER=postgresql://agent:password@manager_host/gatherer?connect_timeout=10&application_name=pg_gatherer&sslmode=disable"
 Environment="CACHE_PATH=/var/tmp/gatherer/host"
 ExecStart=/usr/local/bin/glua-libs /opt/pg_gatherer/agent/init.lua

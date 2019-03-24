@@ -7,7 +7,6 @@ local helpers = {}
 -- config
 helpers.config = {}
 helpers.config.load = dofile(filepath.join(current_dir, "config", "load.lua"))
-helpers.config.host = dofile(filepath.join(current_dir, "config", "host.lua"))
 
 -- linux
 helpers.linux = {}
@@ -23,12 +22,11 @@ helpers.runner = {}
 helpers.runner.run_every = dofile(filepath.join(current_dir, "runner", "run_every.lua"))
 
 if os.getenv("CONFIG_INITILIZED") == "TRUE" then
-  helpers.connections = {}
-  helpers.connections.manager = dofile(filepath.join(current_dir, "connections", "manager.lua"))
-  helpers.connections.get_agent_connection = dofile(filepath.join(current_dir, "connections", "get_agent_connection.lua"))
-  helpers.connections.get_databases = dofile(filepath.join(current_dir, "connections", "get_databases.lua"))
-  helpers.is_rds = helpers.rds.is_rds( helpers.connections.get_agent_connection() )
-  helpers.host = helpers.config.host( os.getenv("TOKEN"), helpers.connections.manager )
+  helpers.manager = dofile(filepath.join(current_dir, "connections", "manager.lua"))
+  helpers.agent = dofile(filepath.join(current_dir, "connections", "agent.lua"))
+  helpers.get_additional_agent_connections = dofile(
+    filepath.join(current_dir, "connections", "get_additional_agent_connections.lua"))
+  helpers.is_rds = helpers.rds.is_rds( helpers.agent() )
   helpers.metric = {}
   helpers.metric.speed = dofile(filepath.join(current_dir, "metric", "speed.lua"))
   helpers.metric.diff = dofile(filepath.join(current_dir, "metric", "diff.lua"))

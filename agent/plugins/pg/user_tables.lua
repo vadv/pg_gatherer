@@ -5,16 +5,17 @@ local plugin = 'pg.user_tables'
 local helpers = dofile(os.getenv("CONFIG_INIT"))
 
 local function metric_insert(key, snapshot, value_bigint, value_double, value_jsonb)
-  helpers.metric.insert(helpers.host, key, snapshot, value_bigint, value_double, value_jsonb, helpers.connections.manager)
+  helpers.metric.insert(key, snapshot, value_bigint, value_double, value_jsonb, helpers.manager)
 end
-local db_list = helpers.connections.get_databases(helpers.connections.manager, helpers.host)
 
-local function collect_for_db(dbname)
+local snapshot = nil
 
-  local agent = helpers.connections.get_agent_connection(dbname)
+local function collect_for_db(connection_string)
+  local agent = helpers.agent(connection_string)
   local result, err = agent:query("select gatherer.snapshot_id(), * from gatherer.pg_stat_user_tables()")
   if err then error(err) end
   for _, row in pairs(result.rows) do
+    if not snapshot then snapshot = row[1] end
     local jsonb, err = json.decode(row[2])
     if err then error(err) end
 
@@ -42,13 +43,15 @@ local function collect_for_db(dbname)
         jsonb.n_tup_del or jsonb.n_tup_hot_upd then
         local jsonb, err = json.encode(jsonb)
         if err then error(err) end
-        metric_insert(plugin, row[1], nil, nil, jsonb)
+        metric_insert(plugin, snapshot, nil, nil, jsonb)
     end
   end
+  snapshot = nil
 
   local result, err = agent:query("select gatherer.snapshot_id(), * from gatherer.pg_statio_user_tables()")
   if err then error(err) end
   for _, row in pairs(result.rows) do
+    if not snapshot then snapshot = row[1] end
     local jsonb, err = json.decode(row[2])
     if err then error(err) end
 
@@ -66,18 +69,16 @@ local function collect_for_db(dbname)
         jsonb.toast_blks_read or jsonb.toast_blks_hit or jsonb.tidx_blks_read or jsonb.tidx_blks_hit then
         local jsonb, err = json.encode(jsonb)
         if err then error(err) end
-        metric_insert(plugin..".io", row[1], nil, nil, jsonb)
+        metric_insert(plugin..".io", snapshot, nil, nil, jsonb)
     end
   end
 
 end
 
-for _, db in pairs(db_list) do
-  print("enable ", plugin, "for database: ", db)
-end
-
 local function collect()
-  for _, db in pairs(db_list) do collect_for_db(db) end
+  collect_for_db()
+  for _, str in pairs(helpers.get_additional_agent_connections()) do collect_for_db(str) end
+  snapshot = nil
 end
 
 -- run collect

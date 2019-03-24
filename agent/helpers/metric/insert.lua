@@ -6,9 +6,9 @@ local function build_stmt(manager)
   return stmt
 end
 
-local function insert(host, plugin, snapshot, value_bigint, value_double, value_jsonb, manager)
+local function insert(plugin, snapshot, value_bigint, value_double, value_jsonb, manager)
   stmt = build_stmt(manager)
-  local _, err = stmt:exec(host, plugin, snapshot, value_bigint, value_double, value_jsonb)
+  local _, err = stmt:exec(os.getenv("TOKEN"), plugin, snapshot, value_bigint, value_double, value_jsonb)
   if err then error("exec error: "..err) end
 end
 

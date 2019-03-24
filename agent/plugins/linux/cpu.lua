@@ -4,10 +4,10 @@ local plugin = 'linux.cpu'
 
 local helpers = dofile(os.getenv("CONFIG_INIT"))
 
-local agent = helpers.connections.agent
-local manager = helpers.connections.manager
+local agent = helpers.agent()
+
 local function metric_insert(key, snapshot, value_bigint, value_double, value_jsonb)
-  helpers.metric.insert(helpers.host, key, snapshot, value_bigint, value_double, value_jsonb, helpers.connections.manager)
+  helpers.metric.insert(key, snapshot, value_bigint, value_double, value_jsonb, helpers.manager)
 end
 
 -- read line from /proc/stat

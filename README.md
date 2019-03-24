@@ -40,21 +40,21 @@ $ AGENT_PRIV_CONNECTION="host=target user=postgres" glua-libs ./schema/agent/dep
 # Seed
 
 ```sql
-insert into manager.host (token, agent_token, databases, maintenance, severity_policy_id)
-    values ( 'hostname', 'token-key', '{"dbname"}'::text[], false, null);
+insert into manager.host (token, agent_token, main_connection, additional_connections, maintenance, severity_policy_id)
+    values ( 'hostname', 'token-key', 'host=xxx dbname=xxx', '{"host=xxx dbname=yyy"}'::text[], false, null);
 ```
 
 # Start Agent
 
 ```
-$ go get github.com/vadv/gopher-lua-libs/cmd/glua-libs
-$ TOKEN=xxx CONNECTION_AGENT=xxx CONNECTION_MANAGER=xxx glua-libs ./agent/init.lua
+$ go get --tags 'sqlite' github.com/vadv/gopher-lua-libs/cmd/glua-libs
+$ TOKEN=xxx MANAGER=xxx glua-libs ./agent/init.lua
 ```
 
 # Start AlertManager
 
 ```
-$ CONNECTION_MANAGER=xxx PAGERDUTY_TOKEN=xxx PAGERDUTY_RK_DEFAULT=xxx glua-libs ./alertmanager/init.lua
+$ MANAGER=xxx PAGERDUTY_TOKEN=xxx PAGERDUTY_RK_DEFAULT=xxx glua-libs ./alertmanager/init.lua
 ```
 
 # Metrics

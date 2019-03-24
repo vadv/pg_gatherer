@@ -4,7 +4,7 @@ local plugin = 'linux.memory'
 
 local helpers = dofile(os.getenv("CONFIG_INIT"))
 local function metric_insert(key, snapshot, value_bigint, value_double, value_jsonb)
-  helpers.metric.insert(helpers.host, key, snapshot, value_bigint, value_double, value_jsonb, helpers.connections.manager)
+  helpers.metric.insert(key, snapshot, value_bigint, value_double, value_jsonb, helpers.manager)
 end
 
 local function collect()
