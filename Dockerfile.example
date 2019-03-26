@@ -29,7 +29,6 @@ RUN /usr/pgsql-11/bin/initdb -D /pg/manager && \
     psql -Atc "create user agent password 'agent_password'" && \
     psql -d manager -Atc "grant usage on schema agent to agent" && \
     psql -d manager -Atc "grant execute on all functions in schema agent to agent" && \
-    psql -d manager -Atc "grant usage on schema agent to agent" && \
     psql -Atc "create user manager password 'manager_password'" && \
     psql -d manager -Atc "grant usage on schema manager to manager" && \
     psql -d manager -Atc "grant execute on all functions in schema manager to manager" && \
