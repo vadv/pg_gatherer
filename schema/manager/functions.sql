@@ -89,19 +89,19 @@ begin
 
     -- create alert
     insert into manager.alert(host, key, severity)
-        select hostname, $2, least(p.max, $3)
+        select $1, $2, least(p.max, $3)
             from manager.host h
                 left join manager.severity_policy p on h.severity_policy_id = p.id
                 where
-                    h.name = hostname
-                    and not exists (select 1 from manager.alert a where a.host = hostname and a.key = $2 );
+                    h.name = $1
+                    and not exists (select 1 from manager.alert a where a.host = $1 and a.key = $2 );
 
     -- update info
     update manager.alert set info = $4
         where id in
             ( select id from manager.alert a
                 where
-                    a.host = hostname and a.key = $2
+                    a.host = $1 and a.key = $2
                     and md5(coalesce(a.info::text, ' ')) <> md5(coalesce($4::text, ' '))
             );
 
@@ -117,13 +117,13 @@ declare
     created_at bigint;
     severity manager.severity;
 begin
-    created_at := (select a.created_at from manager.alert a where a.host = hostname and a.key = $2 limit 1);
-    severity := (select a.severity from manager.alert a where a.host = hostname and a.key = $2 limit 1);
+    created_at := (select a.created_at from manager.alert a where a.host = $1 and a.key = $2 limit 1);
+    severity := (select a.severity from manager.alert a where a.host = $1 and a.key = $2 limit 1);
     if created_at is not null then
-        info := (select a.info from manager.alert a where a.host = hostname and a.key = $2 limit 1);
+        info := (select a.info from manager.alert a where a.host = $1 and a.key = $2 limit 1);
         delete from manager.alert a where a.host = host and a.key = $2;
         insert into manager.alert_history (host, key, severity, created_at, ended_at, info)
-            values (hostname, $2, severity, created_at, extract(epoch from current_timestamp)::bigint, info);
+            values ($1, $2, severity, created_at, extract(epoch from current_timestamp)::bigint, info);
     end if;
 end
 $$ language 'plpgsql' security definer;
