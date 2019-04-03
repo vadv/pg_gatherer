@@ -28,8 +28,6 @@ local stmt, err = manager:stmt([[
     and plugin = md5('pg.uptime.checkpointer')::uuid
     and ts > ($2 - 20 * 60)
     and ts < $2
-  order by 2 desc
-  limit 1
 ]])
 
 if err then error(err) end
