@@ -81,15 +81,11 @@ $$ language 'sql' security definer;
 
 -- create alert if needed
 create or replace function manager.create_alert_if_needed(
-    token text,
+    hostname text,
     key text,
     severity manager.severity,
     info jsonb) returns void AS $$
-declare
-    hostname text;
 begin
-
-    hostname := (select name from manager.host where agent_token = $1 limit 1);
 
     -- create alert
     insert into manager.alert(host, key, severity)
@@ -97,7 +93,7 @@ begin
             from manager.host h
                 left join manager.severity_policy p on h.severity_policy_id = p.id
                 where
-                    h.agent_token = $1
+                    h.name = hostname
                     and not exists (select 1 from manager.alert a where a.host = hostname and a.key = $2 );
 
     -- update info
@@ -114,15 +110,13 @@ $$ language 'plpgsql' security definer;
 
 -- resolve alert
 create or replace function manager.resolve_alert(
-    token text,
+    hostname text,
     key text) returns void AS $$
 declare
-    hostname text;
     info jsonb;
     created_at bigint;
     severity manager.severity;
 begin
-    hostname := (select name from manager.host where agent_token = $1 limit 1);
     created_at := (select a.created_at from manager.alert a where a.host = hostname and a.key = $2 limit 1);
     severity := (select a.severity from manager.alert a where a.host = hostname and a.key = $2 limit 1);
     if created_at is not null then
