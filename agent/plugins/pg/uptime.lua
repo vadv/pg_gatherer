@@ -14,7 +14,12 @@ local function collect()
   for _, row in pairs(result.rows) do
     metric_insert(plugin, nil, row[1], nil, nil)
   end
+  local result, err = agent:query("select gatherer.checkpointer_uptime()")
+  if err then error(err) end
+  for _, row in pairs(result.rows) do
+    metric_insert(plugin..".checkpointer", nil, row[1], nil, nil)
+  end
 end
 
 -- run collect
-helpers.runner.run_every(collect, 60)
+helpers.runner.run_every(collect, 360)

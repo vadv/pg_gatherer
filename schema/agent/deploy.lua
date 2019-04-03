@@ -5,7 +5,7 @@ local filepath = require("filepath")
 local ioutil = require("ioutil")
 
 local conn_string = os.getenv("AGENT_PRIV")
-if not conn_string then error("you must be set AGENT_DEPLOY_CONNECTION env variable") end
+if not conn_string then error("you must be set AGENT_PRIV env variable") end
 
 local conn, err = db.open("postgres", conn_string)
 if err then error(err) end
