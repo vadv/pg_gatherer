@@ -2,7 +2,7 @@ drop function if exists gatherer.pg_block;
 create function gatherer.pg_block() returns setof jsonb AS $$
     SELECT
     jsonb_build_object(
-         'current_database', current_database(),
+         'database', blocked_activity.datname,
          'blocked_query_id', md5(blocked_activity.query || blocked_activity.query_start::text)::UUID,
          'blocked_pid', blocked_locks.pid,
          'blocked_user', blocked_activity.usename,

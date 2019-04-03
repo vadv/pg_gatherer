@@ -86,26 +86,26 @@ create or replace function manager.create_alert_if_needed(
     severity manager.severity,
     info jsonb) returns void AS $$
 declare
-    host text;
+    hostname text;
 begin
 
-    host := (select name from manager.host where agent_token = $1 limit 1);
+    hostname := (select name from manager.host where agent_token = $1 limit 1);
 
     -- create alert
     insert into manager.alert(host, key, severity)
-        select host, $2, least(p.max, $3)
+        select hostname, $2, least(p.max, $3)
             from manager.host h
                 left join manager.severity_policy p on h.severity_policy_id = p.id
                 where
                     h.agent_token = $1
-                    and not exists (select 1 from manager.alert a where a.host = host and a.key = $2 );
+                    and not exists (select 1 from manager.alert a where a.host = hostname and a.key = $2 );
 
     -- update info
     update manager.alert set info = $4
         where id in
             ( select id from manager.alert a
                 where
-                    host = host and key = $2
+                    a.host = hostname and a.key = $2
                     and md5(coalesce(a.info::text, ' ')) <> md5(coalesce($4::text, ' '))
             );
 
@@ -117,19 +117,19 @@ create or replace function manager.resolve_alert(
     token text,
     key text) returns void AS $$
 declare
-    host text;
+    hostname text;
     info jsonb;
     created_at bigint;
     severity manager.severity;
 begin
-    host := (select name from manager.host where agent_token = $1 limit 1);
-    created_at := (select a.created_at from manager.alert a where a.host = host and a.key = $2 limit 1);
-    severity := (select a.severity from manager.alert a where a.host = host and a.key = $2 limit 1);
+    hostname := (select name from manager.host where agent_token = $1 limit 1);
+    created_at := (select a.created_at from manager.alert a where a.host = hostname and a.key = $2 limit 1);
+    severity := (select a.severity from manager.alert a where a.host = hostname and a.key = $2 limit 1);
     if created_at is not null then
-        info := (select a.info from manager.alert a where a.host = host and a.key = $2 limit 1);
+        info := (select a.info from manager.alert a where a.host = hostname and a.key = $2 limit 1);
         delete from manager.alert a where a.host = host and a.key = $2;
         insert into manager.alert_history (host, key, severity, created_at, ended_at, info)
-            values (host, $2, severity, created_at, extract(epoch from current_timestamp)::bigint, info);
+            values (hostname, $2, severity, created_at, extract(epoch from current_timestamp)::bigint, info);
     end if;
 end
 $$ language 'plpgsql' security definer;

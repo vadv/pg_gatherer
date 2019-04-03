@@ -2,7 +2,7 @@ local time = require("time")
 local db = require("db")
 local filepath = require("filepath")
 
-local create_table_every_sec = 60*60
+local create_table_every_sec = 24*60*60
 local gc_sqlite_after_save_count = 1000
 
 local sqlite, err = db.open("sqlite3", filepath.join(os.getenv("CACHE_PATH"), "speed.sqlite3"), {shared = true})
