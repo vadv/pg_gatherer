@@ -19,7 +19,7 @@ local function load_file(conn, filename)
   if err then error(err) end
   local _, err = conn:exec(data)
   if err then
-    print(err)
+    print("load", filename, err)
   end
 end
 
@@ -28,7 +28,7 @@ for _, row in pairs(result.rows) do
   print("deploy to host:", host)
   local conn, err = db.open("postgres", agent_conn)
   if err then
-    print(err)
+    print("connect to", host, err)
   else
     load_file(conn, filepath.join(current_dir, "init.sql"))
     for _, filename in pairs( filepath.glob(filepath.join(current_dir, "plugin_*.sql")) ) do
