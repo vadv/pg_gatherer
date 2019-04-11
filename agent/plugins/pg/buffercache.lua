@@ -47,7 +47,7 @@ local function collect_for_db(connection_string)
     if is_dirty then
       database_state.dirty_count = database_state.dirty_count + buffers
     end
-    if usage_count = 0 then
+    if usage_count == 0 then
       database_state.usage_count_0 = database_state.usage_count_0 + buffers
     end
     if usage_count >= 3 then
@@ -68,7 +68,7 @@ local function collect_for_db(connection_string)
       if is_dirty then
         per_relation_stat[relation].dirty_count = per_relation_stat[relation].dirty_count + buffers
       end
-      if usage_count = 0 then
+      if usage_count == 0 then
         per_relation_stat[relation].usage_count_0 = per_relation_stat[relation].usage_count_0 + buffers
       end
       if usage_count >= 3 then
