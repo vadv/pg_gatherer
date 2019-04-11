@@ -42,7 +42,7 @@ local function collect_for_db(connection_string)
     local relation = jsonb.full_relation_name
     local buffers = tonumber(jsonb.buffers) or 0
     local usage_count = tonumber(json.usage_count) or 0
-    local is_dirty = tonumber(json.dirty) or 0
+    local is_dirty = json.dirty
 
     -- calc database_state
     if is_dirty then
