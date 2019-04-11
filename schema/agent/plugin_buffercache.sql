@@ -4,6 +4,7 @@ create function gatherer.pg_buffer_cache_uses() returns setof jsonb AS $$
     set local work_mem to '128MB';
     select
         jsonb_build_object(
+          'current_database', current_database(),
           'full_relation_name', current_database() || '.' || n.nspname || '.' || c.relname,
           'relation_type', CASE c.relkind
             WHEN 'r' THEN 'table'
@@ -22,7 +23,8 @@ create function gatherer.pg_buffer_cache_uses() returns setof jsonb AS $$
         ) as result
     from
       pg_buffercache b
-      inner join pg_catalog.pg_class c on b.relfilenode = pg_relation_filenode(c.oid)
+      inner join pg_catalog.pg_database d on d.oid = b.reldatabase and d.datname = current_database()
+      left join pg_catalog.pg_class c on b.relfilenode = pg_relation_filenode(c.oid)
       left join pg_catalog.pg_namespace n on n.oid = c.relnamespace
       group by c.relname, n.nspname, b.usagecount, b.isdirty, c.relkind
 $$ language 'sql' security definer;
