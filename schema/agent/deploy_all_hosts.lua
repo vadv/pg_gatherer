@@ -23,10 +23,8 @@ local function load_file(conn, filename)
   end
 end
 
-for _, row in pairs(result.rows) do
-  local host, agent_conn, additional_conns = row[1], row[2], row[3]
-  print("deploy to host:", host)
-  local conn, err = db.open("postgres", agent_conn)
+local function deploy_to_connection(conn_string)
+  local conn, err = db.open("postgres", conn_string)
   if err then
     print("connect to", host, err)
   else
@@ -35,5 +33,14 @@ for _, row in pairs(result.rows) do
       load_file(conn, filename)
     end
     conn:close()
+  end
+end
+
+for _, row in pairs(result.rows) do
+  local host, agent_conn, additional_conns = row[1], row[2], row[3]
+  print("deploy to host:", host)
+  deploy_to_connection(agent_conn)
+  for _, conn_string in pairs(additional_conns) do
+    deploy_to_connection(conn_string)
   end
 end
