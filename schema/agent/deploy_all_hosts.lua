@@ -30,6 +30,7 @@ for _, row in pairs(result.rows) do
   if err then
     print(err)
   else
+    load_file(conn, filepath.join(current_dir, "init.sql"))
     for _, filename in pairs( filepath.glob(filepath.join(current_dir, "plugin_*.sql")) ) do
       load_file(conn, filename)
     end
