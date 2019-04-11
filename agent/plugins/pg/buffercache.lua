@@ -1,3 +1,4 @@
+local json = require('json')
 local plugin = 'pg.buffercache'
 
 local helpers = dofile(os.getenv("CONFIG_INIT"))
