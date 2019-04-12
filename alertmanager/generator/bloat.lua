@@ -19,6 +19,16 @@ end
 local alert_key = "table bloat is too big"
 
 local stmt, err = manager:stmt([[
+  with data as (
+    select
+        snapshot,
+        jsonb_array_elements(value_jsonb) as value_jsonb
+    from manager.metric where
+      host = md5($1::text)::uuid
+      and plugin = md5('pg.user_tables')::uuid
+      and ts > ($2 - 10 * 60)
+      and ts < $2
+)
   select
     value_jsonb->>'full_table_name' as "full_table_name",
     round(
@@ -28,12 +38,8 @@ local stmt, err = manager:stmt([[
         )
     ) as "bloat"
   from
-    manager.metric
+    data
   where
-    host = md5($1::text)::uuid
-    and plugin = md5('pg.user_tables')::uuid
-    and ts > ($2 - 10 * 60)
-    and ts < $2
     and coalesce((value_jsonb->>'n_dead_tup')::bigint, 0) > 0
     and (coalesce((value_jsonb->>'relpages')::bigint, 0) * 8 * 1024) > (256*1024*1024)
     and round(

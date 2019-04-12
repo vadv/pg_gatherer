@@ -89,7 +89,7 @@ local function collect()
 
   local jsonb, err = json.encode(user_tables_io_data)
   if err then error(err) end
-  metric_insert(plugin..".io", snapshot, nil, nil, user_tables_io_data)
+  metric_insert(plugin..".io", snapshot, nil, nil, jsonb)
 
 end
 
