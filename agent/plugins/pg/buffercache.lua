@@ -26,7 +26,7 @@ local function collect_for_db(connection_string)
   --]===]
   local database_state = {
     datname = nil,
-    buffers = 0,
+    buffers_count = 0,
     dirty_count = 0,
     usage_count_0 = 0,
     usage_count_3 = 3,
@@ -45,6 +45,7 @@ local function collect_for_db(connection_string)
     local is_dirty = jsonb.dirty
 
     -- calc database_state
+    database_state.buffers_count = database_state.buffers_count + buffers
     if is_dirty then
       database_state.dirty_count = database_state.dirty_count + buffers
     end
