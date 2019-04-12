@@ -16,7 +16,7 @@ local function unixts()
   return helpers.query.unixts(helpers.connections.manager)
 end
 
-local alert_key = "too many waits events"
+local alert_key = "too many wait events"
 
 local stmt, err = manager:stmt([[
   with sum_waits as (
@@ -28,7 +28,7 @@ local stmt, err = manager:stmt([[
     where
       host = md5($1::text)::uuid
       and plugin = md5('pg.activity.waits')::uuid
-      and ts > ( $2 - (10 * 60) )
+      and ts > ( $2 - (20 * 60) )
       and ts < $2
       and value_jsonb->>'state' <> 'idle in transaction'
     group by ts
@@ -52,7 +52,7 @@ function collect()
     if err then error(err) end
 
     if not(result.rows[1] == nil) and not(result.rows[1][1] == nil) then
-      if result.rows[1][1] > 50 then
+      if result.rows[1][1] > 60 then
         local jsonb = {
           custom_details = {
             percentile_90 = result.rows[1][1]

@@ -44,7 +44,7 @@ if err then error(err) end
 local stmt, err = manager:stmt("select key, severity, info, created_at from manager.alert where host = $1")
 if err then error(err) end
 
-local function collect()
+local function fetch_and_send()
   for _, host in pairs(get_hosts()) do
     local result, err = stmt:query(host)
     if err then error(err) end
@@ -82,4 +82,4 @@ local function collect()
   end
 end
 
-helpers.runner.run_every(collect, 10)
+helpers.runner.run_every(fetch_and_send, 10)
