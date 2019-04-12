@@ -13,7 +13,10 @@ end
 local function collect()
   local result, err = agent:query("select gatherer.snapshot_id(), * from gatherer.pg_stat_statements()")
   if err then error(err) end
+
+  local statements_data, snapshot = {}, nil
   for _, row in pairs(result.rows) do
+    if not snapshot then snapshot = row[1] end
     local jsonb, err = json.decode(row[2])
     if err then error(err) end
 
@@ -36,12 +39,12 @@ local function collect()
     jsonb.blk_write_time = helpers.metric.diff(key..".blk_write_time", jsonb.blk_write_time)
 
     if jsonb.calls and (jsonb.calls > 0) then
-      local jsonb, err = json.encode(jsonb)
-      if err then error(err) end
-      metric_insert(plugin, row[1], nil, nil, jsonb)
+      table.insert(statements_data, jsonb)
     end
-
   end
+  local jsonb, err = json.encode(statements_data)
+  if err then error(err) end
+  metric_insert(plugin, snapshot, nil, nil, jsonb)
 end
 
 -- run collect

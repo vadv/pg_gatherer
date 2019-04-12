@@ -9,11 +9,14 @@ local function metric_insert(key, snapshot, value_bigint, value_double, value_js
 end
 
 local snapshot = nil
+local user_tables_stat_data, user_tables_io_data = {}, {}
 
 local function collect_for_db(connection_string)
+
   local agent = helpers.agent(connection_string)
   local result, err = agent:query("select gatherer.snapshot_id(), * from gatherer.pg_stat_user_tables()")
   if err then error(err) end
+
   for _, row in pairs(result.rows) do
     if not snapshot then snapshot = row[1] end
     local jsonb, err = json.decode(row[2])
@@ -41,9 +44,7 @@ local function collect_for_db(connection_string)
         jsonb.autoanalyze_count or jsonb.seq_scan or jsonb.seq_tup_read or jsonb.idx_scan or
         jsonb.idx_tup_fetch or jsonb.idx_tup_fetch or jsonb.n_tup_ins or jsonb.n_tup_upd or
         jsonb.n_tup_del or jsonb.n_tup_hot_upd then
-        local jsonb, err = json.encode(jsonb)
-        if err then error(err) end
-        metric_insert(plugin, snapshot, nil, nil, jsonb)
+        table.insert(user_tables_stat_data, jsonb)
     end
   end
   snapshot = nil
@@ -67,18 +68,29 @@ local function collect_for_db(connection_string)
 
     if jsonb.heap_blks_read or jsonb.heap_blks_hit or jsonb.idx_blks_read or jsonb.idx_blks_hit or
         jsonb.toast_blks_read or jsonb.toast_blks_hit or jsonb.tidx_blks_read or jsonb.tidx_blks_hit then
-        local jsonb, err = json.encode(jsonb)
-        if err then error(err) end
-        metric_insert(plugin..".io", snapshot, nil, nil, jsonb)
+        table.insert(user_tables_io_data, jsonb)
     end
   end
 
 end
 
 local function collect()
+
+  snapshot, user_tables_stat_data, user_tables_io_data = nil, {}, {}
+
   collect_for_db()
-  for _, str in pairs(helpers.get_additional_agent_connections()) do collect_for_db(str) end
-  snapshot = nil
+  for _, str in pairs(helpers.get_additional_agent_connections()) do
+    collect_for_db(str)
+  end
+
+  local jsonb, err = json.encode(user_tables_stat_data)
+  if err then error(err) end
+  metric_insert(plugin, snapshot, nil, nil, jsonb)
+
+  local jsonb, err = json.encode(user_tables_io_data)
+  if err then error(err) end
+  metric_insert(plugin..".io", snapshot, nil, nil, user_tables_io_data)
+
 end
 
 -- run collect
