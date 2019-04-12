@@ -40,7 +40,7 @@ local stmt, err = manager:stmt([[
   from
     data
   where
-    and coalesce((value_jsonb->>'n_dead_tup')::bigint, 0) > 0
+    coalesce((value_jsonb->>'n_dead_tup')::bigint, 0) > 0
     and (coalesce((value_jsonb->>'relpages')::bigint, 0) * 8 * 1024) > (256*1024*1024)
     and round(
       100*coalesce((value_jsonb->>'n_dead_tup')::float8, 0) / (
