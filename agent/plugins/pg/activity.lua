@@ -13,7 +13,7 @@ end
 
 -- sql queries only
 local function collect_rds()
-  local result, err = agent:query("select gatherer.snapshot_id(10), * from gatherer.pg_stat_activity(1)")
+  local result, err = agent:query("select gatherer.snapshot_id(30), * from gatherer.pg_stat_activity(30)")
   if err then error(err) end
   for _, row in pairs(result.rows) do
     metric_insert(plugin, row[1], nil, nil, row[2])
@@ -29,7 +29,7 @@ local function collect_rds()
   if err then error(err) end
   metric_insert(plugin..".states", nil, nil, nil, jsonb)
 
-  local result, err = agent:query("select gatherer.snapshot_id(10), * from gatherer.pg_stat_activity_waits()")
+  local result, err = agent:query("select gatherer.snapshot_id(30), * from gatherer.pg_stat_activity_waits()")
   if err then error(err) end
   for _, row in pairs(result.rows) do
     metric_insert(plugin..".waits", row[1], nil, nil, row[2])
@@ -38,7 +38,7 @@ end
 
 -- with io/cpu statistics
 local function collect_with_linux()
-  local result, err = agent:query("select gatherer.snapshot_id(10), * from gatherer.pg_stat_activity(1)")
+  local result, err = agent:query("select gatherer.snapshot_id(30), * from gatherer.pg_stat_activity(30)")
   if err then error(err) end
   for _, row in pairs(result.rows) do
     local jsonb, err = json.decode(row[2])
@@ -77,7 +77,7 @@ local function collect_with_linux()
   if err then error(err) end
   metric_insert(plugin..".states", nil, nil, nil, jsonb)
 
-  local result, err = agent:query("select gatherer.snapshot_id(10), * from gatherer.pg_stat_activity_waits()")
+  local result, err = agent:query("select gatherer.snapshot_id(30), * from gatherer.pg_stat_activity_waits()")
   if err then error(err) end
   for _, row in pairs(result.rows) do
     metric_insert(plugin..".waits", row[1], nil, nil, row[2])
@@ -88,4 +88,4 @@ end
 local collect_func = collect_with_linux
 if helpers.is_rds then collect_func = collect_rds end
 -- run collect
-helpers.runner.run_every(collect_func, 10)
+helpers.runner.run_every(collect_func, 30)
