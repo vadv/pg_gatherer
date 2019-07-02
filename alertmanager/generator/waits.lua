@@ -52,7 +52,7 @@ function collect()
     if err then error(err) end
 
     if not(result.rows[1] == nil) and not(result.rows[1][1] == nil) then
-      if result.rows[1][1] > 60 then
+      if result.rows[1][1] > 200 then
         local jsonb = {
           custom_details = {
             percentile_90 = result.rows[1][1]

@@ -56,9 +56,12 @@ function collect()
 
       -- humanize info
       local humanize_info = {}
-      for _, size in pairs(info) do
+      for slot_name, size in pairs(info) do
         local size_string = humanize.ibytes(size)
-        table.insert(humanize_info, size_string)
+        table.insert(humanize_info, {
+          slot_name = slot_name,
+          size = size_string,
+        })
       end
 
       local trigger_value = 1024 * 1024 * 1024
