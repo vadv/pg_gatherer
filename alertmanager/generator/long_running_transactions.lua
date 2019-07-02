@@ -1,5 +1,6 @@
 local json = require("json")
 local inspect = require("inspect")
+local strings = require("strings")
 local helpers = dofile(os.getenv("CONFIG_INIT"))
 
 local manager = helpers.connections.manager
@@ -48,10 +49,13 @@ function collect()
     if not(result.rows[1] == nil) and not(result.rows[1][1] == nil) then
       local info, err = json.decode(result.rows[1][1])
       if err then error(err) end
+      -- set default severity
+      local severity = 'critical'
+      if strings.has_prefix(info.query, 'COPY') then severity = 'warning' end
       local jsonb = {custom_details=info}
       local jsonb, err = json.encode(jsonb)
       if err then error(err) end
-      create_alert(host, alert_key, 'critical', jsonb)
+      create_alert(host, alert_key, severity, jsonb)
     else
       resolve_alert(host, alert_key)
     end
