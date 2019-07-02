@@ -1,5 +1,6 @@
 local json = require("json")
 local inspect = require("inspect")
+local humanize = require("humanize")
 local helpers = dofile(os.getenv("CONFIG_INIT"))
 
 local manager = helpers.connections.manager
@@ -53,10 +54,17 @@ function collect()
         if size > max_size then max_size = size end
       end
 
+      -- humanize info
+      local humanize_info
+      for _, size in pairs(info) do
+        local size_string = humanize.ibytes(size)
+        table.insert(humanize_info, size_string)
+      end
+
       local trigger_value = 1024 * 1024 * 1024
       if max_size > trigger_value then
         -- alert
-        local jsonb = {custom_details=info}
+        local jsonb = {custom_details=humanize_info}
         local jsonb, err = json.encode(jsonb)
         if err then error(err) end
         create_alert(host, alert_key, 'critical', jsonb)
