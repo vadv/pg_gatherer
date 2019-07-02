@@ -55,7 +55,7 @@ function collect()
       end
 
       -- humanize info
-      local humanize_info
+      local humanize_info = {}
       for _, size in pairs(info) do
         local size_string = humanize.ibytes(size)
         table.insert(humanize_info, size_string)
