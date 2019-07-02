@@ -72,7 +72,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": null,
-  "iteration": 1553546831532,
+  "iteration": 1562063670015,
   "links": [],
   "panels": [
     {
@@ -97,7 +97,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#299c46"
       ],
-      "datasource": "dba-only-pg",
+      "datasource": "${DS_DBA-ONLY-PG}",
       "decimals": null,
       "format": "s",
       "gauge": {
@@ -180,7 +180,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#299c46"
       ],
-      "datasource": "dba-only-pg",
+      "datasource": "${DS_DBA-ONLY-PG}",
       "decimals": null,
       "format": "decbytes",
       "gauge": {
@@ -263,7 +263,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
-      "datasource": "dba-only-pg",
+      "datasource": "${DS_DBA-ONLY-PG}",
       "format": "Bps",
       "gauge": {
         "maxValue": 100,
@@ -345,7 +345,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
-      "datasource": "dba-only-pg",
+      "datasource": "${DS_DBA-ONLY-PG}",
       "format": "Bps",
       "gauge": {
         "maxValue": 100,
@@ -427,7 +427,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
-      "datasource": "dba-only-pg",
+      "datasource": "${DS_DBA-ONLY-PG}",
       "format": "decbytes",
       "gauge": {
         "maxValue": 100,
@@ -509,7 +509,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#299c46"
       ],
-      "datasource": "dba-only-pg",
+      "datasource": "${DS_DBA-ONLY-PG}",
       "decimals": null,
       "format": "percentunit",
       "gauge": {
@@ -592,7 +592,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
-      "datasource": "dba-only-pg",
+      "datasource": "${DS_DBA-ONLY-PG}",
       "decimals": null,
       "format": "ops",
       "gauge": {
@@ -675,7 +675,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
-      "datasource": "dba-only-pg",
+      "datasource": "${DS_DBA-ONLY-PG}",
       "decimals": null,
       "format": "ops",
       "gauge": {
@@ -758,7 +758,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
-      "datasource": "dba-only-pg",
+      "datasource": "${DS_DBA-ONLY-PG}",
       "decimals": null,
       "format": "ops",
       "gauge": {
@@ -815,7 +815,7 @@
           "expr": "",
           "format": "time_series",
           "intervalFactor": 1,
-          "rawSql": "SELECT\n  snapshot as \"time\",\n  sum((value_jsonb->>'calls')::float8) / 60\nfrom manager.metric where\n  $__unixEpochFilter(ts) AND\n  host = md5('$host')::uuid AND\n  plugin = md5('pg.statements')::uuid\ngroup by snapshot\norder by snapshot;\n",
+          "rawSql": "with data as (\n    select\n        snapshot,\n        jsonb_array_elements(value_jsonb) as value_jsonb\n    from manager.metric where\n        $__unixEpochFilter(ts) AND\n        host = md5('$host')::uuid AND\n        plugin = md5('pg.statements')::uuid\n)\nSELECT\n  snapshot as \"time\",\n  sum((value_jsonb->>'calls')::float8) / 60\nfrom data\ngroup by snapshot\norder by snapshot;\n",
           "refId": "A"
         }
       ],
@@ -841,7 +841,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
-      "datasource": "dba-only-pg",
+      "datasource": "${DS_DBA-ONLY-PG}",
       "decimals": null,
       "format": "s",
       "gauge": {
@@ -898,7 +898,7 @@
           "expr": "",
           "format": "time_series",
           "intervalFactor": 1,
-          "rawSql": "SELECT\n  snapshot as \"time\",\n  sum(coalesce((value_jsonb->>'total_time')::float8,0)) / ( sum(coalesce((value_jsonb->>'calls')::float8, 0)) + 1)\nfrom manager.metric where\n  $__unixEpochFilter(ts) AND\n  host = md5('$host')::uuid AND\n  plugin = md5('pg.statements')::uuid\ngroup by snapshot\norder by snapshot;\n",
+          "rawSql": "with data as (\n    select\n        snapshot,\n        jsonb_array_elements(value_jsonb) as value_jsonb\n    from manager.metric where\n        $__unixEpochFilter(ts) AND\n        host = md5('$host')::uuid AND\n        plugin = md5('pg.statements')::uuid\n)\nSELECT\n  snapshot as \"time\",\n  sum(coalesce((value_jsonb->>'total_time')::float8,0)) / ( sum(coalesce((value_jsonb->>'calls')::float8, 0)) + 1)\nfrom data\ngroup by snapshot\norder by snapshot;\n",
           "refId": "A"
         }
       ],
@@ -924,7 +924,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
-      "datasource": "dba-only-pg",
+      "datasource": "${DS_DBA-ONLY-PG}",
       "decimals": null,
       "format": "s",
       "gauge": {
@@ -1007,7 +1007,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
-      "datasource": "dba-only-pg",
+      "datasource": "${DS_DBA-ONLY-PG}",
       "decimals": null,
       "format": "none",
       "gauge": {
@@ -1090,7 +1090,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
-      "datasource": "dba-only-pg",
+      "datasource": "${DS_DBA-ONLY-PG}",
       "decimals": null,
       "format": "none",
       "gauge": {
@@ -1173,7 +1173,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
-      "datasource": "dba-only-pg",
+      "datasource": "${DS_DBA-ONLY-PG}",
       "decimals": null,
       "format": "short",
       "gauge": {
@@ -1230,7 +1230,7 @@
           "expr": "",
           "format": "time_series",
           "intervalFactor": 1,
-          "rawSql": "SELECT\n  snapshot as \"time\",\n  sum( coalesce((value_jsonb->>'seq_scan')::float8, 0) )\nfrom manager.metric where\n  $__unixEpochFilter(ts) AND\n  host = md5('$host')::uuid AND\n  plugin = md5('pg.user_tables')::uuid AND\n  coalesce((value_jsonb->>'relpages')::bigint, 0)> (256*1024*1024) / (8*1024)\ngroup by snapshot\norder by snapshot;\n",
+          "rawSql": "with data as (\n    select\n        snapshot,\n        jsonb_array_elements(value_jsonb) as value_jsonb\n    from manager.metric where\n        $__unixEpochFilter(ts) AND\n        host = md5('$host')::uuid AND\n        plugin = md5('pg.user_tables')::uuid\n)\nSELECT\n  snapshot as \"time\",\n  sum( coalesce((value_jsonb->>'seq_scan')::float8, 0) )\nfrom data where\n  coalesce((value_jsonb->>'relpages')::bigint, 0)> (256*1024*1024) / (8*1024)\ngroup by snapshot\norder by snapshot;\n",
           "refId": "A"
         }
       ],
@@ -1256,7 +1256,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
-      "datasource": "dba-only-pg",
+      "datasource": "${DS_DBA-ONLY-PG}",
       "decimals": null,
       "format": "percentunit",
       "gauge": {
@@ -1313,7 +1313,7 @@
           "expr": "",
           "format": "time_series",
           "intervalFactor": 1,
-          "rawSql": "SELECT\n  snapshot as \"time\",\n  sum(coalesce((value_jsonb->>'n_dead_tup')::bigint, 0)) / sum(coalesce((value_jsonb->>'n_live_tup')::bigint, 0))\nfrom manager.metric where\n  $__unixEpochFilter(ts) AND\n  host = md5('$host')::uuid AND\n  plugin = md5('pg.user_tables')::uuid\n--  AND coalesce((value_jsonb->>'relpages')::bigint, 0)> (256*1024*1024) / (8*1024)\ngroup by snapshot\norder by snapshot;\n",
+          "rawSql": "SELECT\n  snapshot as \"time\",\n  sum(coalesce((value_jsonb->>'n_dead_tup')::bigint, 0)) / sum(coalesce((value_jsonb->>'n_live_tup')::bigint, 0))\nfrom manager.metric where\n  $__unixEpochFilter(ts) AND\n  host = md5('$host')::uuid AND\n  plugin = md5('pg.user_tables')::uuid\n--  AND coalesce((value_jsonb->>'relpages')::bigint, 0)> (256*1024*1024) / (8*1024)\ngroup by snapshot\nhaving sum(coalesce((value_jsonb->>'n_live_tup')::bigint, 0)) > 0\norder by snapshot;\n",
           "refId": "A"
         }
       ],
@@ -1339,7 +1339,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
-      "datasource": "dba-only-pg",
+      "datasource": "${DS_DBA-ONLY-PG}",
       "decimals": null,
       "format": "percentunit",
       "gauge": {
@@ -1396,7 +1396,7 @@
           "expr": "",
           "format": "time_series",
           "intervalFactor": 1,
-          "rawSql": "WITH dirty as (\r\n    SELECT\r\n      m.snapshot AS \"time\",\r\n      sum( (m.value_jsonb->>'buffers')::bigint )*8*1024 as \"size\"\r\n    FROM manager.metric m\r\n    WHERE\r\n      $__unixEpochFilter(m.ts) AND\r\n      m.host = md5('$host')::uuid AND\r\n      m.plugin = md5('pg.buffercache')::uuid AND\r\n      (m.value_jsonb->>'dirty')::bool = true\r\n    GROUP BY 1\r\n    ORDER BY 1\r\n),\r\nclean as (\r\n    SELECT\r\n      m.snapshot AS \"time\",\r\n      sum( (m.value_jsonb->>'buffers')::bigint )*8*1024 as \"size\"\r\n    FROM manager.metric m\r\n    WHERE\r\n      $__unixEpochFilter(m.ts) AND\r\n      m.host = md5('$host')::uuid AND\r\n      m.plugin = md5('pg.buffercache')::uuid AND\r\n      (m.value_jsonb->>'dirty')::bool = false\r\n    GROUP BY 1\r\n    ORDER BY 1\r\n)\r\n\r\nSELECT\r\n    clean.time,\r\n    (dirty.size / (clean.size + dirty.size + 1)) as \"value\"\r\nFROM clean\r\nINNER JOIN dirty on dirty.time = clean.time ",
+          "rawSql": "WITH dirty as (\nSELECT\n  m.snapshot AS \"time\",\n  sum(COALESCE( (m.value_jsonb->>'dirty_count')::bigint, 0 ) * 8 * 1024) as \"size\"\nFROM manager.metric m\nWHERE\n  $__unixEpochFilter(m.ts) AND\n  m.host = md5('$host')::uuid AND\n  m.plugin = md5('pg.buffercache')::uuid\nGROUP BY 1\nORDER BY 1\n),\ntotal as (\nSELECT\n  m.snapshot AS \"time\",\n  sum(COALESCE( (m.value_jsonb->>'buffers_count')::bigint, 0 ) * 8 * 1024) as \"size\"\nFROM manager.metric m\nWHERE\n  $__unixEpochFilter(m.ts) AND\n  m.host = md5('$host')::uuid AND\n  m.plugin = md5('pg.buffercache')::uuid\nGROUP BY 1\nORDER BY 1\n)\n\nSELECT\n    total.time,\n    (dirty.size / (total.size + 1)) as \"value\"\nFROM total\nINNER JOIN dirty on dirty.time = total.time",
           "refId": "A"
         }
       ],
@@ -1411,7 +1411,7 @@
           "value": "null"
         }
       ],
-      "valueName": "max"
+      "valueName": "current"
     },
     {
       "cacheTimeout": null,
@@ -1422,7 +1422,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#299c46"
       ],
-      "datasource": "dba-only-pg",
+      "datasource": "${DS_DBA-ONLY-PG}",
       "decimals": null,
       "format": "percentunit",
       "gauge": {
@@ -1479,7 +1479,7 @@
           "expr": "",
           "format": "time_series",
           "intervalFactor": 1,
-          "rawSql": "WITH once as (\r\n    SELECT\r\n      m.snapshot AS \"time\",\r\n      sum( (m.value_jsonb->>'buffers')::bigint )*8*1024 as \"size\"\r\n    FROM manager.metric m\r\n    WHERE\r\n      $__unixEpochFilter(m.ts) AND\r\n      m.host = md5('$host')::uuid AND\r\n      m.plugin = md5('pg.buffercache')::uuid AND\r\n      (m.value_jsonb->>'usagecount')::bigint = 0\r\n    GROUP BY 1\r\n    ORDER BY 1\r\n),\r\ntotal as (\r\n    SELECT\r\n      m.snapshot AS \"time\",\r\n      sum( (m.value_jsonb->>'buffers')::bigint )*8*1024 as \"size\"\r\n    FROM manager.metric m\r\n    WHERE\r\n      $__unixEpochFilter(m.ts) AND\r\n      m.host = md5('$host')::uuid AND\r\n      m.plugin = md5('pg.buffercache')::uuid\r\n    GROUP BY 1\r\n    ORDER BY 1\r\n)\r\n\r\nSELECT\r\n    total.time,\r\n    (1-(once.size / (total.size + once.size + 1))) as \"value\"\r\nFROM total\r\nINNER JOIN once on once.time = total.time ",
+          "rawSql": "WITH usage_count_0 as (\nSELECT\n  m.snapshot AS \"time\",\n  sum(COALESCE( (m.value_jsonb->>'usage_count_0')::bigint, 0 ) * 8 * 1024) as \"size\"\nFROM manager.metric m\nWHERE\n  $__unixEpochFilter(m.ts) AND\n  m.host = md5('$host')::uuid AND\n  m.plugin = md5('pg.buffercache')::uuid\nGROUP BY 1\nORDER BY 1\n),\ntotal as (\nSELECT\n  m.snapshot AS \"time\",\n  sum(COALESCE( (m.value_jsonb->>'buffers_count')::bigint, 0 ) * 8 * 1024) as \"size\"\nFROM manager.metric m\nWHERE\n  $__unixEpochFilter(m.ts) AND\n  m.host = md5('$host')::uuid AND\n  m.plugin = md5('pg.buffercache')::uuid\nGROUP BY 1\nORDER BY 1\n)\n\nSELECT\n    total.time,\n    1 - (usage_count_0.size / (total.size + 1)) as \"value\"\nFROM total\nINNER JOIN usage_count_0 on usage_count_0.time = total.time\n",
           "refId": "A"
         }
       ],
@@ -1494,7 +1494,7 @@
           "value": "null"
         }
       ],
-      "valueName": "max"
+      "valueName": "current"
     },
     {
       "collapsed": true,
@@ -1508,7 +1508,7 @@
       "panels": [
         {
           "columns": [],
-          "datasource": "dba-only-pg",
+          "datasource": "${DS_DBA-ONLY-PG}",
           "fontSize": "100%",
           "gridPos": {
             "h": 9,
@@ -1625,7 +1625,7 @@
           "bars": true,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "dba-only-pg",
+          "datasource": "${DS_DBA-ONLY-PG}",
           "fill": 1,
           "gridPos": {
             "h": 11,
@@ -1788,7 +1788,7 @@
       "panels": [
         {
           "columns": [],
-          "datasource": "dba-only-pg",
+          "datasource": "${DS_DBA-ONLY-PG}",
           "fontSize": "100%",
           "gridPos": {
             "h": 8,
@@ -1851,7 +1851,7 @@
                 "skipEmptyValues": false
               },
               "rawQuery": true,
-              "rawSql": "select\r\n    value_jsonb->>'dbname' as \"database\",\r\n    value_jsonb->>'query' as \"query\",\r\n    sum( coalesce( (value_jsonb->>'calls')::bigint, 0 ) ) as \"calls\",\r\n    pg_size_pretty(\r\n      (sum(\r\n        coalesce((value_jsonb->>'shared_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_read')::float8, 0)\r\n      )*8*1024)::bigint\r\n    ) as \"r (b)\",\r\n    pg_size_pretty(\r\n      (sum(\r\n        coalesce((value_jsonb->>'shared_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_dirtied')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_written')::float8, 0)\r\n      )*8/1024)::bigint\r\n    ) as \"w (b)\",\r\n    TO_CHAR( sum(coalesce((value_jsonb->>'blk_read_time')::float8, 0)) * interval '1 second' , 'HH24:MI:SS') as  \"r(s)\",\r\n    TO_CHAR( sum(coalesce((value_jsonb->>'blk_write_time')::float8, 0)) * interval '1 second' , 'HH24:MI:SS') as  \"w(s)\"\r\n    from manager.metric where\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.statements')::uuid\r\n    group by 1,2\r\n    having\r\n    sum(\r\n        coalesce((value_jsonb->>'shared_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'shared_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_dirtied')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_written')::float8, 0)\r\n    ) > 0\r\n    order by sum(\r\n        coalesce((value_jsonb->>'shared_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_read')::float8, 0)\r\n        + coalesce((value_jsonb->>'shared_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'local_blks_dirtied')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_written')::float8, 0)\r\n    ) desc",
+              "rawSql": "with data as (\n    select\n        jsonb_array_elements(value_jsonb) as value_jsonb\n    from manager.metric where\n        $__unixEpochFilter(ts) AND\n        host = md5('$host')::uuid AND\n        plugin = md5('pg.statements')::uuid\n)\nselect\n    value_jsonb->>'dbname' as \"database\",\n    value_jsonb->>'query' as \"query\",\n    sum( coalesce( (value_jsonb->>'calls')::bigint, 0 ) ) as \"calls\",\n    pg_size_pretty(\n      (sum(\n        coalesce((value_jsonb->>'shared_blks_read')::float8, 0)\n        + coalesce((value_jsonb->>'local_blks_read')::float8, 0)\n        + coalesce((value_jsonb->>'temp_blks_read')::float8, 0)\n      )*8*1024)::bigint\n    ) as \"r (b)\",\n    pg_size_pretty(\n      (sum(\n        coalesce((value_jsonb->>'shared_blks_written')::float8, 0)\n        + coalesce((value_jsonb->>'local_blks_written')::float8, 0)\n        + coalesce((value_jsonb->>'local_blks_dirtied')::float8, 0)\n        + coalesce((value_jsonb->>'temp_blks_written')::float8, 0)\n      )*8/1024)::bigint\n    ) as \"w (b)\",\n    TO_CHAR( sum(coalesce((value_jsonb->>'blk_read_time')::float8, 0)) * interval '1 second' , 'HH24:MI:SS') as  \"r(s)\",\n    TO_CHAR( sum(coalesce((value_jsonb->>'blk_write_time')::float8, 0)) * interval '1 second' , 'HH24:MI:SS') as  \"w(s)\"\n    from data\n    group by 1,2\n    having\n    sum(\n        coalesce((value_jsonb->>'shared_blks_read')::float8, 0)\n        + coalesce((value_jsonb->>'local_blks_read')::float8, 0)\n        + coalesce((value_jsonb->>'temp_blks_read')::float8, 0)\n        + coalesce((value_jsonb->>'shared_blks_written')::float8, 0)\n        + coalesce((value_jsonb->>'local_blks_written')::float8, 0)\n        + coalesce((value_jsonb->>'local_blks_dirtied')::float8, 0)\n        + coalesce((value_jsonb->>'temp_blks_written')::float8, 0)\n    ) > 0\n    order by sum(\n        coalesce((value_jsonb->>'shared_blks_read')::float8, 0)\n        + coalesce((value_jsonb->>'local_blks_read')::float8, 0)\n        + coalesce((value_jsonb->>'temp_blks_read')::float8, 0)\n        + coalesce((value_jsonb->>'shared_blks_written')::float8, 0)\n        + coalesce((value_jsonb->>'local_blks_written')::float8, 0)\n        + coalesce((value_jsonb->>'local_blks_dirtied')::float8, 0)\n        + coalesce((value_jsonb->>'temp_blks_written')::float8, 0)\n    ) desc",
               "refId": "A",
               "resultFormat": "time_series",
               "select": [
@@ -1888,7 +1888,7 @@
         },
         {
           "columns": [],
-          "datasource": "dba-only-pg",
+          "datasource": "${DS_DBA-ONLY-PG}",
           "fontSize": "100%",
           "gridPos": {
             "h": 8,
@@ -1951,7 +1951,7 @@
                 "skipEmptyValues": false
               },
               "rawQuery": true,
-              "rawSql": "select\r\n    value_jsonb->>'dbname' as \"database\",\r\n    value_jsonb->>'query' as \"query\",\r\n    pg_size_pretty(\r\n      (sum( \r\n        coalesce((value_jsonb->>'temp_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_read')::float8, 0)\r\n       ))::bigint*8*1024\r\n    ) as \"size\"\r\n    from manager.metric where\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.statements')::uuid\r\n    group by 1,2\r\n    having sum( \r\n        coalesce((value_jsonb->>'temp_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_read')::float8, 0)\r\n      ) > 0\r\n    order by \r\n      sum( \r\n        coalesce((value_jsonb->>'temp_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_read')::float8, 0)\r\n      ) desc\r\n    limit 20",
+              "rawSql": "with data as (\r\n    select\r\n        jsonb_array_elements(value_jsonb) as value_jsonb\r\n    from manager.metric where\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.statements')::uuid\r\n)\r\nselect\r\n    value_jsonb->>'dbname' as \"database\",\r\n    value_jsonb->>'query' as \"query\",\r\n    pg_size_pretty(\r\n      (sum( \r\n        coalesce((value_jsonb->>'temp_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_read')::float8, 0)\r\n       ))::bigint*8*1024\r\n    ) as \"size\"\r\n    from data\r\n    group by 1,2\r\n    having sum( \r\n        coalesce((value_jsonb->>'temp_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_read')::float8, 0)\r\n      ) > 0\r\n    order by \r\n      sum( \r\n        coalesce((value_jsonb->>'temp_blks_written')::float8, 0)\r\n        + coalesce((value_jsonb->>'temp_blks_read')::float8, 0)\r\n      ) desc\r\n    limit 20",
               "refId": "A",
               "resultFormat": "time_series",
               "select": [
@@ -1988,7 +1988,7 @@
         },
         {
           "columns": [],
-          "datasource": "dba-only-pg",
+          "datasource": "${DS_DBA-ONLY-PG}",
           "fontSize": "100%",
           "gridPos": {
             "h": 8,
@@ -2051,7 +2051,7 @@
                 "skipEmptyValues": false
               },
               "rawQuery": true,
-              "rawSql": "select\r\n    value_jsonb->>'dbname' as \"database\",\r\n    value_jsonb->>'query' as \"query\",\r\n    sum( coalesce( (value_jsonb->>'calls')::bigint, 0 ) ) as \"calls\",\r\n    TO_CHAR( sum(coalesce((value_jsonb->>'total_time')::float8, 0)) * interval '1 second' , 'HH24:MI:SS') as \"total_time\"\r\n    from manager.metric where\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.statements')::uuid AND\r\n        value_jsonb->>'query' <> 'BEGIN' AND\r\n        value_jsonb->>'query' <> 'BEGIN READ WRITE' AND\r\n        value_jsonb->>'query' <> 'COMMIT' AND\r\n        value_jsonb->>'query' <> 'ROLLBACK'\r\n    group by 1,2\r\n    order by sum(coalesce((value_jsonb->>'total_time')::float8, 0)) desc\r\n    limit 20",
+              "rawSql": "with data as (\r\n    select\r\n        jsonb_array_elements(value_jsonb) as value_jsonb\r\n    from manager.metric where\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.statements')::uuid\r\n)\r\nselect\r\n    value_jsonb->>'dbname' as \"database\",\r\n    value_jsonb->>'query' as \"query\",\r\n    sum( coalesce( (value_jsonb->>'calls')::bigint, 0 ) ) as \"calls\",\r\n    TO_CHAR( sum(coalesce((value_jsonb->>'total_time')::float8, 0)) * interval '1 second' , 'HH24:MI:SS') as \"total_time\"\r\n    from data where\r\n        value_jsonb->>'query' <> 'BEGIN' AND\r\n        value_jsonb->>'query' <> 'BEGIN READ WRITE' AND\r\n        value_jsonb->>'query' <> 'COMMIT' AND\r\n        value_jsonb->>'query' <> 'ROLLBACK'\r\n    group by 1,2\r\n    order by sum(coalesce((value_jsonb->>'total_time')::float8, 0)) desc\r\n    limit 20",
               "refId": "A",
               "resultFormat": "time_series",
               "select": [
@@ -2103,13 +2103,13 @@
       "panels": [
         {
           "columns": [],
-          "datasource": "dba-only-pg",
+          "datasource": "${DS_DBA-ONLY-PG}",
           "fontSize": "100%",
           "gridPos": {
             "h": 16,
             "w": 24,
             "x": 0,
-            "y": 11
+            "y": 55
           },
           "id": 9,
           "links": [],
@@ -2217,10 +2217,10 @@
       "panels": [
         {
           "columns": [],
-          "datasource": "dba-only-pg",
+          "datasource": "${DS_DBA-ONLY-PG}",
           "fontSize": "100%",
           "gridPos": {
-            "h": 16,
+            "h": 19,
             "w": 24,
             "x": 0,
             "y": 12
@@ -2231,7 +2231,7 @@
           "scroll": true,
           "showHeader": true,
           "sort": {
-            "col": 4,
+            "col": 2,
             "desc": true
           },
           "styles": [
@@ -2320,7 +2320,7 @@
       "type": "row"
     },
     {
-      "collapsed": false,
+      "collapsed": true,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -2328,624 +2328,777 @@
         "y": 12
       },
       "id": 81,
-      "panels": [],
+      "panels": [
+        {
+          "aliasColors": {},
+          "bars": true,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "${DS_DBA-ONLY-PG}",
+          "fill": 1,
+          "gridPos": {
+            "h": 13,
+            "w": 24,
+            "x": 0,
+            "y": 41
+          },
+          "id": 12,
+          "legend": {
+            "alignAsTable": true,
+            "avg": true,
+            "current": true,
+            "max": true,
+            "min": true,
+            "show": true,
+            "sort": "max",
+            "sortDesc": true,
+            "total": false,
+            "values": true
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [
+            {
+              "alias": "fork-rate",
+              "yaxis": 2
+            }
+          ],
+          "spaceLength": 10,
+          "stack": true,
+          "steppedLine": false,
+          "targets": [
+            {
+              "alias": "",
+              "application": {
+                "filter": ""
+              },
+              "format": "time_series",
+              "functions": [],
+              "group": [],
+              "host": {
+                "filter": ""
+              },
+              "item": {
+                "filter": ""
+              },
+              "metricColumn": "none",
+              "mode": 0,
+              "options": {
+                "showDisabledItems": false,
+                "skipEmptyValues": false
+              },
+              "rawQuery": true,
+              "rawSql": "with data as (\n  SELECT\n      m.snapshot as \"time\",\n      j.key as \"relation\",\n      sum(coalesce((j.value->>'buffers')::bigint, 0)*8*1024) as \"size\"\n  FROM manager.metric m\n  CROSS JOIN LATERAL jsonb_each((m.value_jsonb->>'per_relation_stat')::jsonb) j\n  WHERE\n    $__unixEpochFilter(m.ts) AND\n    m.host = md5('$host')::uuid AND\n    m.plugin = md5('pg.buffercache')::uuid\n  GROUP BY 1,2\n  ORDER BY 1,2\n)\n, big_relations as (\n  SELECT\n      d.relation as relation,\n      sum(d.size) as size\n  FROM data d\n  GROUP BY 1\n  ORDER BY 2 DESC\n  LIMIT 20\n)\nSELECT\n  d.time,\n  d.relation,\n  d.size\nFROM data d\nINNER JOIN big_relations t ON t.relation = d.relation\nORDER BY 1,2",
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value_bigint"
+                    ],
+                    "type": "column"
+                  }
+                ]
+              ],
+              "table": "manager.metric",
+              "timeColumn": "ts",
+              "triggers": {
+                "acknowledged": 2,
+                "count": true,
+                "minSeverity": 3
+              },
+              "where": [
+                {
+                  "name": "$__timeFilter",
+                  "params": [],
+                  "type": "macro"
+                },
+                {
+                  "name": "",
+                  "params": [
+                    "host",
+                    "=",
+                    "md5('$host')::uuid"
+                  ],
+                  "type": "expression"
+                },
+                {
+                  "name": "",
+                  "params": [
+                    "plugin",
+                    "=",
+                    "'linux_cpu.running'"
+                  ],
+                  "type": "expression"
+                }
+              ]
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Buffer pool per relation",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "decbytes",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": "0",
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": "0",
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
+        },
+        {
+          "aliasColors": {
+            "dirty": "#508642"
+          },
+          "bars": true,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "${DS_DBA-ONLY-PG}",
+          "fill": 1,
+          "gridPos": {
+            "h": 8,
+            "w": 7,
+            "x": 0,
+            "y": 54
+          },
+          "id": 83,
+          "legend": {
+            "alignAsTable": true,
+            "avg": true,
+            "current": true,
+            "max": true,
+            "min": true,
+            "show": true,
+            "sort": "avg",
+            "sortDesc": true,
+            "total": false,
+            "values": true
+          },
+          "lines": false,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [
+            {
+              "alias": "fork-rate",
+              "yaxis": 2
+            }
+          ],
+          "spaceLength": 10,
+          "stack": true,
+          "steppedLine": false,
+          "targets": [
+            {
+              "alias": "",
+              "application": {
+                "filter": ""
+              },
+              "format": "time_series",
+              "functions": [],
+              "group": [],
+              "host": {
+                "filter": ""
+              },
+              "item": {
+                "filter": ""
+              },
+              "metricColumn": "none",
+              "mode": 0,
+              "options": {
+                "showDisabledItems": false,
+                "skipEmptyValues": false
+              },
+              "rawQuery": true,
+              "rawSql": "SELECT\r\n  m.snapshot AS \"time\",\r\n  sum(COALESCE( (m.value_jsonb->>'dirty_count')::bigint, 0 ) * 8 * 1024) as \"dirty\",\r\n  m.value_jsonb->>'datname' as \"database\"\r\nFROM manager.metric m\r\nWHERE\r\n  $__unixEpochFilter(m.ts) AND\r\n  m.host = md5('$host')::uuid AND\r\n  m.plugin = md5('pg.buffercache')::uuid\r\nGROUP BY 1, m.value_jsonb->>'datname'\r\nORDER BY 1",
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value_bigint"
+                    ],
+                    "type": "column"
+                  }
+                ]
+              ],
+              "table": "manager.metric",
+              "timeColumn": "ts",
+              "triggers": {
+                "acknowledged": 2,
+                "count": true,
+                "minSeverity": 3
+              },
+              "where": [
+                {
+                  "name": "$__timeFilter",
+                  "params": [],
+                  "type": "macro"
+                },
+                {
+                  "name": "",
+                  "params": [
+                    "host",
+                    "=",
+                    "md5('$host')::uuid"
+                  ],
+                  "type": "expression"
+                },
+                {
+                  "name": "",
+                  "params": [
+                    "plugin",
+                    "=",
+                    "'linux_cpu.running'"
+                  ],
+                  "type": "expression"
+                }
+              ]
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Buffer pool (dirty)",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "decbytes",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": "0",
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": "0",
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
+        },
+        {
+          "aliasColors": {
+            "reused": "#890f02",
+            "used one time": "#bf1b00"
+          },
+          "bars": true,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "${DS_DBA-ONLY-PG}",
+          "fill": 1,
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 7,
+            "y": 54
+          },
+          "id": 85,
+          "legend": {
+            "alignAsTable": true,
+            "avg": true,
+            "current": true,
+            "max": true,
+            "min": true,
+            "show": true,
+            "sort": "avg",
+            "sortDesc": true,
+            "total": false,
+            "values": true
+          },
+          "lines": false,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [
+            {
+              "alias": "fork-rate",
+              "yaxis": 2
+            }
+          ],
+          "spaceLength": 10,
+          "stack": true,
+          "steppedLine": false,
+          "targets": [
+            {
+              "alias": "",
+              "application": {
+                "filter": ""
+              },
+              "format": "time_series",
+              "functions": [],
+              "group": [],
+              "host": {
+                "filter": ""
+              },
+              "item": {
+                "filter": ""
+              },
+              "metricColumn": "none",
+              "mode": 0,
+              "options": {
+                "showDisabledItems": false,
+                "skipEmptyValues": false
+              },
+              "rawQuery": true,
+              "rawSql": "SELECT\r\n  m.snapshot AS \"time\",\r\n  sum(COALESCE( (m.value_jsonb->>'usage_count_0')::bigint, 0 ) * 8 * 1024) as \"usage_count_0\",\r\n  m.value_jsonb->>'datname' as \"database\"\r\nFROM manager.metric m\r\nWHERE\r\n  $__unixEpochFilter(m.ts) AND\r\n  m.host = md5('$host')::uuid AND\r\n  m.plugin = md5('pg.buffercache')::uuid\r\nGROUP BY 1, m.value_jsonb->>'datname'\r\nORDER BY 1",
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value_bigint"
+                    ],
+                    "type": "column"
+                  }
+                ]
+              ],
+              "table": "manager.metric",
+              "timeColumn": "ts",
+              "triggers": {
+                "acknowledged": 2,
+                "count": true,
+                "minSeverity": 3
+              },
+              "where": [
+                {
+                  "name": "$__timeFilter",
+                  "params": [],
+                  "type": "macro"
+                },
+                {
+                  "name": "",
+                  "params": [
+                    "host",
+                    "=",
+                    "md5('$host')::uuid"
+                  ],
+                  "type": "expression"
+                },
+                {
+                  "name": "",
+                  "params": [
+                    "plugin",
+                    "=",
+                    "'linux_cpu.running'"
+                  ],
+                  "type": "expression"
+                }
+              ]
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Buffer pool (usagecount = 0)",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "decbytes",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": "0",
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": "0",
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
+        },
+        {
+          "aliasColors": {
+            "reused": "#508642"
+          },
+          "bars": true,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "${DS_DBA-ONLY-PG}",
+          "fill": 1,
+          "gridPos": {
+            "h": 8,
+            "w": 9,
+            "x": 15,
+            "y": 54
+          },
+          "id": 84,
+          "legend": {
+            "alignAsTable": true,
+            "avg": true,
+            "current": true,
+            "max": true,
+            "min": true,
+            "show": true,
+            "sort": "avg",
+            "sortDesc": true,
+            "total": false,
+            "values": true
+          },
+          "lines": false,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [
+            {
+              "alias": "fork-rate",
+              "yaxis": 2
+            }
+          ],
+          "spaceLength": 10,
+          "stack": true,
+          "steppedLine": false,
+          "targets": [
+            {
+              "alias": "",
+              "application": {
+                "filter": ""
+              },
+              "format": "time_series",
+              "functions": [],
+              "group": [],
+              "host": {
+                "filter": ""
+              },
+              "item": {
+                "filter": ""
+              },
+              "metricColumn": "none",
+              "mode": 0,
+              "options": {
+                "showDisabledItems": false,
+                "skipEmptyValues": false
+              },
+              "rawQuery": true,
+              "rawSql": "SELECT\r\n  m.snapshot AS \"time\",\r\n  sum(COALESCE( (m.value_jsonb->>'usage_count_3')::bigint, 0 ) * 8 * 1024) as \"reused\",\r\n  m.value_jsonb->>'datname' as \"database\"\r\nFROM manager.metric m\r\nWHERE\r\n  $__unixEpochFilter(m.ts) AND\r\n  m.host = md5('$host')::uuid AND\r\n  m.plugin = md5('pg.buffercache')::uuid\r\nGROUP BY 1, m.value_jsonb->>'datname'\r\nORDER BY 1",
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value_bigint"
+                    ],
+                    "type": "column"
+                  }
+                ]
+              ],
+              "table": "manager.metric",
+              "timeColumn": "ts",
+              "triggers": {
+                "acknowledged": 2,
+                "count": true,
+                "minSeverity": 3
+              },
+              "where": [
+                {
+                  "name": "$__timeFilter",
+                  "params": [],
+                  "type": "macro"
+                },
+                {
+                  "name": "",
+                  "params": [
+                    "host",
+                    "=",
+                    "md5('$host')::uuid"
+                  ],
+                  "type": "expression"
+                },
+                {
+                  "name": "",
+                  "params": [
+                    "plugin",
+                    "=",
+                    "'linux_cpu.running'"
+                  ],
+                  "type": "expression"
+                }
+              ]
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Buffer pool (usagecount >= 3)",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "decbytes",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": "0",
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": "0",
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": true,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "${DS_DBA-ONLY-PG}",
+          "fill": 1,
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 62
+          },
+          "id": 89,
+          "legend": {
+            "alignAsTable": true,
+            "avg": true,
+            "current": true,
+            "max": true,
+            "min": true,
+            "show": true,
+            "sort": "max",
+            "sortDesc": true,
+            "total": false,
+            "values": true
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [
+            {
+              "alias": "fork-rate",
+              "yaxis": 2
+            }
+          ],
+          "spaceLength": 10,
+          "stack": true,
+          "steppedLine": false,
+          "targets": [
+            {
+              "alias": "",
+              "application": {
+                "filter": ""
+              },
+              "format": "time_series",
+              "functions": [],
+              "group": [],
+              "host": {
+                "filter": ""
+              },
+              "item": {
+                "filter": ""
+              },
+              "metricColumn": "none",
+              "mode": 0,
+              "options": {
+                "showDisabledItems": false,
+                "skipEmptyValues": false
+              },
+              "rawQuery": true,
+              "rawSql": "SELECT\r\n  m.snapshot AS \"time\",\r\n  sum(COALESCE( (m.value_jsonb->>'buffers_count')::bigint, 0 ) * 8 * 1024) as \"count\",\r\n  m.value_jsonb->>'datname' as \"database\"\r\nFROM manager.metric m\r\nWHERE\r\n  $__unixEpochFilter(m.ts) AND\r\n  m.host = md5('$host')::uuid AND\r\n  m.plugin = md5('pg.buffercache')::uuid\r\nGROUP BY 1, m.value_jsonb->>'datname'\r\nORDER BY 1",
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value_bigint"
+                    ],
+                    "type": "column"
+                  }
+                ]
+              ],
+              "table": "manager.metric",
+              "timeColumn": "ts",
+              "triggers": {
+                "acknowledged": 2,
+                "count": true,
+                "minSeverity": 3
+              },
+              "where": [
+                {
+                  "name": "$__timeFilter",
+                  "params": [],
+                  "type": "macro"
+                },
+                {
+                  "name": "",
+                  "params": [
+                    "host",
+                    "=",
+                    "md5('$host')::uuid"
+                  ],
+                  "type": "expression"
+                },
+                {
+                  "name": "",
+                  "params": [
+                    "plugin",
+                    "=",
+                    "'linux_cpu.running'"
+                  ],
+                  "type": "expression"
+                }
+              ]
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Per database",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "decbytes",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": "0",
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": "0",
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
+        }
+      ],
       "title": "Buffer pool",
       "type": "row"
-    },
-    {
-      "aliasColors": {},
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "dba-only-pg",
-      "fill": 1,
-      "gridPos": {
-        "h": 13,
-        "w": 24,
-        "x": 0,
-        "y": 13
-      },
-      "id": 12,
-      "legend": {
-        "alignAsTable": true,
-        "avg": true,
-        "current": true,
-        "max": true,
-        "min": true,
-        "show": true,
-        "sort": "max",
-        "sortDesc": true,
-        "total": false,
-        "values": true
-      },
-      "lines": true,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "null",
-      "percentage": false,
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [
-        {
-          "alias": "fork-rate",
-          "yaxis": 2
-        }
-      ],
-      "spaceLength": 10,
-      "stack": true,
-      "steppedLine": false,
-      "targets": [
-        {
-          "alias": "",
-          "application": {
-            "filter": ""
-          },
-          "format": "time_series",
-          "functions": [],
-          "group": [],
-          "host": {
-            "filter": ""
-          },
-          "item": {
-            "filter": ""
-          },
-          "metricColumn": "none",
-          "mode": 0,
-          "options": {
-            "showDisabledItems": false,
-            "skipEmptyValues": false
-          },
-          "rawQuery": true,
-          "rawSql": "WITH tables AS(\r\n    SELECT\r\n        m.value_jsonb->>'full_relation_name' as \"relation\",\r\n        sum( coalesce((m.value_jsonb->>'buffers')::float8, 0) )  as \"rows\"\r\n    FROM manager.metric m\r\n    WHERE\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.buffercache')::uuid\r\n    GROUP BY 1\r\n    ORDER BY 2 DESC\r\n    LIMIT 20\r\n)\r\nSELECT\r\n  m.snapshot AS \"time\",\r\n  m.value_jsonb->>'full_relation_name' as \"relation\",\r\n  sum( (m.value_jsonb->>'buffers')::bigint )*8*1024 as \"value\"\r\nFROM manager.metric m\r\nINNER JOIN tables t ON t.relation = m.value_jsonb->>'full_relation_name'\r\nWHERE\r\n  $__unixEpochFilter(m.ts) AND\r\n  m.host = md5('$host')::uuid AND\r\n  m.plugin = md5('pg.buffercache')::uuid\r\nGROUP BY 1,2\r\nORDER BY 1,2",
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value_bigint"
-                ],
-                "type": "column"
-              }
-            ]
-          ],
-          "table": "manager.metric",
-          "timeColumn": "ts",
-          "triggers": {
-            "acknowledged": 2,
-            "count": true,
-            "minSeverity": 3
-          },
-          "where": [
-            {
-              "name": "$__timeFilter",
-              "params": [],
-              "type": "macro"
-            },
-            {
-              "name": "",
-              "params": [
-                "host",
-                "=",
-                "md5('$host')::uuid"
-              ],
-              "type": "expression"
-            },
-            {
-              "name": "",
-              "params": [
-                "plugin",
-                "=",
-                "'linux_cpu.running'"
-              ],
-              "type": "expression"
-            }
-          ]
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Buffer pool per relation",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "decbytes",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": "0",
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": "0",
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {
-        "dirty": "#508642"
-      },
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "dba-only-pg",
-      "fill": 1,
-      "gridPos": {
-        "h": 8,
-        "w": 7,
-        "x": 0,
-        "y": 26
-      },
-      "id": 83,
-      "legend": {
-        "alignAsTable": true,
-        "avg": true,
-        "current": true,
-        "max": true,
-        "min": true,
-        "show": true,
-        "sort": "avg",
-        "sortDesc": true,
-        "total": false,
-        "values": true
-      },
-      "lines": false,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "null",
-      "percentage": false,
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [
-        {
-          "alias": "fork-rate",
-          "yaxis": 2
-        }
-      ],
-      "spaceLength": 10,
-      "stack": true,
-      "steppedLine": false,
-      "targets": [
-        {
-          "alias": "",
-          "application": {
-            "filter": ""
-          },
-          "format": "time_series",
-          "functions": [],
-          "group": [],
-          "host": {
-            "filter": ""
-          },
-          "item": {
-            "filter": ""
-          },
-          "metricColumn": "none",
-          "mode": 0,
-          "options": {
-            "showDisabledItems": false,
-            "skipEmptyValues": false
-          },
-          "rawQuery": true,
-          "rawSql": "SELECT\r\n  m.snapshot AS \"time\",\r\n  sum( (m.value_jsonb->>'buffers')::bigint )*8*1024 as \"dirty\"\r\nFROM manager.metric m\r\nWHERE\r\n  $__unixEpochFilter(m.ts) AND\r\n  m.host = md5('$host')::uuid AND\r\n  m.plugin = md5('pg.buffercache')::uuid AND\r\n  (m.value_jsonb->>'dirty')::bool = true\r\nGROUP BY 1\r\nORDER BY 1",
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value_bigint"
-                ],
-                "type": "column"
-              }
-            ]
-          ],
-          "table": "manager.metric",
-          "timeColumn": "ts",
-          "triggers": {
-            "acknowledged": 2,
-            "count": true,
-            "minSeverity": 3
-          },
-          "where": [
-            {
-              "name": "$__timeFilter",
-              "params": [],
-              "type": "macro"
-            },
-            {
-              "name": "",
-              "params": [
-                "host",
-                "=",
-                "md5('$host')::uuid"
-              ],
-              "type": "expression"
-            },
-            {
-              "name": "",
-              "params": [
-                "plugin",
-                "=",
-                "'linux_cpu.running'"
-              ],
-              "type": "expression"
-            }
-          ]
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Buffer pool (dirty)",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "decbytes",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": "0",
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": "0",
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {
-        "reused": "#890f02",
-        "used one time": "#bf1b00"
-      },
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "dba-only-pg",
-      "fill": 1,
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 7,
-        "y": 26
-      },
-      "id": 85,
-      "legend": {
-        "alignAsTable": true,
-        "avg": true,
-        "current": true,
-        "max": true,
-        "min": true,
-        "show": true,
-        "sort": "avg",
-        "sortDesc": true,
-        "total": false,
-        "values": true
-      },
-      "lines": false,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "null",
-      "percentage": false,
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [
-        {
-          "alias": "fork-rate",
-          "yaxis": 2
-        }
-      ],
-      "spaceLength": 10,
-      "stack": true,
-      "steppedLine": false,
-      "targets": [
-        {
-          "alias": "",
-          "application": {
-            "filter": ""
-          },
-          "format": "time_series",
-          "functions": [],
-          "group": [],
-          "host": {
-            "filter": ""
-          },
-          "item": {
-            "filter": ""
-          },
-          "metricColumn": "none",
-          "mode": 0,
-          "options": {
-            "showDisabledItems": false,
-            "skipEmptyValues": false
-          },
-          "rawQuery": true,
-          "rawSql": "SELECT\r\n  m.snapshot AS \"time\",\r\n  sum( (m.value_jsonb->>'buffers')::bigint )*8*1024 as \"used one time\"\r\nFROM manager.metric m\r\nWHERE\r\n  $__unixEpochFilter(m.ts) AND\r\n  m.host = md5('$host')::uuid AND\r\n  m.plugin = md5('pg.buffercache')::uuid AND\r\n  (m.value_jsonb->>'usagecount')::bigint = 0\r\nGROUP BY 1\r\nORDER BY 1",
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value_bigint"
-                ],
-                "type": "column"
-              }
-            ]
-          ],
-          "table": "manager.metric",
-          "timeColumn": "ts",
-          "triggers": {
-            "acknowledged": 2,
-            "count": true,
-            "minSeverity": 3
-          },
-          "where": [
-            {
-              "name": "$__timeFilter",
-              "params": [],
-              "type": "macro"
-            },
-            {
-              "name": "",
-              "params": [
-                "host",
-                "=",
-                "md5('$host')::uuid"
-              ],
-              "type": "expression"
-            },
-            {
-              "name": "",
-              "params": [
-                "plugin",
-                "=",
-                "'linux_cpu.running'"
-              ],
-              "type": "expression"
-            }
-          ]
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Buffer pool (usagecount = 0)",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "decbytes",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": "0",
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": "0",
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {
-        "reused": "#508642"
-      },
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "dba-only-pg",
-      "fill": 1,
-      "gridPos": {
-        "h": 8,
-        "w": 9,
-        "x": 15,
-        "y": 26
-      },
-      "id": 84,
-      "legend": {
-        "alignAsTable": true,
-        "avg": true,
-        "current": true,
-        "max": true,
-        "min": true,
-        "show": true,
-        "sort": "avg",
-        "sortDesc": true,
-        "total": false,
-        "values": true
-      },
-      "lines": false,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "null",
-      "percentage": false,
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [
-        {
-          "alias": "fork-rate",
-          "yaxis": 2
-        }
-      ],
-      "spaceLength": 10,
-      "stack": true,
-      "steppedLine": false,
-      "targets": [
-        {
-          "alias": "",
-          "application": {
-            "filter": ""
-          },
-          "format": "time_series",
-          "functions": [],
-          "group": [],
-          "host": {
-            "filter": ""
-          },
-          "item": {
-            "filter": ""
-          },
-          "metricColumn": "none",
-          "mode": 0,
-          "options": {
-            "showDisabledItems": false,
-            "skipEmptyValues": false
-          },
-          "rawQuery": true,
-          "rawSql": "SELECT\r\n  m.snapshot AS \"time\",\r\n  sum( (m.value_jsonb->>'buffers')::bigint )*8*1024 as \"reused\"\r\nFROM manager.metric m\r\nWHERE\r\n  $__unixEpochFilter(m.ts) AND\r\n  m.host = md5('$host')::uuid AND\r\n  m.plugin = md5('pg.buffercache')::uuid AND\r\n  (m.value_jsonb->>'usagecount')::bigint >= 3\r\nGROUP BY 1\r\nORDER BY 1",
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value_bigint"
-                ],
-                "type": "column"
-              }
-            ]
-          ],
-          "table": "manager.metric",
-          "timeColumn": "ts",
-          "triggers": {
-            "acknowledged": 2,
-            "count": true,
-            "minSeverity": 3
-          },
-          "where": [
-            {
-              "name": "$__timeFilter",
-              "params": [],
-              "type": "macro"
-            },
-            {
-              "name": "",
-              "params": [
-                "host",
-                "=",
-                "md5('$host')::uuid"
-              ],
-              "type": "expression"
-            },
-            {
-              "name": "",
-              "params": [
-                "plugin",
-                "=",
-                "'linux_cpu.running'"
-              ],
-              "type": "expression"
-            }
-          ]
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Buffer pool (usagecount >= 3)",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "decbytes",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": "0",
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": "0",
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
     },
     {
       "collapsed": true,
@@ -2953,7 +3106,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 34
+        "y": 13
       },
       "id": 56,
       "panels": [
@@ -2962,13 +3115,13 @@
           "bars": true,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "dba-only-pg",
+          "datasource": "${DS_DBA-ONLY-PG}",
           "fill": 1,
           "gridPos": {
             "h": 10,
             "w": 8,
             "x": 0,
-            "y": 18
+            "y": 58
           },
           "id": 10,
           "legend": {
@@ -3022,7 +3175,7 @@
                 "skipEmptyValues": false
               },
               "rawQuery": true,
-              "rawSql": "WITH tables AS(\r\n    SELECT\r\n        m.value_jsonb->>'full_table_name' as \"table\",\r\n        sum( coalesce((m.value_jsonb->>'seq_tup_read')::float8, 0) )  as \"rows\"\r\n    FROM manager.metric m\r\n    WHERE\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.user_tables')::uuid\r\n    GROUP BY 1\r\n    ORDER BY 2 DESC\r\n    LIMIT 20\r\n)\r\n\r\nSELECT\r\n  m.ts AS \"time\",\r\n  m.value_jsonb->>'full_table_name' as \"table\",\r\n  sum( coalesce((m.value_jsonb->>'seq_tup_read')::float8, 0) ) as \"rows\"\r\nFROM tables t \r\nINNER JOIN manager.metric m ON t.table = m.value_jsonb->>'full_table_name'\r\nWHERE\r\n  $__unixEpochFilter(m.ts) AND\r\n  m.host = md5('$host')::uuid AND\r\n  m.plugin = md5('pg.user_tables')::uuid\r\nGROUP BY 1,2\r\nORDER BY 1,2",
+              "rawSql": "with data as (\n    select\n        snapshot,\n        jsonb_array_elements(value_jsonb) as value_jsonb\n    from manager.metric where\n        $__unixEpochFilter(ts) AND\n        host = md5('$host')::uuid AND\n        plugin = md5('pg.user_tables')::uuid\n)\n, tables AS(\n    SELECT\n        m.value_jsonb->>'full_table_name' as \"table\",\n        sum( coalesce((m.value_jsonb->>'seq_tup_read')::float8, 0) )  as \"rows\"\n    FROM data m\n    GROUP BY 1\n    ORDER BY 2 DESC\n    LIMIT 20\n)\n\nSELECT\n  snapshot AS \"time\",\n  m.value_jsonb->>'full_table_name' as \"table\",\n  sum( coalesce((m.value_jsonb->>'seq_tup_read')::float8, 0) ) as \"rows\"\nFROM tables t \nINNER JOIN data m ON t.table = m.value_jsonb->>'full_table_name'\nGROUP BY 1,2\nORDER BY 1,2",
               "refId": "A",
               "resultFormat": "time_series",
               "select": [
@@ -3114,13 +3267,13 @@
           "bars": true,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "dba-only-pg",
+          "datasource": "${DS_DBA-ONLY-PG}",
           "fill": 1,
           "gridPos": {
             "h": 10,
             "w": 8,
             "x": 8,
-            "y": 18
+            "y": 58
           },
           "id": 82,
           "legend": {
@@ -3174,7 +3327,7 @@
                 "skipEmptyValues": false
               },
               "rawQuery": true,
-              "rawSql": "WITH tables AS(\r\n    SELECT\r\n        m.value_jsonb->>'full_table_name' as \"table\",\r\n        sum( coalesce((m.value_jsonb->>'idx_tup_fetch')::float8, 0) )  as \"rows\"\r\n    FROM manager.metric m\r\n    WHERE\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.user_tables')::uuid\r\n    GROUP BY 1\r\n    ORDER BY 2 DESC\r\n    LIMIT 20\r\n)\r\n\r\nSELECT\r\n  m.ts AS \"time\",\r\n  m.value_jsonb->>'full_table_name' as \"table\",\r\n  sum( coalesce((m.value_jsonb->>'idx_tup_fetch')::float8, 0) ) as \"rows\"\r\nFROM manager.metric m\r\nINNER JOIN tables t ON t.table = m.value_jsonb->>'full_table_name'\r\nWHERE\r\n  $__unixEpochFilter(ts) AND\r\n  host = md5('$host')::uuid AND\r\n  plugin = md5('pg.user_tables')::uuid\r\nGROUP BY 1,2\r\nORDER BY 1,2",
+              "rawSql": "with data as (\n    select\n        snapshot,\n        jsonb_array_elements(value_jsonb) as value_jsonb\n    from manager.metric where\n        $__unixEpochFilter(ts) AND\n        host = md5('$host')::uuid AND\n        plugin = md5('pg.user_tables')::uuid\n)\n, tables AS (\n    SELECT\n        m.value_jsonb->>'full_table_name' as \"table\",\n        sum( coalesce((m.value_jsonb->>'idx_tup_fetch')::float8, 0) )  as \"rows\"\n    FROM data m\n    GROUP BY 1\n    ORDER BY 2 DESC\n    LIMIT 20\n)\n\nSELECT\n  m.snapshot AS \"time\",\n  m.value_jsonb->>'full_table_name' as \"table\",\n  sum( coalesce((m.value_jsonb->>'idx_tup_fetch')::float8, 0) ) as \"rows\"\nFROM data m\nINNER JOIN tables t ON t.table = m.value_jsonb->>'full_table_name'\nGROUP BY 1,2\nORDER BY 1,2",
               "refId": "A",
               "resultFormat": "time_series",
               "select": [
@@ -3266,13 +3419,13 @@
           "bars": true,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "dba-only-pg",
+          "datasource": "${DS_DBA-ONLY-PG}",
           "fill": 1,
           "gridPos": {
             "h": 10,
             "w": 8,
             "x": 16,
-            "y": 18
+            "y": 58
           },
           "id": 11,
           "legend": {
@@ -3326,7 +3479,7 @@
                 "skipEmptyValues": false
               },
               "rawQuery": true,
-              "rawSql": "WITH tables AS(\r\n    SELECT\r\n        m.value_jsonb->>'full_table_name' as \"table\",\r\n        sum( coalesce((m.value_jsonb->>'n_tup_ins')::float8, 0) + coalesce((value_jsonb->>'n_tup_upd')::float8, 0) + coalesce((value_jsonb->>'n_tup_del')::float8, 0) + coalesce((value_jsonb->>'n_tup_hot_upd')::float8, 0) )\r\n    FROM manager.metric m\r\n    WHERE\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.user_tables')::uuid\r\n    GROUP BY 1\r\n    ORDER BY 2 DESC\r\n    LIMIT 20\r\n)\r\n\r\nSELECT\r\n  m.ts AS \"time\",\r\n  m.value_jsonb->>'full_table_name' as \"table\",\r\n  sum( coalesce((m.value_jsonb->>'n_tup_ins')::float8, 0) + coalesce((value_jsonb->>'n_tup_upd')::float8, 0) + coalesce((value_jsonb->>'n_tup_del')::float8, 0) + coalesce((value_jsonb->>'n_tup_hot_upd')::float8, 0) ) as \"rows\"\r\nFROM manager.metric m\r\nINNER JOIN tables t ON t.table = m.value_jsonb->>'full_table_name'\r\nWHERE\r\n  $__unixEpochFilter(ts) AND\r\n  host = md5('$host')::uuid AND\r\n  plugin = md5('pg.user_tables')::uuid\r\nGROUP BY 1,2\r\nORDER BY 1,2\r\n",
+              "rawSql": "\nwith data as (\n    select\n        snapshot,\n        jsonb_array_elements(value_jsonb) as value_jsonb\n    from manager.metric where\n        $__unixEpochFilter(ts) AND\n        host = md5('$host')::uuid AND\n        plugin = md5('pg.user_tables')::uuid\n), tables AS(\n    SELECT\n        m.value_jsonb->>'full_table_name' as \"table\",\n        sum( coalesce((m.value_jsonb->>'n_tup_ins')::float8, 0) + coalesce((value_jsonb->>'n_tup_upd')::float8, 0) + coalesce((value_jsonb->>'n_tup_del')::float8, 0) + coalesce((value_jsonb->>'n_tup_hot_upd')::float8, 0) )\n    FROM data m\n    GROUP BY 1\n    ORDER BY 2 DESC\n    LIMIT 20\n)\n\nSELECT\n  m.snapshot AS \"time\",\n  m.value_jsonb->>'full_table_name' as \"table\",\n  sum( coalesce((m.value_jsonb->>'n_tup_ins')::float8, 0) + coalesce((value_jsonb->>'n_tup_upd')::float8, 0) + coalesce((value_jsonb->>'n_tup_del')::float8, 0) + coalesce((value_jsonb->>'n_tup_hot_upd')::float8, 0) ) as \"rows\"\nFROM data m\nINNER JOIN tables t ON t.table = m.value_jsonb->>'full_table_name'\nGROUP BY 1,2\nORDER BY 1,2",
               "refId": "A",
               "resultFormat": "time_series",
               "select": [
@@ -3423,7 +3576,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 35
+        "y": 14
       },
       "id": 60,
       "panels": [
@@ -3432,13 +3585,13 @@
           "bars": true,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "dba-only-pg",
+          "datasource": "${DS_DBA-ONLY-PG}",
           "fill": 1,
           "gridPos": {
             "h": 10,
             "w": 11,
             "x": 0,
-            "y": 14
+            "y": 59
           },
           "id": 20,
           "legend": {
@@ -3492,7 +3645,7 @@
                 "skipEmptyValues": false
               },
               "rawQuery": true,
-              "rawSql": "WITH tables AS(\r\n    SELECT\r\n        m.value_jsonb->>'full_table_name' as \"table\",\r\n        sum( coalesce((m.value_jsonb->>'heap_blks_read')::float8, 0) )  as \"rows\"\r\n    FROM manager.metric m\r\n    WHERE\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.user_tables.io')::uuid\r\n    GROUP BY 1\r\n    ORDER BY 2 DESC\r\n    LIMIT 20\r\n)\r\n\r\nSELECT\r\n  m.ts AS \"time\",\r\n  m.value_jsonb->>'full_table_name' as \"table\",\r\n  sum( coalesce((m.value_jsonb->>'heap_blks_read')::float8, 0) )  * 8 * 1024 as \"heap\"\r\nFROM manager.metric m\r\nINNER JOIN tables t ON t.table = m.value_jsonb->>'full_table_name'\r\nWHERE\r\n  $__unixEpochFilter(ts) AND\r\n  host = md5('$host')::uuid AND\r\n  plugin = md5('pg.user_tables.io')::uuid\r\nGROUP BY 1,2\r\nORDER BY 1\r\n",
+              "rawSql": "with data as (\n    select\n        snapshot,\n        jsonb_array_elements(value_jsonb) as value_jsonb\n    from manager.metric where\n        $__unixEpochFilter(ts) AND\n        host = md5('$host')::uuid AND\n        plugin = md5('pg.user_tables.io')::uuid\n), tables AS(\n    SELECT\n        m.value_jsonb->>'full_table_name' as \"table\",\n        sum( coalesce((m.value_jsonb->>'heap_blks_read')::float8, 0) )  as \"rows\"\n    FROM data m\n    GROUP BY 1\n    ORDER BY 2 DESC\n    LIMIT 20\n)\n\nSELECT\n  m.snapshot AS \"time\",\n  m.value_jsonb->>'full_table_name' as \"table\",\n  sum( coalesce((m.value_jsonb->>'heap_blks_read')::float8, 0) )  * 8 * 1024 as \"heap\"\nFROM data m\nINNER JOIN tables t ON t.table = m.value_jsonb->>'full_table_name'\nGROUP BY 1,2\nORDER BY 1",
               "refId": "A",
               "resultFormat": "time_series",
               "select": [
@@ -3584,13 +3737,13 @@
           "bars": true,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "dba-only-pg",
+          "datasource": "${DS_DBA-ONLY-PG}",
           "fill": 1,
           "gridPos": {
             "h": 10,
             "w": 13,
             "x": 11,
-            "y": 14
+            "y": 59
           },
           "id": 21,
           "legend": {
@@ -3644,7 +3797,7 @@
                 "skipEmptyValues": false
               },
               "rawQuery": true,
-              "rawSql": "WITH tables AS(\r\n    SELECT\r\n        m.value_jsonb->>'full_table_name' as \"table\",\r\n        sum( coalesce((m.value_jsonb->>'toast_blks_read')::float8, 0) )  as \"rows\"\r\n    FROM manager.metric m\r\n    WHERE\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.user_tables.io')::uuid\r\n    GROUP BY 1\r\n    ORDER BY 2 DESC\r\n    LIMIT 20\r\n)\r\n\r\nSELECT\r\n  m.ts AS \"time\",\r\n  m.value_jsonb->>'full_table_name' as \"table\",\r\n  sum( coalesce((m.value_jsonb->>'toast_blks_read')::float8, 0) )  * 8 * 1024 as \"heap\"\r\nFROM manager.metric m\r\nINNER JOIN tables t ON t.table = m.value_jsonb->>'full_table_name'\r\nWHERE\r\n  $__unixEpochFilter(ts) AND\r\n  host = md5('$host')::uuid AND\r\n  plugin = md5('pg.user_tables.io')::uuid\r\nGROUP BY 1,2\r\nORDER BY 1\r\n",
+              "rawSql": "with data as (\n    select\n        snapshot,\n        jsonb_array_elements(value_jsonb) as value_jsonb\n    from manager.metric where\n        $__unixEpochFilter(ts) AND\n        host = md5('$host')::uuid AND\n        plugin = md5('pg.user_tables.io')::uuid\n), tables AS (\n    SELECT\n        m.value_jsonb->>'full_table_name' as \"table\",\n        sum( coalesce((m.value_jsonb->>'toast_blks_read')::float8, 0) )  as \"rows\"\n    FROM data m\n    GROUP BY 1\n    ORDER BY 2 DESC\n    LIMIT 20\n)\n\nSELECT\n  m.snapshot AS \"time\",\n  m.value_jsonb->>'full_table_name' as \"table\",\n  sum( coalesce((m.value_jsonb->>'toast_blks_read')::float8, 0) )  * 8 * 1024 as \"heap\"\nFROM data m\nINNER JOIN tables t ON t.table = m.value_jsonb->>'full_table_name'\nGROUP BY 1,2\nORDER BY 1",
               "refId": "A",
               "resultFormat": "time_series",
               "select": [
@@ -3736,13 +3889,13 @@
           "bars": true,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "dba-only-pg",
+          "datasource": "${DS_DBA-ONLY-PG}",
           "fill": 1,
           "gridPos": {
             "h": 10,
             "w": 11,
             "x": 0,
-            "y": 24
+            "y": 69
           },
           "id": 22,
           "legend": {
@@ -3796,7 +3949,7 @@
                 "skipEmptyValues": false
               },
               "rawQuery": true,
-              "rawSql": "WITH tables AS(\r\n    SELECT\r\n        m.value_jsonb->>'full_table_name' as \"table\",\r\n        sum( coalesce((m.value_jsonb->>'tidx_blks_read')::float8, 0) )  as \"rows\"\r\n    FROM manager.metric m\r\n    WHERE\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.user_tables.io')::uuid\r\n    GROUP BY 1\r\n    ORDER BY 2 DESC\r\n    LIMIT 20\r\n)\r\n\r\nSELECT\r\n  m.ts AS \"time\",\r\n  m.value_jsonb->>'full_table_name' as \"table\",\r\n  sum( coalesce((m.value_jsonb->>'tidx_blks_read')::float8, 0) )  * 8 * 1024 as \"heap\"\r\nFROM manager.metric m\r\nINNER JOIN tables t ON t.table = m.value_jsonb->>'full_table_name'\r\nWHERE\r\n  $__unixEpochFilter(ts) AND\r\n  host = md5('$host')::uuid AND\r\n  plugin = md5('pg.user_tables.io')::uuid\r\nGROUP BY 1,2\r\nORDER BY 1\r\n",
+              "rawSql": "with data as (\n    select\n        snapshot,\n        jsonb_array_elements(value_jsonb) as value_jsonb\n    from manager.metric where\n        $__unixEpochFilter(ts) AND\n        host = md5('$host')::uuid AND\n        plugin = md5('pg.user_tables.io')::uuid\n), tables AS(\n    SELECT\n        m.value_jsonb->>'full_table_name' as \"table\",\n        sum( coalesce((m.value_jsonb->>'tidx_blks_read')::float8, 0) )  as \"rows\"\n    FROM data m\n    GROUP BY 1\n    ORDER BY 2 DESC\n    LIMIT 20\n)\n\nSELECT\n  m.snapshot AS \"time\",\n  m.value_jsonb->>'full_table_name' as \"table\",\n  sum( coalesce((m.value_jsonb->>'tidx_blks_read')::float8, 0) )  * 8 * 1024 as \"heap\"\nFROM data m\nINNER JOIN tables t ON t.table = m.value_jsonb->>'full_table_name'\nGROUP BY 1,2\nORDER BY 1\n",
               "refId": "A",
               "resultFormat": "time_series",
               "select": [
@@ -3893,19 +4046,19 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 36
+        "y": 15
       },
       "id": 64,
       "panels": [
         {
           "columns": [],
-          "datasource": "dba-only-pg",
+          "datasource": "${DS_DBA-ONLY-PG}",
           "fontSize": "100%",
           "gridPos": {
             "h": 9,
             "w": 24,
             "x": 0,
-            "y": 37
+            "y": 16
           },
           "id": 44,
           "links": [],
@@ -3962,7 +4115,7 @@
                 "skipEmptyValues": false
               },
               "rawQuery": true,
-              "rawSql": "SELECT\r\n  to_timestamp(snapshot) as \"timestamp\",\r\n  value_jsonb->>'full_table_name' as table,\r\n  pg_size_pretty(coalesce((value_jsonb->>'relpages')::bigint, 0)*8*1024) as \"table size\",\r\n  sum( coalesce((value_jsonb->>'seq_scan')::float8, 0) ) as \"count\"\r\nfrom manager.metric where\r\n  $__unixEpochFilter(ts) AND\r\n  host = md5('$host')::uuid AND\r\n  plugin = md5('pg.user_tables')::uuid AND\r\n  coalesce((value_jsonb->>'relpages')::bigint, 0)> (256*1024*1024) / (8*1024)\r\ngroup by 1,2,3,snapshot\r\nhaving sum( coalesce((value_jsonb->>'seq_scan')::float8, 0) ) * 60 > 0\r\norder by snapshot;",
+              "rawSql": "with data as (\n    select\n        snapshot,\n        jsonb_array_elements(value_jsonb) as value_jsonb\n    from manager.metric where\n        $__unixEpochFilter(ts) AND\n        host = md5('$host')::uuid AND\n        plugin = md5('pg.user_tables')::uuid\n)\nSELECT\n  to_timestamp(snapshot) as \"timestamp\",\n  value_jsonb->>'full_table_name' as table,\n  pg_size_pretty(coalesce((value_jsonb->>'relpages')::bigint, 0)*8*1024) as \"table size\",\n  sum( coalesce((value_jsonb->>'seq_scan')::float8, 0) ) as \"count\"\nfrom data where\n  coalesce((value_jsonb->>'relpages')::bigint, 0)> (256*1024*1024) / (8*1024)\ngroup by 1,2,3,snapshot\nhaving sum( coalesce((value_jsonb->>'seq_scan')::float8, 0) ) > 0\norder by snapshot;",
               "refId": "A",
               "resultFormat": "time_series",
               "select": [
@@ -4002,321 +4155,322 @@
       "type": "row"
     },
     {
-      "collapsed": false,
+      "collapsed": true,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 37
+        "y": 16
       },
       "id": 62,
-      "panels": [],
+      "panels": [
+        {
+          "aliasColors": {},
+          "bars": true,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "${DS_DBA-ONLY-PG}",
+          "fill": 1,
+          "gridPos": {
+            "h": 11,
+            "w": 13,
+            "x": 0,
+            "y": 47
+          },
+          "id": 16,
+          "legend": {
+            "alignAsTable": true,
+            "avg": true,
+            "current": true,
+            "max": true,
+            "min": true,
+            "show": true,
+            "sort": null,
+            "sortDesc": null,
+            "total": false,
+            "values": true
+          },
+          "lines": false,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [
+            {
+              "alias": "fork-rate",
+              "yaxis": 2
+            }
+          ],
+          "spaceLength": 10,
+          "stack": true,
+          "steppedLine": false,
+          "targets": [
+            {
+              "alias": "",
+              "application": {
+                "filter": ""
+              },
+              "format": "time_series",
+              "functions": [],
+              "group": [],
+              "host": {
+                "filter": ""
+              },
+              "item": {
+                "filter": ""
+              },
+              "metricColumn": "none",
+              "mode": 0,
+              "options": {
+                "showDisabledItems": false,
+                "skipEmptyValues": false
+              },
+              "rawQuery": true,
+              "rawSql": "SELECT\r\n  ts AS \"time\",\r\n  (value_jsonb->>'checkpoints_timed')::bigint as \"timed\",\r\n  (value_jsonb->>'checkpoints_req')::bigint as \"required\"\r\nFROM manager.metric\r\nWHERE\r\n  $__unixEpochFilter(ts) AND\r\n  host = md5('$host')::uuid AND\r\n  plugin = md5('pg.bgwriter')::uuid\r\nORDER BY 1",
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value_bigint"
+                    ],
+                    "type": "column"
+                  }
+                ]
+              ],
+              "table": "manager.metric",
+              "timeColumn": "ts",
+              "triggers": {
+                "acknowledged": 2,
+                "count": true,
+                "minSeverity": 3
+              },
+              "where": [
+                {
+                  "name": "$__timeFilter",
+                  "params": [],
+                  "type": "macro"
+                },
+                {
+                  "name": "",
+                  "params": [
+                    "host",
+                    "=",
+                    "md5('$host')::uuid"
+                  ],
+                  "type": "expression"
+                },
+                {
+                  "name": "",
+                  "params": [
+                    "plugin",
+                    "=",
+                    "'linux_cpu.running'"
+                  ],
+                  "type": "expression"
+                }
+              ]
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Checkpoints (count)",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "none",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": "0",
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": "0",
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": true,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "${DS_DBA-ONLY-PG}",
+          "fill": 1,
+          "gridPos": {
+            "h": 11,
+            "w": 11,
+            "x": 13,
+            "y": 47
+          },
+          "id": 17,
+          "legend": {
+            "alignAsTable": true,
+            "avg": true,
+            "current": true,
+            "max": true,
+            "min": true,
+            "show": true,
+            "sort": null,
+            "sortDesc": null,
+            "total": false,
+            "values": true
+          },
+          "lines": false,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [
+            {
+              "alias": "fork-rate",
+              "yaxis": 2
+            }
+          ],
+          "spaceLength": 10,
+          "stack": true,
+          "steppedLine": false,
+          "targets": [
+            {
+              "alias": "",
+              "application": {
+                "filter": ""
+              },
+              "format": "time_series",
+              "functions": [],
+              "group": [],
+              "host": {
+                "filter": ""
+              },
+              "item": {
+                "filter": ""
+              },
+              "metricColumn": "none",
+              "mode": 0,
+              "options": {
+                "showDisabledItems": false,
+                "skipEmptyValues": false
+              },
+              "rawQuery": true,
+              "rawSql": "SELECT\r\n  ts AS \"time\",\r\n  (value_jsonb->>'checkpoint_write_time')::float8 as \"write\",\r\n  (value_jsonb->>'checkpoint_sync_time')::float8 as \"sync\"\r\nFROM manager.metric\r\nWHERE\r\n  $__unixEpochFilter(ts) AND\r\n  host = md5('$host')::uuid AND\r\n  plugin = md5('pg.bgwriter')::uuid\r\nORDER BY 1",
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value_bigint"
+                    ],
+                    "type": "column"
+                  }
+                ]
+              ],
+              "table": "manager.metric",
+              "timeColumn": "ts",
+              "triggers": {
+                "acknowledged": 2,
+                "count": true,
+                "minSeverity": 3
+              },
+              "where": [
+                {
+                  "name": "$__timeFilter",
+                  "params": [],
+                  "type": "macro"
+                },
+                {
+                  "name": "",
+                  "params": [
+                    "host",
+                    "=",
+                    "md5('$host')::uuid"
+                  ],
+                  "type": "expression"
+                },
+                {
+                  "name": "",
+                  "params": [
+                    "plugin",
+                    "=",
+                    "'linux_cpu.running'"
+                  ],
+                  "type": "expression"
+                }
+              ]
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Checkpoints (time)",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "ms",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": "0",
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": "0",
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
+        }
+      ],
       "title": "Checkpoints",
       "type": "row"
-    },
-    {
-      "aliasColors": {},
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "dba-only-pg",
-      "fill": 1,
-      "gridPos": {
-        "h": 11,
-        "w": 13,
-        "x": 0,
-        "y": 38
-      },
-      "id": 16,
-      "legend": {
-        "alignAsTable": true,
-        "avg": true,
-        "current": true,
-        "max": true,
-        "min": true,
-        "show": true,
-        "sort": null,
-        "sortDesc": null,
-        "total": false,
-        "values": true
-      },
-      "lines": false,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "null",
-      "percentage": false,
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [
-        {
-          "alias": "fork-rate",
-          "yaxis": 2
-        }
-      ],
-      "spaceLength": 10,
-      "stack": true,
-      "steppedLine": false,
-      "targets": [
-        {
-          "alias": "",
-          "application": {
-            "filter": ""
-          },
-          "format": "time_series",
-          "functions": [],
-          "group": [],
-          "host": {
-            "filter": ""
-          },
-          "item": {
-            "filter": ""
-          },
-          "metricColumn": "none",
-          "mode": 0,
-          "options": {
-            "showDisabledItems": false,
-            "skipEmptyValues": false
-          },
-          "rawQuery": true,
-          "rawSql": "SELECT\r\n  ts AS \"time\",\r\n  (value_jsonb->>'checkpoints_timed')::bigint as \"timed\",\r\n  (value_jsonb->>'checkpoints_req')::bigint as \"required\"\r\nFROM manager.metric\r\nWHERE\r\n  $__unixEpochFilter(ts) AND\r\n  host = md5('$host')::uuid AND\r\n  plugin = md5('pg.bgwriter')::uuid\r\nORDER BY 1",
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value_bigint"
-                ],
-                "type": "column"
-              }
-            ]
-          ],
-          "table": "manager.metric",
-          "timeColumn": "ts",
-          "triggers": {
-            "acknowledged": 2,
-            "count": true,
-            "minSeverity": 3
-          },
-          "where": [
-            {
-              "name": "$__timeFilter",
-              "params": [],
-              "type": "macro"
-            },
-            {
-              "name": "",
-              "params": [
-                "host",
-                "=",
-                "md5('$host')::uuid"
-              ],
-              "type": "expression"
-            },
-            {
-              "name": "",
-              "params": [
-                "plugin",
-                "=",
-                "'linux_cpu.running'"
-              ],
-              "type": "expression"
-            }
-          ]
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Checkpoints (count)",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "none",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": "0",
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": "0",
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "dba-only-pg",
-      "fill": 1,
-      "gridPos": {
-        "h": 11,
-        "w": 11,
-        "x": 13,
-        "y": 38
-      },
-      "id": 17,
-      "legend": {
-        "alignAsTable": true,
-        "avg": true,
-        "current": true,
-        "max": true,
-        "min": true,
-        "show": true,
-        "sort": null,
-        "sortDesc": null,
-        "total": false,
-        "values": true
-      },
-      "lines": false,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "null",
-      "percentage": false,
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [
-        {
-          "alias": "fork-rate",
-          "yaxis": 2
-        }
-      ],
-      "spaceLength": 10,
-      "stack": true,
-      "steppedLine": false,
-      "targets": [
-        {
-          "alias": "",
-          "application": {
-            "filter": ""
-          },
-          "format": "time_series",
-          "functions": [],
-          "group": [],
-          "host": {
-            "filter": ""
-          },
-          "item": {
-            "filter": ""
-          },
-          "metricColumn": "none",
-          "mode": 0,
-          "options": {
-            "showDisabledItems": false,
-            "skipEmptyValues": false
-          },
-          "rawQuery": true,
-          "rawSql": "SELECT\r\n  ts AS \"time\",\r\n  (value_jsonb->>'checkpoint_write_time')::float8 as \"write\",\r\n  (value_jsonb->>'checkpoint_sync_time')::float8 as \"sync\"\r\nFROM manager.metric\r\nWHERE\r\n  $__unixEpochFilter(ts) AND\r\n  host = md5('$host')::uuid AND\r\n  plugin = md5('pg.bgwriter')::uuid\r\nORDER BY 1",
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value_bigint"
-                ],
-                "type": "column"
-              }
-            ]
-          ],
-          "table": "manager.metric",
-          "timeColumn": "ts",
-          "triggers": {
-            "acknowledged": 2,
-            "count": true,
-            "minSeverity": 3
-          },
-          "where": [
-            {
-              "name": "$__timeFilter",
-              "params": [],
-              "type": "macro"
-            },
-            {
-              "name": "",
-              "params": [
-                "host",
-                "=",
-                "md5('$host')::uuid"
-              ],
-              "type": "expression"
-            },
-            {
-              "name": "",
-              "params": [
-                "plugin",
-                "=",
-                "'linux_cpu.running'"
-              ],
-              "type": "expression"
-            }
-          ]
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Checkpoints (time)",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "ms",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": "0",
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": "0",
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
     },
     {
       "collapsed": true,
@@ -4324,22 +4478,22 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 49
+        "y": 17
       },
       "id": 68,
       "panels": [
         {
           "aliasColors": {},
-          "bars": true,
+          "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "dba-only-pg",
+          "datasource": "${DS_DBA-ONLY-PG}",
           "fill": 1,
           "gridPos": {
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 39
+            "y": 18
           },
           "id": 28,
           "legend": {
@@ -4354,7 +4508,7 @@
             "total": false,
             "values": true
           },
-          "lines": false,
+          "lines": true,
           "linewidth": 1,
           "links": [],
           "nullPointMode": "null",
@@ -4477,16 +4631,16 @@
         },
         {
           "aliasColors": {},
-          "bars": true,
+          "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "dba-only-pg",
+          "datasource": "${DS_DBA-ONLY-PG}",
           "fill": 1,
           "gridPos": {
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 39
+            "y": 18
           },
           "id": 27,
           "legend": {
@@ -4501,7 +4655,7 @@
             "total": false,
             "values": true
           },
-          "lines": false,
+          "lines": true,
           "linewidth": 1,
           "links": [],
           "nullPointMode": "null",
@@ -4637,7 +4791,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 50
+        "y": 18
       },
       "id": 70,
       "panels": [
@@ -4651,13 +4805,13 @@
           "bars": true,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "dba-only-pg",
+          "datasource": "${DS_DBA-ONLY-PG}",
           "fill": 1,
           "gridPos": {
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 59
+            "y": 76
           },
           "id": 4,
           "legend": {
@@ -4784,13 +4938,13 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "dba-only-pg",
+          "datasource": "${DS_DBA-ONLY-PG}",
           "fill": 1,
           "gridPos": {
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 59
+            "y": 76
           },
           "id": 2,
           "legend": {
@@ -5074,7 +5228,7 @@
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 69
+            "y": 86
           },
           "id": 78,
           "legend": {
@@ -5217,7 +5371,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 51
+        "y": 19
       },
       "id": 72,
       "panels": [
@@ -5226,7 +5380,7 @@
           "bars": true,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "dba-only-pg",
+          "datasource": "${DS_DBA-ONLY-PG}",
           "fill": 1,
           "gridPos": {
             "h": 9,
@@ -5364,7 +5518,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 52
+        "y": 20
       },
       "id": 74,
       "panels": [
@@ -5373,13 +5527,13 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "dba-only-pg",
+          "datasource": "${DS_DBA-ONLY-PG}",
           "fill": 1,
           "gridPos": {
             "h": 9,
             "w": 12,
             "x": 0,
-            "y": 21
+            "y": 98
           },
           "id": 19,
           "legend": {
@@ -5506,13 +5660,13 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "dba-only-pg",
+          "datasource": "${DS_DBA-ONLY-PG}",
           "fill": 1,
           "gridPos": {
             "h": 9,
             "w": 12,
             "x": 12,
-            "y": 21
+            "y": 98
           },
           "id": 18,
           "legend": {
@@ -5645,7 +5799,7 @@
             "h": 9,
             "w": 12,
             "x": 0,
-            "y": 30
+            "y": 107
           },
           "id": 79,
           "legend": {
@@ -5852,13 +6006,13 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 53
+        "y": 21
       },
       "id": 76,
       "panels": [
         {
           "columns": [],
-          "datasource": "dba-only-pg",
+          "datasource": "${DS_DBA-ONLY-PG}",
           "fontSize": "100%",
           "gridPos": {
             "h": 6,
@@ -5921,7 +6075,7 @@
                 "skipEmptyValues": false
               },
               "rawQuery": true,
-              "rawSql": "select\r\n    value_jsonb->>'full_table_name' as \"table\",\r\n    max( to_timestamp( (value_jsonb->>'last_autovacuum')::bigint ) AT TIME ZONE 'UTC') as \"last_autovacuum\",\r\n    sum( (value_jsonb->>'autovacuum_count')::bigint ) as \"autovacuum count\", \r\n    max( to_timestamp( (value_jsonb->>'last_autoanalyze')::bigint ) AT TIME ZONE 'UTC') as \"last_autoanalyze\",\r\n    sum( (value_jsonb->>'autoanalyze_count')::bigint ) as \"autoanalyze count\"\r\n    from manager.metric where\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.user_tables')::uuid\r\n    group by 1\r\n    having (sum( (value_jsonb->>'autovacuum_count')::bigint ) > 0) OR (sum( (value_jsonb->>'autoanalyze_count')::bigint ) > 0)\r\n    order by 5 desc",
+              "rawSql": "with data as (\r\n    select\r\n        snapshot,\r\n        jsonb_array_elements(value_jsonb) as value_jsonb\r\n    from manager.metric where\r\n        $__unixEpochFilter(ts) AND\r\n        host = md5('$host')::uuid AND\r\n        plugin = md5('pg.user_tables')::uuid\r\n)\r\nselect\r\n    value_jsonb->>'full_table_name' as \"table\",\r\n    max( to_timestamp( (value_jsonb->>'last_autovacuum')::bigint ) AT TIME ZONE 'UTC') as \"last_autovacuum\",\r\n    sum( (value_jsonb->>'autovacuum_count')::bigint ) as \"autovacuum count\", \r\n    max( to_timestamp( (value_jsonb->>'last_autoanalyze')::bigint ) AT TIME ZONE 'UTC') as \"last_autoanalyze\",\r\n    sum( (value_jsonb->>'autoanalyze_count')::bigint ) as \"autoanalyze count\"\r\n    from data\r\n    group by 1\r\n    having (sum( (value_jsonb->>'autovacuum_count')::bigint ) > 0) OR (sum( (value_jsonb->>'autoanalyze_count')::bigint ) > 0)\r\n    order by 5 desc",
               "refId": "A",
               "resultFormat": "time_series",
               "select": [
@@ -5966,7 +6120,209 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 54
+        "y": 22
+      },
+      "id": 93,
+      "panels": [
+        {
+          "aliasColors": {},
+          "bars": true,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "${DS_DBA-ONLY-PG}",
+          "fill": 1,
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 23
+          },
+          "id": 91,
+          "legend": {
+            "alignAsTable": true,
+            "avg": true,
+            "current": true,
+            "max": true,
+            "min": true,
+            "show": true,
+            "sort": "max",
+            "sortDesc": true,
+            "total": false,
+            "values": true
+          },
+          "lines": false,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": true,
+          "steppedLine": false,
+          "targets": [
+            {
+              "alias": "",
+              "expr": "",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "rawSql": "with slots as (\n select\n  distinct(jsonb_object_keys(value_jsonb)) as name\n from manager.metric where\n  $__unixEpochFilter(ts) AND\n  host = md5('$host')::uuid AND\n  plugin = md5('pg.replication_slots')::uuid\n)\nSELECT\n  ts as \"time\",\n  sum(coalesce((m.value_jsonb->>(s.name))::bigint, 0)) as \"value\",\n  s.name\nfrom manager.metric m, slots s\nwhere\n  $__unixEpochFilter(ts) AND\n  host = md5('$host')::uuid AND\n  plugin = md5('pg.replication_slots')::uuid\ngroup by ts, s.name\norder by ts, s.name\n\n",
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Slot sizes",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "bytes",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": "0",
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
+        }
+      ],
+      "title": "Replication",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 23
+      },
+      "id": 97,
+      "panels": [
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "${DS_DBA-ONLY-PG}",
+          "fill": 4,
+          "gridPos": {
+            "h": 9,
+            "w": 24,
+            "x": 0,
+            "y": 24
+          },
+          "id": 95,
+          "legend": {
+            "alignAsTable": true,
+            "avg": true,
+            "current": true,
+            "max": true,
+            "min": true,
+            "show": true,
+            "total": false,
+            "values": true
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": true,
+          "steppedLine": false,
+          "targets": [
+            {
+              "alias": "",
+              "expr": "",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "rawSql": "SELECT\n  ts as \"time\",\n  value_double as \"value\"\nfrom manager.metric where\n  $__unixEpochFilter(ts) AND\n  host = md5('$host')::uuid AND\n  plugin = md5('pg.wal.speed')::uuid\nORDER BY ts\n\n",
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Generation speed",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "Bps",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": "0",
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
+        }
+      ],
+      "title": "WAL",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 24
       },
       "id": 58,
       "panels": [
@@ -5975,7 +6331,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "dba-only-pg",
+          "datasource": "${DS_DBA-ONLY-PG}",
           "fill": 4,
           "gridPos": {
             "h": 10,
@@ -6125,9 +6481,197 @@
       ],
       "title": "Buffers write",
       "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 25
+      },
+      "id": 99,
+      "panels": [
+        {
+          "aliasColors": {},
+          "bars": true,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "${DS_DBA-ONLY-PG}",
+          "fill": 1,
+          "gridPos": {
+            "h": 11,
+            "w": 12,
+            "x": 0,
+            "y": 26
+          },
+          "id": 101,
+          "legend": {
+            "alignAsTable": true,
+            "avg": true,
+            "current": true,
+            "max": true,
+            "min": true,
+            "show": true,
+            "total": false,
+            "values": true
+          },
+          "lines": false,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "alias": "",
+              "expr": "",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "rawSql": "with data as (\n    select\n        snapshot,\n        jsonb_array_elements(value_jsonb) as value_jsonb\n    from manager.metric where\n        $__unixEpochFilter(ts) AND\n        host = md5('$host')::uuid AND\n        plugin = md5('pg.statements')::uuid\n)\nSELECT\n  snapshot as \"time\",\n  sum((value_jsonb->>'calls')::float8) / 60 as \"qp/s\"\nfrom data\ngroup by snapshot\norder by snapshot;\n",
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Statements",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "ops",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": "0",
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": true,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "${DS_DBA-ONLY-PG}",
+          "fill": 1,
+          "gridPos": {
+            "h": 11,
+            "w": 12,
+            "x": 12,
+            "y": 26
+          },
+          "id": 102,
+          "legend": {
+            "alignAsTable": true,
+            "avg": true,
+            "current": true,
+            "max": true,
+            "min": true,
+            "show": true,
+            "sort": "avg",
+            "sortDesc": true,
+            "total": false,
+            "values": true
+          },
+          "lines": false,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "alias": "",
+              "expr": "",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "rawSql": "SELECT\n  ts as \"time\",\n  value_jsonb->>'datname' as \"database\",\n  sum( coalesce((value_jsonb->>'xact_commit')::float8, 0) + coalesce((value_jsonb->>'xact_rollback')::float8, 0) )\nfrom manager.metric where\n  $__unixEpochFilter(ts) AND\n  host = md5('$host')::uuid AND\n  plugin = md5('pg.databases')::uuid\ngroup by 1,2\norder by ts;\n",
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Transactions",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "ops",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": "0",
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
+        }
+      ],
+      "title": "Operations",
+      "type": "row"
     }
   ],
-  "refresh": "30s",
+  "refresh": "1m",
   "schemaVersion": 16,
   "style": "dark",
   "tags": [],
@@ -6136,7 +6680,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": "dba-only-pg",
+        "datasource": "${DS_DBA-ONLY-PG}",
         "hide": 0,
         "includeAll": false,
         "label": null,
@@ -6147,7 +6691,7 @@
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
-        "sort": 3,
+        "sort": 0,
         "tagValuesQuery": "",
         "tags": [],
         "tagsQuery": "",
@@ -6188,5 +6732,5 @@
   "timezone": "",
   "title": "PostgreSQL (pg_gatherer)",
   "uid": "Q1TigQumk",
-  "version": 141
+  "version": 177
 }
