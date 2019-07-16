@@ -30,7 +30,9 @@ create table manager.metric (
     value_bigint bigint,
     value_double float8,
     value_jsonb  jsonb
-) partition by list(host);
+);
+select create_hypertable('manager.metric', 'ts', chunk_time_interval => 86400000000);
+create index ON manager.metric (ts, plugin, host);
 
 -- alerts
 create table manager.alert (
