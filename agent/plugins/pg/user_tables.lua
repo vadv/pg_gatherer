@@ -1,5 +1,4 @@
 local json = require('json')
-local time = require('time')
 local plugin = 'pg.user_tables'
 
 local helpers = dofile(os.getenv("CONFIG_INIT"))

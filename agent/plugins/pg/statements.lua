@@ -1,6 +1,5 @@
 local json = require('json')
 local crypto = require('crypto')
-local time = require('time')
 local plugin = 'pg.statements'
 
 local helpers = dofile(os.getenv("CONFIG_INIT"))

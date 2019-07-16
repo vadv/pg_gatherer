@@ -1,4 +1,3 @@
-local time = require("time")
 local plugin = 'pg.wal'
 
 local helpers = dofile(os.getenv("CONFIG_INIT"))

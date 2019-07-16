@@ -8,6 +8,8 @@ end
 
 local function insert(plugin, snapshot, value_bigint, value_double, value_jsonb, manager)
   stmt = build_stmt(manager)
+  -- fixes for glua json.encode({}) == '[]'
+  if value_jsonb == '[]' then value_jsonb = nil end
   local _, err = stmt:exec(os.getenv("TOKEN"), plugin, snapshot, value_bigint, value_double, value_jsonb)
   if err then error("exec error: "..err) end
 end

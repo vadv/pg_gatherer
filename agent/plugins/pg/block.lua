@@ -1,4 +1,3 @@
-local time = require('time')
 local plugin = 'pg.block'
 
 local helpers = dofile(os.getenv("CONFIG_INIT"))
@@ -17,4 +16,4 @@ local function collect()
 end
 
 -- run collect
-helpers.runner.run_every(collect, 5)
+helpers.runner.run_every(collect, 30)

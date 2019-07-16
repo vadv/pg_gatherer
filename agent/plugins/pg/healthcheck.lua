@@ -1,4 +1,3 @@
-local time = require('time')
 local plugin = 'pg.healthcheck'
 
 local helpers = dofile(os.getenv("CONFIG_INIT"))
