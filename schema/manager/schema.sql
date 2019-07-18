@@ -31,7 +31,7 @@ create table manager.metric (
     value_double float8,
     value_jsonb  jsonb
 );
-select create_hypertable('manager.metric', 'ts', chunk_time_interval => 86400000000);
+select create_hypertable('manager.metric', 'ts', chunk_time_interval => 43200);
 create index ON manager.metric (ts, plugin, host);
 
 -- alerts
