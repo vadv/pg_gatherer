@@ -12,7 +12,7 @@ local function agent(connection_string)
     if os.getenv("MAIN_AGENT_CONNECTION") then
       if connections[os.getenv("MAIN_AGENT_CONNECTION")] == nil then
         -- build connection
-        local conn, err = db.open("postgres", os.getenv("MAIN_AGENT_CONNECTION"), {shared=true})
+        local conn, err = db.open("postgres", os.getenv("MAIN_AGENT_CONNECTION"), {shared=true, read_only=true})
         if err then error(err) end
         connections[os.getenv("MAIN_AGENT_CONNECTION")] = conn
         return conn
@@ -32,7 +32,7 @@ local function agent(connection_string)
     end
     stmt:close()
     os.setenv("MAIN_AGENT_CONNECTION", result.rows[1][1])
-    local conn, err = db.open("postgres", os.getenv("MAIN_AGENT_CONNECTION"), {shared=true})
+    local conn, err = db.open("postgres", os.getenv("MAIN_AGENT_CONNECTION"), {shared=true, read_only=true})
     if err then error(err) end
     connections[os.getenv("MAIN_AGENT_CONNECTION")] = conn
     return conn
@@ -43,7 +43,7 @@ local function agent(connection_string)
     return connections[connection_string]
   end
 
-  local conn, err = db.open("postgres", connection_string, {shared=true})
+  local conn, err = db.open("postgres", connection_string, {shared=true, read_only=true})
   if err then error(err) end
   connections[connection_string] = conn
   return conn
