@@ -1,20 +1,21 @@
-language: go
+sudo: required
 
 services:
   - docker
 
-os:
-  - linux
+jobs:
+  include:
 
-go:
-  - "1.9.x"
-  - "1.10.x"
-  - "1.11.x"
-  - "1.12.x"
+    - stage: build test docker image and test
+      script:
+        - docker build -t pg_gatherer_test . -f ./docker/test.Dockerfile
+        - docker run -ti --rm pg_gatherer_test bash -ec "make test_in_docker"
 
-before_install:
-# build docker image
-  - docker build -t pg_gatherer_test . -f ./docker/test.Dockerfile
-
-script: >
-  docker run -ti --rm pg_gatherer_test bash -ec "make test_in_docker"
+    - stage: build release docker image
+      script:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - docker run -ti --rm pg_gatherer_test bash -ec "make test_in_docker"
+        - docker build -t pg_gatherer . -f ./docker/release.Dockerfile
+        - docker images
+        - docker tag pg_gatherer $DOCKER_USERNAME/pg_gatherer:$TRAVIS_BRANCH
+        - docker push $DOCKER_USERNAME/pg_gatherer:$TRAVIS_BRANCH
