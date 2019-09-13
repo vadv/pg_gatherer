@@ -1,4 +1,9 @@
 language: go
+sudo: required
+services:
+  - docker
+os:
+  - linux
 
 go:
   - "1.9.x"
@@ -11,9 +16,11 @@ before_install:
   - go get github.com/axw/gocov/gocov
   - go get github.com/mattn/goveralls
   - if ! go get code.google.com/p/go.tools/cmd/cover; then go get golang.org/x/tools/cmd/cover; fi
+# build docker image
+  - sudo docker build -t pg_gatherer . -f ./docker/test.Dockerfile
 
 install:
   - go get -u -v $(go list -f '{{join .Imports "\n"}}{{"\n"}}{{join .TestImports "\n"}}' ./... | sort | uniq | grep -v gopher-lua-libs)
 
 script:
-  make test_intergation
+  sudo docker run --rm -t -i pg_gatherer make test_intergation
