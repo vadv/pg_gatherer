@@ -11,10 +11,9 @@ jobs:
         - docker build -t pg_gatherer_test . -f ./docker/test.Dockerfile
         - docker run -ti --rm pg_gatherer_test bash -ec "make test_in_docker"
 
-    - stage: build release docker image
+    - stage: build release docker image and push
       script:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        - docker run -ti --rm pg_gatherer_test bash -ec "make test_in_docker"
         - docker build -t pg_gatherer . -f ./docker/release.Dockerfile
         - docker images
         - docker tag pg_gatherer $DOCKER_USERNAME/pg_gatherer:$TRAVIS_BRANCH
