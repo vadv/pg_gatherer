@@ -6,9 +6,9 @@ Creates lua user data `connection_ud`.
 	state := lua.NewState()
 	connection.Preload(state)
 	// register user data "test"
-	connection.New(state, "test", "/tmp", "coinsph-db-test", 5432, "coinsph-user-test", "coinsph-password")
+	connection.New(state, "test", "/tmp", "gatherer-db-test", 5432, "gatherer-user-test", "gatherer-password")
 	// register user data "connection"
-	connection.New(state, "connection", "/tmp", "coinsph-db", 5432, "coinsph-user", "coinsph-password")
+	connection.New(state, "connection", "/tmp", "gatherer-db", 5432, "gatherer-user", "gatherer-password")
 ```
 
 # Lua

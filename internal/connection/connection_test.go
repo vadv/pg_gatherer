@@ -14,7 +14,7 @@ func TestConnection(t *testing.T) {
 	state := lua.NewState()
 	connection.Preload(state)
 	connection.New(state, `connection`,
-		"/tmp", "coinsph", 5432, "coinsph", "")
+		"/tmp", "gatherer", 5432, "gatherer", "")
 
 	inspect.Preload(state)
 	if err := state.DoFile("./tests/connection.lua"); err != nil {

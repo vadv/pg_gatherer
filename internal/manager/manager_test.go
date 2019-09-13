@@ -3,9 +3,9 @@ package manager_test
 import (
 	"testing"
 
+	"github.com/vadv/gopher-lua-libs/inspect"
 	"github.com/vadv/pg_gatherer/internal/connection"
 	"github.com/vadv/pg_gatherer/internal/manager"
-	"github.com/vadv/gopher-lua-libs/inspect"
 	lua "github.com/yuin/gopher-lua"
 )
 
@@ -13,10 +13,10 @@ func TestManager(t *testing.T) {
 
 	state := lua.NewState()
 	manager.Preload(state)
-	manager.New(state, `manager`, "host=/tmp dbname=coinsph user=coinsph")
+	manager.New(state, `manager`, "host=/tmp dbname=gatherer user=gatherer")
 	connection.Preload(state)
 	connection.New(state, `connection`,
-		"/tmp", "coinsph", 5432, "coinsph", "")
+		"/tmp", "gatherer", 5432, "gatherer", "")
 
 	inspect.Preload(state)
 	if err := state.DoFile("./tests/manager.lua"); err != nil {
