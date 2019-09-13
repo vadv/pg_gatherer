@@ -1,6 +1,3 @@
-test_compose:
-	docker-compose -f docker/docker-compose.yml up
-
-go_test:
+test_intergation:
 	./tests/postgresql.sh
 	go test -v -race ./...
