@@ -12,15 +12,13 @@ go:
   - "1.12.x"
 
 before_install:
-# install dependency
-  - go get github.com/axw/gocov/gocov
-  - go get github.com/mattn/goveralls
-  - if ! go get code.google.com/p/go.tools/cmd/cover; then go get golang.org/x/tools/cmd/cover; fi
 # build docker image
-  - sudo docker build -t pg_gatherer . -f ./docker/test.Dockerfile
+  - sudo docker build -t pg_gatherer_test . -f ./docker/test.Dockerfile
 
-install:
-  - go get -u -v $(go list -f '{{join .Imports "\n"}}{{"\n"}}{{join .TestImports "\n"}}' ./... | sort | uniq | grep -v gopher-lua-libs)
-
-script:
-  sudo docker run --rm -t -i pg_gatherer make test_intergation
+script: >
+  sudo docker run --privileged -ti --rm --user $(id -u):$(id -g)
+  -e TRAVIS=$TRAVIS -e TRAVIS_COMMIT_RANGE=$TRAVIS_COMMIT_RANGE
+  -e TRAVIS_PULL_REQUEST=$TRAVIS_PULL_REQUEST -e TRAVIS_REPO_SLUG=$TRAVIS_REPO_SLUG
+  -e TRAVIS_BRANCH=$TRAVIS_BRANCH -e TRAVIS_COMMIT=$TRAVIS_COMMIT
+  -v /etc/passwd:/etc/passwd -v /etc/sudoers:/etc/sudoers -v /etc/sudoers.d:/etc/sudoers.d
+  pg_gatherer_test bash -c "make test_in_docker"
