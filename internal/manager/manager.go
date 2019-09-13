@@ -9,6 +9,7 @@ import (
 // manager connection to PostgreSQL
 type manager struct {
 	db *sql.DB
+	host string
 }
 
 // Preload is the preloader of user data connection_ud.
@@ -24,14 +25,14 @@ func Preload(L *lua.LState) int {
 }
 
 // New create new manager into lua state as user data
-func New(L *lua.LState, userDataName, connection string) error {
+func New(L *lua.LState, userDataName, host, connection string) error {
 	db, err := sql.Open(`postgres`, connection)
 	if err != nil {
 		return err
 	}
 	db.SetMaxOpenConns(1)
 	db.SetMaxIdleConns(1)
-	manager := &manager{db: db}
+	manager := &manager{db: db, host: host}
 	ud := L.NewUserData()
 	ud.Value = manager
 	L.SetMetatable(ud, L.GetTypeMetatable(`manager_ud`))

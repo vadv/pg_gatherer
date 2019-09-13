@@ -13,7 +13,7 @@ func TestManager(t *testing.T) {
 
 	state := lua.NewState()
 	manager.Preload(state)
-	manager.New(state, `manager`, "host=/tmp dbname=gatherer user=gatherer")
+	manager.New(state, `manager`, `host`, "host=/tmp dbname=gatherer user=gatherer")
 	connection.Preload(state)
 	connection.New(state, `connection`,
 		"/tmp", "gatherer", 5432, "gatherer", "")

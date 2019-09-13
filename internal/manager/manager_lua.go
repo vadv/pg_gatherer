@@ -25,7 +25,7 @@ func checkUserDataManager(L *lua.LState, n int) *manager {
 func setMetric(L *lua.LState) int {
 	ud := checkUserDataManager(L, 1)
 	table := L.CheckTable(2)
-	m, err := parseMetric(table)
+	m, err := parseMetric(ud.host, table)
 	if err != nil {
 		L.Push(lua.LNil)
 		L.Push(lua.LString(err.Error()))

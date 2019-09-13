@@ -16,8 +16,8 @@ type metric struct {
 	valueJson    *string
 }
 
-func parseMetric(table *lua.LTable) (*metric, error) {
-	m := &metric{}
+func parseMetric(host string, table *lua.LTable) (*metric, error) {
+	m := &metric{host:host}
 	var err error
 	table.ForEach(func(k lua.LValue, v lua.LValue) {
 		switch strings.ToLower(k.String()) {
