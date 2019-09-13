@@ -1,7 +1,8 @@
 language: go
-sudo: required
+
 services:
   - docker
+
 os:
   - linux
 
@@ -13,7 +14,7 @@ go:
 
 before_install:
 # build docker image
-  - sudo docker build -t pg_gatherer_test . -f ./docker/test.Dockerfile
+  - docker build -t pg_gatherer_test . -f ./docker/test.Dockerfile
 
 script: >
-  sudo docker run -ti --rm pg_gatherer_test bash -ec "make test_in_docker"
+  docker run -ti --rm pg_gatherer_test bash -ec "make test_in_docker"
