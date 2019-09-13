@@ -3,6 +3,4 @@ test_compose:
 
 go_test:
 	./tests/postgresql.sh
-	#go test -v -race ./connection
-	#go test -v -race ./cache
-	go test -v -race ./manager
+	go test -v -race ./...

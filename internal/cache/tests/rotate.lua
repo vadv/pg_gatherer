@@ -10,7 +10,7 @@ local value, err = cache:get("must_be_rotated_after_2_second")
 if err then error(err) end
 if not(value == 1) then error("must be get from prev table") end
 
-time.sleep(2)
+time.sleep(3)
 local value, err = cache:get("must_be_rotated_after_2_second")
 if err then error(err) end
 if value then error("table must be rotated") end

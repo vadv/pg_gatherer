@@ -1,4 +1,4 @@
-module github.com/coins.ph/pg_gatherer
+module github.com/vadv/pg_gatherer
 
 go 1.12
 

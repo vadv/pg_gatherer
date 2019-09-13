@@ -1,7 +1,7 @@
 package cache
 
 import (
-	"github.com/coins.ph/pg_gatherer/cache/sqlite"
+	"github.com/vadv/pg_gatherer/internal/cache/sqlite"
 	lua "github.com/yuin/gopher-lua"
 )
 

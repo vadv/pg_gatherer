@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/coins.ph/pg_gatherer/cache"
+	"github.com/vadv/pg_gatherer/internal/cache"
 	"github.com/vadv/gopher-lua-libs/inspect"
 	"github.com/vadv/gopher-lua-libs/time"
 	lua "github.com/yuin/gopher-lua"
