@@ -42,7 +42,7 @@ func checkUserDataConnection(L *lua.LState, n int) *connection {
 // query execute query from connection
 func query(L *lua.LState) int {
 	ud := checkUserDataConnection(L, 1)
-	query := L.CheckString(2)
+	sqlQuery := L.CheckString(2)
 	args := make([]interface{}, 0)
 	if count := L.GetTop(); count > 2 {
 		for n := 3; n <= count; n++ {
@@ -56,20 +56,19 @@ func query(L *lua.LState) int {
 				args = append(args, L.CheckBool(n))
 			default:
 				L.Push(lua.LNil)
-				L.Push(lua.LString("unsupported type for query args"))
+				L.Push(lua.LString("unsupported type for sqlQuery args"))
 				return 2
 			}
 		}
 	}
-	queryResult, err := processQuery(L, ud.db, query, args...)
+	execResult, err := processQuery(L, ud.db, sqlQuery, args...)
 	if err != nil {
-		L.Push(lua.LNil)
-		L.Push(lua.LString(err.Error()))
-		return 2
+		L.RaiseError("error: %s", err.Error())
+		return 0
 	}
 	result := L.NewTable()
-	result.RawSetString(`rows`, queryResult.Rows)
-	result.RawSetString(`columns`, queryResult.Columns)
+	result.RawSetString(`rows`, execResult.Rows)
+	result.RawSetString(`columns`, execResult.Columns)
 	L.Push(result)
 	return 1
 }
@@ -79,25 +78,24 @@ func availableConnections(L *lua.LState) int {
 	ud := checkUserDataConnection(L, 1)
 	sqlRows, err := ud.db.Query(listConnections)
 	if err != nil {
-		L.Push(lua.LNil)
-		L.Push(lua.LString(err.Error()))
-		return 2
+		L.RaiseError("error: %s", err.Error())
+		return 0
 	}
 	defer sqlRows.Close()
 	result := L.NewTable()
 	for sqlRows.Next() {
 		dbname := ""
-		if err := sqlRows.Scan(&dbname); err != nil {
+		if errScan := sqlRows.Scan(&dbname); errScan != nil {
 			L.Push(lua.LNil)
-			L.Push(lua.LString(err.Error()))
+			L.Push(lua.LString(errScan.Error()))
 			return 2
 		}
 		c := &connection{
-			Host:     ud.Host,
-			DBName:   dbname,
-			Port:     ud.Port,
-			User:     ud.User,
-			Password: ud.Password,
+			host:     ud.host,
+			dbname:   dbname,
+			port:     ud.port,
+			user:     ud.user,
+			password: ud.password,
 		}
 		newUd := c.userData(L)
 		result.Append(newUd)

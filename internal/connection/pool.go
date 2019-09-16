@@ -17,14 +17,14 @@ func getDBFromPool(c *connection) (*sql.DB, error) {
 		return db, nil
 	} else {
 		// open
-		db, err := sql.Open(`postgres`, c.connectionString())
+		newDB, err := sql.Open(`postgres`, c.connectionString())
 		if err != nil {
 			return nil, err
 		}
-		db.SetMaxIdleConns(1)
-		db.SetMaxOpenConns(1)
+		newDB.SetMaxIdleConns(1)
+		newDB.SetMaxOpenConns(1)
 		// store
-		connectionPool[c.connectionString()] = db
-		return db, nil
+		connectionPool[c.connectionString()] = newDB
+		return newDB, nil
 	}
 }

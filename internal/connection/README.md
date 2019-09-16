@@ -15,7 +15,7 @@ Creates lua user data `connection_ud`.
 
 ## connection:query(string, args...)
 
-Execute read-only query with args. Return table with `rows` and `columns` and error.
+Execute read-only query with args. Return table with `rows` and `columns`, raise error.
 
 ```lua
 local result, err = connection:query("select $1::integer, $1::text, $2", 1, "tests")
@@ -30,7 +30,7 @@ result:
 
 ## connection:available_connections()
 
-List of available connections in this PostgreSQL instance. Return list of user data `connection_ud` and error.
+List of available connections in this PostgreSQL instance. Return list of user data `connection_ud`, raise error.
 
 ```lua
 local connections, err = connection:available_connections()

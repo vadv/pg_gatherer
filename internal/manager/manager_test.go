@@ -12,12 +12,13 @@ import (
 func TestManager(t *testing.T) {
 
 	state := lua.NewState()
+
 	manager.Preload(state)
 	manager.New(state, `manager`, `host`, "host=/tmp dbname=gatherer user=gatherer")
+
 	connection.Preload(state)
 	connection.New(state, `connection`,
-		"/tmp", "gatherer", 5432, "gatherer", "")
-
+		"/tmp", "gatherer", "gatherer", "", 5432, nil)
 	inspect.Preload(state)
 	if err := state.DoFile("./tests/manager.lua"); err != nil {
 		t.Fatalf("error: %s\n", err.Error())
