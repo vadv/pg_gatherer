@@ -13,7 +13,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-// Cache in sqlite database
+// cache in sqlite database
 // this is a trade-off between memory usage and disk iops usage
 
 const (

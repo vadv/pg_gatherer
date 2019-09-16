@@ -5,13 +5,13 @@ import (
 	lua "github.com/yuin/gopher-lua"
 )
 
-type Cache interface {
+type cache interface {
 	Set(key string, value float64) error
 	Get(key string) (float64, int64, bool, error)
 }
 
 type cacheUserData struct {
-	Cache
+	cache
 }
 
 // Preload is the preloader of user data connection_ud.
@@ -28,13 +28,13 @@ func Preload(L *lua.LState) int {
 }
 
 func NewSqlite(L *lua.LState, userDataName, path string) error {
-	sqlite, err := sqlite.New(path)
+	s, err := sqlite.New(path)
 	if err != nil {
 		return err
 	}
-	cache := &cacheUserData{sqlite}
+	c := &cacheUserData{s}
 	ud := L.NewUserData()
-	ud.Value = cache
+	ud.Value = c
 	L.SetMetatable(ud, L.GetTypeMetatable(`cache_ud`))
 	L.SetGlobal(userDataName, ud)
 	return nil
