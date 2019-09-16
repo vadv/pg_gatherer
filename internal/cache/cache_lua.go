@@ -43,7 +43,7 @@ func get(L *lua.LState) int {
 	}
 	L.Push(lua.LNumber(value))
 	L.Push(lua.LNumber(updatedAt))
-	return 1
+	return 2
 }
 
 // diff key
