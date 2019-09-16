@@ -31,16 +31,18 @@ func set(L *lua.LState) int {
 func get(L *lua.LState) int {
 	ud := checkUserDataCache(L, 1)
 	key := L.CheckString(2)
-	value, _, found, err := ud.Get(key)
+	value, updatedAt, found, err := ud.Get(key)
 	if err != nil {
 		L.RaiseError("cache error: %s", err.Error())
 		return 0
 	}
 	if !found {
 		L.Push(lua.LNil)
-		return 1
+		L.Push(lua.LNil)
+		return 2
 	}
 	L.Push(lua.LNumber(value))
+	L.Push(lua.LNumber(updatedAt))
 	return 1
 }
 

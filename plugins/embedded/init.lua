@@ -19,16 +19,24 @@ function is_rds()
 end
 
 -- run function f every sec
+-- this function run in plugin context, then we use cache key `last_run`
 function run_every(f, every)
   while true do
-    local start_at = time.unix()
-    f()
-    local sleep_time = every - (time.unix() - start_at)
-    if sleep_time > 0 then
-      time.sleep(sleep_time)
+
+    local _, updated_at = cache:get("last_run")
+    if time.unix() >= updated_at + every then
+      local start_at = time.unix()
+      f()
+      cache:set("last_run", 0)
+      local exec_time = (time.unix() - start_at)
+      if exec_time > every then
+        print(debug.getinfo(2).source, "execution timeout:", exec_time)
+        time.sleep(1)
+      end
     else
-      print(debug.getinfo(2).source, "execution timeout:", (time.unix() - start_at))
+      -- wait
       time.sleep(1)
     end
+
   end
 end

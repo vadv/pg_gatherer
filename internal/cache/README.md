@@ -17,7 +17,7 @@ Set `number` to cache by key `string`, raise error.
 
 ## cache:get(string)
 
-Get `number` from cache by key `string`. Return `number` or `nil`, raise error.
+Get `number` (value) and `number` (time updated_at) from cache by key `string`. Return two `number` or two `nil`, raise error.
 
 ## cache:diff_and_set(string, value)
 
