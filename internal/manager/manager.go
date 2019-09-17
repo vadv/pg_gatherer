@@ -2,9 +2,20 @@ package manager
 
 import (
 	"database/sql"
+	"sync"
 
 	lua "github.com/yuin/gopher-lua"
 )
+
+var listOfOpenedManagerConnections = &listOfManagerConnections{
+	mutex: sync.Mutex{},
+	list:  make(map[string]*sql.DB),
+}
+
+type listOfManagerConnections struct {
+	mutex sync.Mutex
+	list  map[string]*sql.DB
+}
 
 // manager connection to PostgreSQL
 type manager struct {
@@ -26,12 +37,19 @@ func Preload(L *lua.LState) int {
 
 // New create new manager into lua state as user data
 func New(L *lua.LState, userDataName, host, connection string) error {
-	db, err := sql.Open(`postgres`, connection)
-	if err != nil {
-		return err
+	listOfOpenedManagerConnections.mutex.Lock()
+	defer listOfOpenedManagerConnections.mutex.Unlock()
+	db, ok := listOfOpenedManagerConnections.list[connection]
+	if !ok {
+		newDB, err := sql.Open(`postgres`, connection)
+		if err != nil {
+			return err
+		}
+		newDB.SetMaxOpenConns(1)
+		newDB.SetMaxIdleConns(1)
+		listOfOpenedManagerConnections.list[connection] = newDB
+		db = newDB
 	}
-	db.SetMaxOpenConns(1)
-	db.SetMaxIdleConns(1)
 	m := &manager{db: db, host: host}
 	ud := L.NewUserData()
 	ud.Value = m

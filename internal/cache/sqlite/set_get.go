@@ -3,8 +3,6 @@ package sqlite
 import (
 	"database/sql"
 	"fmt"
-	"log"
-	"sync"
 	"time"
 )
 
@@ -18,21 +16,15 @@ values (?, ?, ?) on conflict (key) do
 	getQuery = `select value, updated_at from %s where key = ?`
 )
 
-var (
-	createdTables      = make(map[string]bool, 0)
-	createdTablesMutex = sync.Mutex{}
-)
-
 func (c *Cache) checkTableExists(tableName string) error {
 	// check to table is created
-	createdTablesMutex.Lock()
-	defer createdTablesMutex.Unlock()
-	if _, ok := createdTables[tableName]; !ok {
-		log.Printf("[INFO] cache %s create new table: %s\n", c.path, tableName)
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	if _, ok := c.tables[tableName]; !ok {
 		if err := c.createTable(tableName); err != nil {
 			return err
 		}
-		createdTables[tableName] = true
+		c.tables[tableName] = true
 	}
 	return nil
 }

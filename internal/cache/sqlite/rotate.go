@@ -32,19 +32,18 @@ func (c *Cache) rotateOldTables() error {
 	defer rows.Close()
 	for rows.Next() {
 		tableName := ""
-		err := rows.Scan(&tableName)
-		if err != nil {
-			return err
+		errScan := rows.Scan(&tableName)
+		if errScan != nil {
+			return errScan
 		}
 		if tableName != c.currentTableName() && tableName != c.prevTableName() {
-			log.Printf("[INFO] cache %s rotating old table %s\n", c.path, tableName)
-			_, err := c.db.Exec(fmt.Sprintf(`drop table %s`, tableName))
-			if err != nil {
-				return err
+			_, errExec := c.db.Exec(fmt.Sprintf(`drop table %s`, tableName))
+			if errExec != nil {
+				return errExec
 			}
-			createdTablesMutex.Lock()
-			delete(createdTables, tableName)
-			createdTablesMutex.Unlock()
+			c.mutex.Lock()
+			delete(c.tables, tableName)
+			c.mutex.Unlock()
 		}
 	}
 	return rows.Err()

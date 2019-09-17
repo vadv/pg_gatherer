@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"time"
 
 	"github.com/vadv/pg_gatherer/internal/cache"
 
@@ -28,6 +29,17 @@ type Connection struct {
 	Params   map[string]string
 }
 
+// PluginStatistic represent statistics for plugin
+type PluginStatistic struct {
+	Host           string
+	PluginName     string
+	PluginFileName string
+	Starts         int
+	Errors         int
+	LastCheck      int64
+	LastError      string
+}
+
 // plugin struct
 type plugin struct {
 	mutex      sync.Mutex
@@ -37,6 +49,7 @@ type plugin struct {
 	fileName   string
 	running    bool
 	err        error
+	statistics *PluginStatistic
 }
 
 // pluginConfig configures plugin
@@ -61,6 +74,10 @@ func createPlugin(config *pluginConfig) (*plugin, error) {
 	}
 	result := &plugin{
 		config: config,
+		statistics: &PluginStatistic{
+			PluginName: config.pluginName,
+			Host:       config.host,
+		},
 	}
 	// try to find in embedded
 	if _, err := os.Stat(filepath.Join(config.rootDir, "embedded", config.pluginName, "plugin.lua")); err == nil {
@@ -73,6 +90,7 @@ func createPlugin(config *pluginConfig) (*plugin, error) {
 	if result.fileName == "" {
 		return nil, fmt.Errorf("plugin not found")
 	}
+	result.statistics.PluginFileName = result.fileName
 	return result, nil
 }
 
@@ -100,8 +118,8 @@ func (p *plugin) prepareState() error {
 		p.config.manager.Params))
 	// cache
 	cache.Preload(state)
-	if err := cache.NewSqlite(state, `cache`,
-		filepath.Join(p.config.globalCacheDir, p.config.host, p.config.pluginName, "cache.sqlite")); err != nil {
+	cachePath := filepath.Join(p.config.globalCacheDir, p.config.host, p.config.pluginName, "cache.sqlite")
+	if err := cache.NewSqlite(state, `cache`, cachePath); err != nil {
 		return err
 	}
 	p.state = state
@@ -113,11 +131,16 @@ func (p *plugin) prepareState() error {
 func (p *plugin) execute() {
 	// set running
 	p.mutex.Lock()
+	p.statistics.Starts++
 	p.running = true
 	p.mutex.Unlock()
 	// set err
 	err := p.state.DoFile(p.fileName)
 	p.mutex.Lock()
+	if err != nil {
+		p.statistics.Errors++
+		p.statistics.LastError = err.Error()
+	}
 	p.err = err
 	// set not running
 	p.running = false
@@ -136,4 +159,20 @@ func (p *plugin) check() (running bool, err error) {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 	return p.running, p.err
+}
+
+// Show statistic for plugin
+func (p *plugin) getStatistics() PluginStatistic {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+	result := p.statistics
+	return *result
+}
+
+// update information about plugin check
+// need for monitoring that plugin errors was checked
+func (p *plugin) updateStatisticCheck() {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+	p.statistics.LastCheck = time.Now().Unix()
 }

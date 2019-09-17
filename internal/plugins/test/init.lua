@@ -1,1 +1,1 @@
-print("init initialized")
+time = require("time")
