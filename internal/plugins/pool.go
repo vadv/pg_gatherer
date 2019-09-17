@@ -1,6 +1,7 @@
 package plugins
 
 import (
+	"fmt"
 	"log"
 	"sync"
 	"time"
@@ -75,6 +76,18 @@ func (p *pool) AddHost(host string, conn *Connection, manager *Connection) {
 
 // AddPluginToHost add plugin to host
 func (p *pool) AddPluginToHost(pluginName, host string) error {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+	// check
+	if pls, ok := p.hosts[host]; !ok {
+		return fmt.Errorf("host not registered")
+	} else {
+		for _, pl := range pls.plugins {
+			if pl.config.pluginName == pluginName {
+				return fmt.Errorf("plugin already registered")
+			}
+		}
+	}
 	plConfig := &pluginConfig{
 		host:           host,
 		rootDir:        p.rootDir,
@@ -87,12 +100,41 @@ func (p *pool) AddPluginToHost(pluginName, host string) error {
 	if err != nil {
 		return err
 	}
-	p.mutex.Lock()
 	p.hosts[host].plugins = append(p.hosts[host].plugins, pl)
-	p.mutex.Unlock()
 	if errPrepare := pl.prepareState(); errPrepare != nil {
 		return errPrepare
 	}
+	return nil
+}
+
+// StopAndRemovePluginFromHost stop plugin on host
+func (p *pool) StopAndRemovePluginFromHost(pluginName, host string) error {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+	// check
+	if pls, ok := p.hosts[host]; !ok {
+		return fmt.Errorf("host '%s' not registered", host)
+	} else {
+		var found bool
+		for _, pl := range pls.plugins {
+			if pl.config.pluginName == pluginName {
+				found = true
+			}
+		}
+		if !found {
+			return fmt.Errorf("plugin '%s' for host '%s' not found", pluginName, host)
+		}
+	}
+	// stop
+	plugins := make([]*plugin, 0)
+	for _, pl := range p.hosts[host].plugins {
+		if pl.config.pluginName == pluginName {
+			pl.stop()
+		} else {
+			plugins = append(plugins, pl)
+		}
+	}
+	p.hosts[host].plugins = plugins
 	return nil
 }
 
