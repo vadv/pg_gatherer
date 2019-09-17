@@ -38,6 +38,16 @@ func TestPool(t *testing.T) {
 		t.Fatalf("add plugin: %s\n", err.Error())
 	}
 
+	// add pl_rds
+	if err := pool.AddPluginToHost("pl_rds", "localhost-test"); err != nil {
+		t.Fatalf("add plugin: %s\n", err.Error())
+	}
+
+	// add pl_run_every
+	if err := pool.AddPluginToHost("pl_run_every", "localhost-test"); err != nil {
+		t.Fatalf("add plugin: %s\n", err.Error())
+	}
+
 	time.Sleep(5 * time.Second)
 
 	stat := pool.PluginStatisticPerHost()
@@ -47,6 +57,26 @@ func TestPool(t *testing.T) {
 		if pl.PluginName == `pl_pg` {
 			if pl.Errors > 0 {
 				t.Fatalf("plugin pl_pg must not restarted with error: %d\n", pl.Errors)
+			}
+		}
+
+		// pl_run_every
+		if pl.PluginName == `pl_run_every` {
+			if pl.Errors != 1 {
+				t.Fatalf("plugin pl_run_every must be 1 time errored: %d\n", pl.Errors)
+			}
+			if !strings.Contains(pl.LastError, "first error") {
+				t.Fatalf("must be error 'first error, but get: %s\n'", pl.LastError)
+			}
+			if pl.Starts != 2 {
+				t.Fatalf("plugin pl_run_every must started 2 times: %d\n", pl.Starts)
+			}
+		}
+
+		// pl_rds
+		if pl.PluginName == `pl_rds` {
+			if pl.Errors > 0 {
+				t.Fatalf("plugin pl_rds must not restarted with error: %d\n", pl.Errors)
 			}
 		}
 
