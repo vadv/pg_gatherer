@@ -27,16 +27,12 @@ func setMetric(L *lua.LState) int {
 	table := L.CheckTable(2)
 	m, err := parseMetric(ud.host, table)
 	if err != nil {
-		L.Push(lua.LNil)
-		L.Push(lua.LString(err.Error()))
-		return 2
+		L.RaiseError("parse metric: %s", err.Error())
 	}
 	_, err = ud.db.Exec(queryInsert,
 		m.host, m.plugin, m.snapshot, m.valueInteger, m.valueFloat64, m.valueJson)
 	if err != nil {
-		L.Push(lua.LNil)
-		L.Push(lua.LString(err.Error()))
-		return 2
+		L.RaiseError("save metric: %s", err.Error())
 	}
 	return 0
 }

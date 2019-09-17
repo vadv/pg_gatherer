@@ -6,14 +6,14 @@ Creates lua user data `manager_ud`.
 	state := lua.NewState()
 	manager.Preload(state)
 	// register user data "manager"
-	manager.New(state, "manager", "host=/tmp dbname=")
+	manager.New(state, "manager", "localhost", "host=/tmp dbname=")
 ```
 
 # Lua
 
-## manager:metric({host="", plugin="", [int=0,float=0,json=""]})
+## manager:metric({plugin="", [int=0,float=0,json=""]})
 
-Save metric to manager database.
+Save metric to manager database, raise error.
 
 # SQL
 

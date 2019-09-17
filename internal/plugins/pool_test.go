@@ -23,19 +23,32 @@ func TestPool(t *testing.T) {
 	// delete caches
 	os.RemoveAll("./test/cache")
 
-	// add test_cache
+	// add pl_cache
 	if err := pool.AddPluginToHost("pl_cache", "localhost-test"); err != nil {
 		t.Fatalf("add plugin: %s\n", err.Error())
 	}
 
-	// add test_restarts
+	// add pl_restarts
 	if err := pool.AddPluginToHost("pl_restarts", "localhost-test"); err != nil {
 		t.Fatalf("add plugin: %s\n", err.Error())
 	}
-	time.Sleep(10 * time.Second)
+
+	// add pl_pg
+	if err := pool.AddPluginToHost("pl_pg", "localhost-test"); err != nil {
+		t.Fatalf("add plugin: %s\n", err.Error())
+	}
+
+	time.Sleep(5 * time.Second)
 
 	stat := pool.PluginStatisticPerHost()
 	for _, pl := range stat["localhost-test"] {
+
+		// pl_pg
+		if pl.PluginName == `pl_pg` {
+			if pl.Errors > 0 {
+				t.Fatalf("plugin pl_pg must not restarted with error: %d\n", pl.Errors)
+			}
+		}
 
 		// pl_cache
 		if pl.PluginName == `pl_cache` {
@@ -50,7 +63,7 @@ func TestPool(t *testing.T) {
 		// pl_restarts
 		if pl.PluginName == `pl_restarts` {
 			if pl.Errors != 1 {
-				t.Fatalf("plugin pl_restarts must errored 2 times: %d\n", pl.Errors)
+				t.Fatalf("plugin pl_restarts must errored 1 times: %d\n", pl.Errors)
 			}
 			if pl.Starts != 3 {
 				t.Fatalf("plugin pl_restarts must start only 3 times: %d\n", pl.Starts)
