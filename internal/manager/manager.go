@@ -8,7 +8,7 @@ import (
 
 // manager connection to PostgreSQL
 type manager struct {
-	db *sql.DB
+	db   *sql.DB
 	host string
 }
 
@@ -32,9 +32,9 @@ func New(L *lua.LState, userDataName, host, connection string) error {
 	}
 	db.SetMaxOpenConns(1)
 	db.SetMaxIdleConns(1)
-	manager := &manager{db: db, host: host}
+	m := &manager{db: db, host: host}
 	ud := L.NewUserData()
-	ud.Value = manager
+	ud.Value = m
 	L.SetMetatable(ud, L.GetTypeMetatable(`manager_ud`))
 	L.SetGlobal(userDataName, ud)
 	return nil

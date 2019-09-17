@@ -27,8 +27,8 @@ func Preload(L *lua.LState) int {
 	return 0
 }
 
-func NewSqlite(L *lua.LState, userDataName, path string) error {
-	s, err := sqlite.New(path)
+func NewSqlite(L *lua.LState, userDataName, fileName string) error {
+	s, err := sqlite.New(fileName)
 	if err != nil {
 		return err
 	}

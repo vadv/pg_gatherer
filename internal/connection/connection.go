@@ -46,6 +46,11 @@ func New(L *lua.LState, userDataName, host, dbname, user, password string, port 
 
 // ConnectionString return connection string
 func (c *connection) connectionString() string {
+	return BuildConnectionString(c.host, c.password, c.port, c.user, c.password, c.params)
+}
+
+// BuildConnectionString create connection string
+func BuildConnectionString(host, dbname string, port int, user, password string, params map[string]string) string {
 	kvs := make([]string, 0)
 	escaper := strings.NewReplacer(` `, `\ `, `'`, `\'`, `\`, `\\`)
 	accrue := func(k, v string) {
@@ -53,9 +58,9 @@ func (c *connection) connectionString() string {
 			kvs = append(kvs, k+"="+escaper.Replace(v))
 		}
 	}
-	for k, v := range c.params {
+	for k, v := range params {
 		accrue(k, v)
 	}
 	return fmt.Sprintf("host='%s' port=%d dbname='%s' user='%s' password='%s' %s",
-		c.host, c.port, c.dbname, c.user, c.password, strings.Join(kvs, " "))
+		host, port, dbname, user, password, strings.Join(kvs, " "))
 }
