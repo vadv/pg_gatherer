@@ -21,7 +21,7 @@ func TestPool(t *testing.T) {
 		Port:     5432,
 		UserName: "gatherer",
 	}
-	pool.AddHost(hostname, conn, conn)
+	pool.RegisterHost(hostname, conn, conn)
 
 	// delete caches
 	os.RemoveAll("./test/cache")
@@ -48,6 +48,13 @@ func TestPool(t *testing.T) {
 
 	// add pl_run_every
 	if err := pool.AddPluginToHost("pl_run_every", hostname); err != nil {
+		t.Fatalf("add plugin: %s\n", err.Error())
+	}
+
+	// add pl_stop
+	os.RemoveAll("./test/pl_stop/must_exist.txt")
+	os.RemoveAll("./test/pl_stop/must_not_exist.txt")
+	if err := pool.AddPluginToHost("pl_stop", hostname); err != nil {
 		t.Fatalf("add plugin: %s\n", err.Error())
 	}
 
@@ -107,6 +114,14 @@ func TestPool(t *testing.T) {
 		}
 	}
 
+	time.Sleep(2 * time.Second)
+	if _, err := os.Stat("./test/pl_stop/must_exist.txt"); err != nil {
+		t.Fatalf("file must exist\n")
+	}
+	if _, err := os.Stat("./test/pl_stop/must_not_exist.txt"); err == nil {
+		t.Fatalf("file must not exist\n")
+	}
+
 	// stop all plugins
 	for _, pl := range stat[hostname] {
 		log.Printf("stop plugin: %s\n", pl.PluginName)
@@ -119,5 +134,6 @@ func TestPool(t *testing.T) {
 	if len(stat[hostname]) != 0 {
 		t.Fatalf("all plugins must be stopped\n")
 	}
+	pool.RemoveHostAndPlugins(hostname)
 
 }

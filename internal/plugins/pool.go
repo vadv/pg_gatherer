@@ -61,8 +61,8 @@ func (p *pool) supervisor() error {
 	}
 }
 
-// AddHost add new host
-func (p *pool) AddHost(host string, conn *Connection, manager *Connection) {
+// RegisterHost register new host
+func (p *pool) RegisterHost(host string, conn *Connection, manager *Connection) {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 	if _, ok := p.hosts[host]; !ok {
@@ -70,6 +70,21 @@ func (p *pool) AddHost(host string, conn *Connection, manager *Connection) {
 			manager: manager,
 			conn:    conn,
 			plugins: make([]*plugin, 0),
+		}
+	}
+}
+
+// RemoveHostAndPlugins stop all plugins and remove host
+func (p *pool) RemoveHostAndPlugins(host string) {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+	for plHostName, pls := range p.hosts {
+		if plHostName == host {
+			// stop all plugins
+			for _, pl := range pls.plugins {
+				pl.stop()
+			}
+			delete(p.hosts, host)
 		}
 	}
 }
