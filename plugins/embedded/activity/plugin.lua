@@ -26,14 +26,16 @@ end
 
 -- process waits
 local function waits()
-  for _, row in pairs(connection:query(sql_waits)) do
+  local result = connection:query(sql_waits)
+  for _, row in pairs(result.rows) do
     manager:send_metric({ plugin = plugin_name, snapshot = row[1], json = row[2] })
   end
 end
 
 -- collect on rds
 local function collect_rds()
-  for _, row in pairs(connection:query(sql_activity)) do
+  local result = connection:query(sql_activity)
+  for _, row in pairs(result.rows) do
     manager:send_metric({ plugin = plugin_name, snapshot = row[1], json = row[2] })
   end
   states()
@@ -44,7 +46,7 @@ end
 local function collect_local()
   -- process activity
   local result = connection:query(sql_activity)
-  for _, row in pairs(result) do
+  for _, row in pairs(result.rows) do
     local jsonb, err = json.decode(row[2])
     if err then error(err) end
     local pid = tonumber(jsonb.pid)

@@ -21,8 +21,11 @@ func processQuery(L *lua.LState, db *sql.DB, ctx context.Context, query string, 
 	if err != nil {
 		return nil, err
 	}
-	sqlRows, err := tx.Query(query, args...)
 	defer tx.Commit()
+	sqlRows, errQuery := tx.Query(query, args...)
+	if errQuery != nil {
+		return nil, errQuery
+	}
 	return parseRows(sqlRows, L)
 }
 
@@ -38,6 +41,9 @@ func getTx(db *sql.DB, ctx context.Context) (*sql.Tx, error) {
 }
 
 func parseRows(sqlRows *sql.Rows, L *lua.LState) (*queryResult, error) {
+	if sqlRows == nil {
+		return nil, fmt.Errorf("rows is nil, program bug")
+	}
 	cols, err := sqlRows.Columns()
 	if err != nil {
 		return nil, err

@@ -30,6 +30,12 @@ var (
 	dbPort           = flag.Int(`port`, 5432, `PostgreSQL port`)
 )
 
+type testResult struct {
+	pluginName string
+	testFile   string
+	err        error
+}
+
 func main() {
 	if !flag.Parsed() {
 		flag.Parse()
@@ -52,14 +58,18 @@ func main() {
 	var wg sync.WaitGroup
 	wg.Add(len(plugins))
 	log.Printf("[INFO] test %d plugins\n", len(plugins))
-	errChan := make(chan error, 0)
+	testResultChan := make(chan *testResult, 0)
 
 	for plugin, testFile := range plugins {
 		go func(plugin, testFile string) {
 			log.Printf("[INFO] start testing plugin %s via file %s\n", plugin, testFile)
 			errTest := testPlugin(*pluginPath, plugin, testFile)
 			log.Printf("[INFO] test plugin %s via file %s: was completed\n", plugin, testFile)
-			errChan <- errTest
+			testResultChan <- &testResult{
+				pluginName: plugin,
+				testFile:   testFile,
+				err:        errTest,
+			}
 		}(plugin, testFile)
 	}
 
@@ -68,11 +78,12 @@ func main() {
 		ticker := time.NewTicker(time.Second)
 		for {
 			select {
-			case errPlugin := <-errChan:
+			case result := <-testResultChan:
 				atomic.AddInt32(&completed, 1)
-				if errPlugin != nil {
+				if result != nil && result.err != nil {
 					atomic.AddInt32(&failed, 1)
-					log.Printf("[ERROR] plugin error:\n%s\n", errPlugin.Error())
+					log.Printf("[ERROR] plugin '%s' file '%s' error:\n%s\n",
+						result.pluginName, result.testFile, result.err.Error())
 					if *stopOnFirstError {
 						os.Exit(1)
 					}
@@ -87,7 +98,7 @@ func main() {
 
 	wg.Wait()
 	if failed > 0 {
-		log.Printf("[ERROR] %d plugins was failed\n", failed)
+		log.Printf("[ERROR] %d plugin(s) was failed\n", failed)
 		os.Exit(int(failed))
 	} else {
 		log.Printf("[INFO] was competed after: %v\n", time.Now().Sub(startAt))

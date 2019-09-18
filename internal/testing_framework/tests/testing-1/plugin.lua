@@ -1,1 +1,1 @@
-time.sleep(1000)
+connection:query("select pg_sleep(1000)")
