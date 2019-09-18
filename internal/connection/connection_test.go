@@ -3,6 +3,8 @@ package connection_test
 import (
 	"testing"
 
+	"github.com/vadv/gopher-lua-libs/time"
+
 	"github.com/vadv/gopher-lua-libs/inspect"
 
 	"github.com/vadv/pg_gatherer/internal/connection"
@@ -17,6 +19,7 @@ func TestConnection(t *testing.T) {
 		"/tmp", "gatherer", "gatherer", "", 5432, nil)
 
 	inspect.Preload(state)
+	time.Preload(state)
 	if err := state.DoFile("./tests/connection.lua"); err != nil {
 		t.Fatalf("error: %s\n", err.Error())
 	}

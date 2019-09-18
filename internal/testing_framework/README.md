@@ -13,23 +13,23 @@ Way to test plugin.
 
 ## plugin:create()
 
-Start "plugin.lua" in background.
+Start "plugin.lua" in background, raise error if plugin already created.
 
 ## plugin:remove()
 
-Stop "plugin.lua" (raise error 'context canceled' in plugin).
+Stop "plugin.lua" (raise error 'context canceled' in plugin), raise error if plugin was removed.
 
 ## plugin:restart_count()
 
-Get restart count of plugin.
+Get restart count of plugin, raise error if plugin was removed.
 
 ## plugin:error_count()
 
-Get restart with error count of plugin.
+Get restart with error count of plugin, raise error if plugin was removed.
 
 ## plugin:last_error()
 
-Get string with error description.
+Get string with error text, raise error if plugin was removed.
 
 ## connection:query()
 

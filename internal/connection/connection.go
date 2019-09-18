@@ -26,6 +26,14 @@ func Preload(L *lua.LState) int {
 	L.SetField(connectionUd, "__index", L.SetFuncs(L.NewTable(), map[string]lua.LGFunction{
 		"query":                 query,
 		"available_connections": availableConnections,
+		"background_query":      runBackgroundQuery,
+	}))
+	backgroundQueryUd := L.NewTypeMetatable(`background_query_ud`)
+	L.SetGlobal(`background_query_ud`, backgroundQueryUd)
+	L.SetField(backgroundQueryUd, "__index", L.SetFuncs(L.NewTable(), map[string]lua.LGFunction{
+		"is_running": backgroundQueryIsRunning,
+		"result":     backgroundQueryResult,
+		"cancel":     backgroundQueryCancel,
 	}))
 	return 0
 }

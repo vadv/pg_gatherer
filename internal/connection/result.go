@@ -16,21 +16,25 @@ type queryResult struct {
 	Columns *lua.LTable
 }
 
-func processQuery(L *lua.LState, db *sql.DB, query string, args ...interface{}) (*queryResult, error) {
-	tx, err := db.BeginTx(context.Background(), &sql.TxOptions{
+func processQuery(L *lua.LState, db *sql.DB, ctx context.Context, query string, args ...interface{}) (*queryResult, error) {
+	tx, err := getTx(db, ctx)
+	if err != nil {
+		return nil, err
+	}
+	sqlRows, err := tx.Query(query, args...)
+	defer tx.Commit()
+	return parseRows(sqlRows, L)
+}
+
+func getTx(db *sql.DB, ctx context.Context) (*sql.Tx, error) {
+	tx, err := db.BeginTx(ctx, &sql.TxOptions{
 		Isolation: sql.LevelReadCommitted,
 		ReadOnly:  true,
 	})
 	if err != nil {
 		return nil, err
 	}
-	defer tx.Commit()
-	sqlRows, err := tx.Query(query, args...)
-	if err != nil {
-		return nil, err
-	}
-	defer sqlRows.Close()
-	return parseRows(sqlRows, L)
+	return tx, nil
 }
 
 func parseRows(sqlRows *sql.Rows, L *lua.LState) (*queryResult, error) {
@@ -45,14 +49,14 @@ func parseRows(sqlRows *sql.Rows, L *lua.LState) (*queryResult, error) {
 	luaRows := L.CreateTable(0, len(cols))
 	rowCount := 1
 	for sqlRows.Next() {
-		columns := make([]interface{}, len(cols))
+		col := make([]interface{}, len(cols))
 		pointers := make([]interface{}, len(cols))
-		for i := range columns {
-			pointers[i] = &columns[i]
+		for i := range col {
+			pointers[i] = &col[i]
 		}
-		err := sqlRows.Scan(pointers...)
-		if err != nil {
-			return nil, err
+		errScan := sqlRows.Scan(pointers...)
+		if errScan != nil {
+			return nil, errScan
 		}
 		luaRow := L.CreateTable(0, len(cols))
 		for i := range cols {
@@ -68,7 +72,7 @@ func parseRows(sqlRows *sql.Rows, L *lua.LState) (*queryResult, error) {
 			case []uint8:
 				strArr := make([]string, 0)
 				pqArr := pq.Array(&strArr)
-				if err := pqArr.Scan(converted); err != nil {
+				if errConv := pqArr.Scan(converted); errConv != nil {
 					// todo: new type of array
 					luaRow.RawSetInt(i+1, lua.LString(converted))
 				} else {

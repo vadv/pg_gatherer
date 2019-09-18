@@ -22,7 +22,7 @@ func getDBFromPool(c *connection) (*sql.DB, error) {
 			return nil, err
 		}
 		newDB.SetMaxIdleConns(1)
-		newDB.SetMaxOpenConns(1)
+		newDB.SetMaxOpenConns(5)
 		// store
 		connectionPool[c.connectionString()] = newDB
 		return newDB, nil

@@ -1,6 +1,10 @@
 package main
 
-import "github.com/vadv/pg_gatherer/internal/plugins"
+import (
+	"fmt"
+
+	"github.com/vadv/pg_gatherer/internal/plugins"
+)
 
 // Config represent configuration of plugins
 type Config struct {
@@ -15,4 +19,25 @@ type HostConfigurations struct {
 	Plugins []string            `yaml:"plugins,omitempty"`
 	Manager *plugins.Connection `yaml:"manager"`
 	Agent   *plugins.Connection `yaml:"agent"`
+}
+
+func (c *Config) validate() error {
+	if len(c.Hosts) == 0 {
+		return fmt.Errorf("`hosts` is empty")
+	}
+	for _, h := range c.Hosts {
+		if h.Host == `` {
+			return fmt.Errorf("found empty hosts")
+		}
+		if len(h.Plugins) == 0 {
+			return fmt.Errorf("plugins is empty for host: %s", h.Host)
+		}
+		if h.Manager == nil {
+			return fmt.Errorf("empty manager connection for host: %s", h.Host)
+		}
+		if h.Agent == nil {
+			return fmt.Errorf("empty agent information for host: %s", h.Host)
+		}
+	}
+	return nil
 }

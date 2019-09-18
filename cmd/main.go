@@ -32,6 +32,10 @@ func main() {
 		log.Printf("[FATAL] parse config '%s': %s\n", *configPath, errMarshal.Error())
 		os.Exit(1)
 	}
+	if errConfig := config.validate(); errConfig != nil {
+		log.Printf("[FATAL] config has error: %s\n", errConfig.Error())
+		os.Exit(1)
+	}
 
 	pool := plugins.NewPool(config.PluginsDir, config.CacheDir)
 	for _, hostConfig := range config.Hosts {

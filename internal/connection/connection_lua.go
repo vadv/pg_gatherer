@@ -1,6 +1,8 @@
 package connection
 
 import (
+	"context"
+
 	lua "github.com/yuin/gopher-lua"
 )
 
@@ -39,29 +41,33 @@ func checkUserDataConnection(L *lua.LState, n int) *connection {
 	return nil
 }
 
+func parseArgs(L *lua.LState, n int) []interface{} {
+	args := make([]interface{}, 0)
+	if count := L.GetTop(); count >= n {
+		for i := n; i <= count; i++ {
+			arg := L.CheckAny(i)
+			switch arg.Type() {
+			case lua.LTString:
+				args = append(args, L.CheckString(i))
+			case lua.LTNumber:
+				args = append(args, float64(L.CheckNumber(i)))
+			case lua.LTBool:
+				args = append(args, L.CheckBool(i))
+			default:
+				L.RaiseError("unsupported type for sqlQuery args")
+				return nil
+			}
+		}
+	}
+	return args
+}
+
 // query execute query from connection
 func query(L *lua.LState) int {
 	ud := checkUserDataConnection(L, 1)
 	sqlQuery := L.CheckString(2)
-	args := make([]interface{}, 0)
-	if count := L.GetTop(); count > 2 {
-		for n := 3; n <= count; n++ {
-			arg := L.CheckAny(n)
-			switch arg.Type() {
-			case lua.LTString:
-				args = append(args, L.CheckString(n))
-			case lua.LTNumber:
-				args = append(args, float64(L.CheckNumber(n)))
-			case lua.LTBool:
-				args = append(args, L.CheckBool(n))
-			default:
-				L.Push(lua.LNil)
-				L.Push(lua.LString("unsupported type for sqlQuery args"))
-				return 2
-			}
-		}
-	}
-	execResult, err := processQuery(L, ud.db, sqlQuery, args...)
+	args := parseArgs(L, 3)
+	execResult, err := processQuery(L, ud.db, context.Background(), sqlQuery, args...)
 	if err != nil {
 		L.RaiseError("error: %s", err.Error())
 		return 0

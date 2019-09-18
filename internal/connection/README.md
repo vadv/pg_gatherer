@@ -37,3 +37,19 @@ local connections, err = connection:available_connections()
 if err then error(err) end
 connections[1]:query("select 1")
 ```
+
+## connection:background_query(string, args...)
+
+Execute query with args in background, return user data `background_query_ud`.
+
+## background_query_ud:cancel()
+
+Cancel background query.
+
+## background_query_ud:is_running()
+
+Return true if query is already running.
+
+## background_query_ud:result()
+
+Return `result` table like `connection:query()`, raise error if error was canceled on not executed.
