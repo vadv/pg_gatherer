@@ -7,8 +7,8 @@ import (
 	"time"
 )
 
-// pool of plugins
-type pool struct {
+// Pool of plugins
+type Pool struct {
 	mutex          sync.Mutex
 	hosts          map[string]*pluginsForHost
 	rootDir        string
@@ -22,9 +22,9 @@ type pluginsForHost struct {
 	plugins []*plugin
 }
 
-// NewPool return new pool
-func NewPool(rootDir string, globalCacheDir string) *pool {
-	result := &pool{
+// NewPool return new Pool
+func NewPool(rootDir string, globalCacheDir string) *Pool {
+	result := &Pool{
 		hosts:          make(map[string]*pluginsForHost, 0),
 		rootDir:        rootDir,
 		globalCacheDir: globalCacheDir,
@@ -33,7 +33,7 @@ func NewPool(rootDir string, globalCacheDir string) *pool {
 	return result
 }
 
-func (p *pool) supervisor() error {
+func (p *Pool) supervisor() error {
 	for {
 		time.Sleep(time.Second)
 		p.mutex.Lock()
@@ -62,7 +62,7 @@ func (p *pool) supervisor() error {
 }
 
 // RegisterHost register new host
-func (p *pool) RegisterHost(host string, conn *Connection, manager *Connection) {
+func (p *Pool) RegisterHost(host string, conn *Connection, manager *Connection) {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 	if _, ok := p.hosts[host]; !ok {
@@ -75,7 +75,7 @@ func (p *pool) RegisterHost(host string, conn *Connection, manager *Connection) 
 }
 
 // RemoveHostAndPlugins stop all plugins and remove host
-func (p *pool) RemoveHostAndPlugins(host string) {
+func (p *Pool) RemoveHostAndPlugins(host string) {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 	for plHostName, pls := range p.hosts {
@@ -90,7 +90,7 @@ func (p *pool) RemoveHostAndPlugins(host string) {
 }
 
 // AddPluginToHost add plugin to host
-func (p *pool) AddPluginToHost(pluginName, host string) error {
+func (p *Pool) AddPluginToHost(pluginName, host string) error {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 	// check
@@ -123,7 +123,7 @@ func (p *pool) AddPluginToHost(pluginName, host string) error {
 }
 
 // StopAndRemovePluginFromHost stop plugin on host
-func (p *pool) StopAndRemovePluginFromHost(pluginName, host string) error {
+func (p *Pool) StopAndRemovePluginFromHost(pluginName, host string) error {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 	// check
@@ -154,7 +154,7 @@ func (p *pool) StopAndRemovePluginFromHost(pluginName, host string) error {
 }
 
 // PluginStatisticPerHost statistic information about all host
-func (p *pool) PluginStatisticPerHost() map[string][]PluginStatistic {
+func (p *Pool) PluginStatisticPerHost() map[string][]PluginStatistic {
 	p.mutex.Lock()
 	p.mutex.Unlock()
 	result := make(map[string][]PluginStatistic, 0)

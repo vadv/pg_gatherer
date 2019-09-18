@@ -1,13 +1,13 @@
 local plugin_name = 'pg.activity'
 
-local current_dir = filepath.join(root, "activity", "embedded")
-local sql_activity, err = ioutil.read_file(filepath.join(current_dir, "activity.lua"))
+local current_dir = filepath.join(root, "embedded", "activity")
+local sql_activity, err = ioutil.read_file(filepath.join(current_dir, "activity.sql"))
 if err then error(err) end
 
-local sql_states, err = ioutil.read_file(filepath.join(current_dir, "states.lua"))
+local sql_states, err = ioutil.read_file(filepath.join(current_dir, "states.sql"))
 if err then error(err) end
 
-local sql_waits, err = ioutil.read_file(filepath.join(current_dir, "waits.lua"))
+local sql_waits, err = ioutil.read_file(filepath.join(current_dir, "waits.sql"))
 if err then error(err) end
 
 local helpers = dofile( filepath.join(current_dir, "linux_helper_proc_stat.lua") )

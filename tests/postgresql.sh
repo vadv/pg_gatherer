@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -ex
+
 # start pg
 sudo -H -u postgres bash -l -c '/usr/pgsql-11/bin/initdb -D /tmp/db'
 sudo -H -u postgres bash -l -c '/usr/pgsql-11/bin/pg_ctl start -W -D /tmp/db'

@@ -7,4 +7,5 @@ require (
 	github.com/mattn/go-sqlite3 v1.11.0
 	github.com/vadv/gopher-lua-libs v0.0.5
 	github.com/yuin/gopher-lua v0.0.0-20190514113301-1cd887cd7036
+	gopkg.in/yaml.v2 v2.2.2
 )

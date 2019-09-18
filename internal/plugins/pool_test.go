@@ -14,7 +14,7 @@ const hostname = "localhost-test"
 
 func TestPool(t *testing.T) {
 
-	pool := plugins.NewPool("./test/", "./test/cache")
+	pool := plugins.NewPool("./tests/", "./tests/cache")
 	conn := &plugins.Connection{
 		Host:     "/tmp",
 		DBName:   "gatherer",
@@ -24,7 +24,7 @@ func TestPool(t *testing.T) {
 	pool.RegisterHost(hostname, conn, conn)
 
 	// delete caches
-	os.RemoveAll("./test/cache")
+	os.RemoveAll("./tests/cache")
 
 	// add pl_cache
 	if err := pool.AddPluginToHost("pl_cache", hostname); err != nil {
@@ -52,8 +52,8 @@ func TestPool(t *testing.T) {
 	}
 
 	// add pl_stop
-	os.RemoveAll("./test/pl_stop/must_exist.txt")
-	os.RemoveAll("./test/pl_stop/must_not_exist.txt")
+	os.RemoveAll("./tests/pl_stop/must_exist.txt")
+	os.RemoveAll("./tests/pl_stop/must_not_exist.txt")
 	if err := pool.AddPluginToHost("pl_stop", hostname); err != nil {
 		t.Fatalf("add plugin: %s\n", err.Error())
 	}
@@ -96,7 +96,7 @@ func TestPool(t *testing.T) {
 				t.Fatalf("must not restarted with error: %d\n", pl.Errors)
 			}
 			if pl.Starts != 3 {
-				t.Fatalf("must start only 3 times: %d\n", pl.Starts)
+				t.Fatalf("must start 3 times: %d\n", pl.Starts)
 			}
 		}
 
@@ -115,10 +115,10 @@ func TestPool(t *testing.T) {
 	}
 
 	time.Sleep(2 * time.Second)
-	if _, err := os.Stat("./test/pl_stop/must_exist.txt"); err != nil {
+	if _, err := os.Stat("./tests/pl_stop/must_exist.txt"); err != nil {
 		t.Fatalf("file must exist\n")
 	}
-	if _, err := os.Stat("./test/pl_stop/must_not_exist.txt"); err == nil {
+	if _, err := os.Stat("./tests/pl_stop/must_not_exist.txt"); err == nil {
 		t.Fatalf("file must not exist\n")
 	}
 

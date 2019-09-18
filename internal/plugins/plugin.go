@@ -21,12 +21,12 @@ import (
 
 // Connection to PostgreSQL
 type Connection struct {
-	Host     string
-	DBName   string
-	Port     int
-	UserName string
-	Password string
-	Params   map[string]string
+	Host     string            `yaml:"host"`
+	DBName   string            `yaml:"dbname"`
+	Port     int               `yaml:"port"`
+	UserName string            `yaml:"username"`
+	Password string            `yaml:"password"`
+	Params   map[string]string `yaml:"params"`
 }
 
 // PluginStatistic represent statistics for plugin
@@ -88,7 +88,8 @@ func createPlugin(config *pluginConfig) (*plugin, error) {
 		result.fileName = filepath.Join(config.rootDir, config.pluginName, "plugin.lua")
 	}
 	if result.fileName == "" {
-		return nil, fmt.Errorf("plugin not found")
+		return nil, fmt.Errorf("plugin.lua file in directory '%s' or 'embedded/%s' in '%s' is not found",
+			config.pluginName, config.pluginName, config.rootDir)
 	}
 	result.statistics.PluginFileName = result.fileName
 	return result, nil
