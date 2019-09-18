@@ -43,7 +43,8 @@ end
 -- collect on localhost
 local function collect_local()
   -- process activity
-  for _, row in pairs(connection:query(sql_activity)) do
+  local result = connection:query(sql_activity)
+  for _, row in pairs(result) do
     local jsonb, err = json.decode(row[2])
     if err then error(err) end
     local pid = tonumber(jsonb.pid)
