@@ -6,8 +6,8 @@ test_in_docker:
 	# prepare database gatherer
 	psql -U postgres -Atc "create user gatherer"
 	psql -U postgres -Atc "create database gatherer owner gatherer"
+	psql -U postgres -d gatherer -Atc "create extension pg_buffercache"
 	psql -U postgres -Atc "grant pg_monitor to gatherer"
-	psql -U postgres -Atc "create extension pg_buffercache"
 	psql -U gatherer -At -1 -f ./schema/schema.sql -d gatherer
 	# start tests
 	go test -v -race ./...
