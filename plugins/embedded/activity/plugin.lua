@@ -1,4 +1,5 @@
 local plugin_name = 'pg.activity'
+local every = 60
 
 local current_dir = filepath.join(root, "embedded", "activity")
 
@@ -17,7 +18,7 @@ local helpers = dofile( filepath.join(current_dir, "linux_helper_proc_stat.lua")
 
 -- process states
 local function states()
-  local result = connection:query(sql_states)
+  local result = connection:query(sql_states, every)
   local jsonb = {}
   for _, row in pairs(result.rows) do
     jsonb[ row[1] ] = tonumber(row[2])
@@ -29,7 +30,7 @@ end
 
 -- process waits
 local function waits()
-  local result = connection:query(sql_waits)
+  local result = connection:query(sql_waits, every)
   for _, row in pairs(result.rows) do
     manager:send_metric({ plugin = plugin_name..".waits", snapshot = row[1], json = row[2] })
   end
@@ -37,7 +38,7 @@ end
 
 -- collect on rds
 local function collect_rds()
-  local result = connection:query(sql_activity)
+  local result = connection:query(sql_activity, every)
   for _, row in pairs(result.rows) do
     manager:send_metric({ plugin = plugin_name, snapshot = row[1], json = row[2] })
   end
@@ -48,7 +49,7 @@ end
 -- collect on localhost
 local function collect_local()
   -- process activity
-  local result = connection:query(sql_activity)
+  local result = connection:query(sql_activity, every)
   for _, row in pairs(result.rows) do
     local jsonb, err = json.decode(row[2])
     if err then error(err) end
@@ -83,4 +84,4 @@ end
 local f = collect_local
 if is_rds() then f = collect_rds end
 
-run_every(f, 60)
+run_every(f, every)

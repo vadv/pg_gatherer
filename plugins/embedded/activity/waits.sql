@@ -1,5 +1,5 @@
 select
-    extract(epoch from now())::int - (extract(epoch from now())::int % 60),
+    extract(epoch from now())::int - (extract(epoch from now())::int % $1),
     jsonb_build_object(
         'state', a.state::text,
         'wait_event', a.wait_event::text,

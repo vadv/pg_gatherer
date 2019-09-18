@@ -10,5 +10,6 @@ sleep 3
 # prepare database gatherer
 psql -U postgres -Atc "create user gatherer"
 psql -U postgres -Atc "create database gatherer owner gatherer"
+psql -U postgres -Atc "grant pg_monitor to gatherer"
 
 psql -U gatherer -At -1 -f ./schema/schema.sql -d gatherer

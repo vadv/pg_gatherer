@@ -1,5 +1,5 @@
 select
-    extract(epoch from now())::int - (extract(epoch from now())::int % 60),
+    extract(epoch from now())::int - (extract(epoch from now())::int % $1),
     jsonb_build_object(
         'sql_id', md5(query)::UUID,
         'query_id', md5(query || query_start::text)::UUID,

@@ -4,7 +4,7 @@ with states as (
     unnest('{active,idle,idle in transaction,idle in transaction (aborted),fastpath function call}'::text[])
 )
 select
-    extract(epoch from now())::int - (extract(epoch from now())::int % 60),
+    extract(epoch from now())::int - (extract(epoch from now())::int % $1),
     s.unnest,
     count(a.pid) as count
 from
