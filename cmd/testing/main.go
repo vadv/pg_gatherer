@@ -22,6 +22,7 @@ import (
 
 var (
 	pluginPath       = flag.String(`plugin-dir`, `plugins`, `Path to plugin directory`)
+	cachePath        = flag.String(`cache-dir`, `plugins\cache`, `Path to cache directory`)
 	stopOnFirstError = flag.Bool(`stop-on-first-error`, false, `Stop on first error`)
 	hostName         = flag.String(`host`, os.Getenv(`PGHOST`), `PostgreSQL host`)
 	dbName           = flag.String(`dbname`, os.Getenv(`PGDATABASE`), `PostgreSQL database`)
@@ -63,7 +64,7 @@ func main() {
 	for plugin, testFile := range plugins {
 		go func(plugin, testFile string) {
 			log.Printf("[INFO] start testing plugin %s via file %s\n", plugin, testFile)
-			errTest := testPlugin(*pluginPath, plugin, testFile)
+			errTest := testPlugin(*pluginPath, *cachePath, plugin, testFile)
 			log.Printf("[INFO] test plugin %s via file %s: was completed\n", plugin, testFile)
 			testResultChan <- &testResult{
 				pluginName: plugin,
@@ -105,11 +106,11 @@ func main() {
 	}
 }
 
-func testPlugin(pluginDir string, pluginName, testFile string) error {
+func testPlugin(pluginDir, cacheDir, pluginName, testFile string) error {
 	state := lua.NewState()
 	libs.Preload(state)
 	testing_framework.Preload(state)
-	testing_framework.New(state, pluginDir, pluginName,
+	testing_framework.New(state, pluginDir, cacheDir, pluginName,
 		*hostName, *dbName, *userName, *password, *dbPort, nil)
 	connection.Preload(state)
 	connection.New(state, `connection`,

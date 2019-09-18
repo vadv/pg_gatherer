@@ -1,9 +1,11 @@
+local HOST_PROC_DIR = os.getenv('HOST_PROC_DIR') or '/proc'
+
 local helpers = {}
 
 -- /proc/<pid>/io
 function helpers.read_linux_io_real(pid)
   local result   = {}
-  local filename = string.format("/proc/%d/io", pid)
+  local filename = string.format(HOST_PROC_DIR.."/%d/io", pid)
   local fh       = io.open(filename, "rb")
   if not fh then return result end
   local content = fh:read("*a");
@@ -26,7 +28,7 @@ end
 -- /proc/<pid>/stat
 function helpers.read_linux_cpu_real(pid)
   local result   = {}
-  local filename = string.format("/proc/%d/stat", pid)
+  local filename = string.format(HOST_PROC_DIR.."/%d/stat", pid)
   local fh       = io.open(filename, "rb")
   if not fh then return result end
   local content = fh:read("*a");

@@ -15,7 +15,7 @@ func TestFramework(t *testing.T) {
 
 	libs.Preload(state)
 	testing_framework.Preload(state)
-	testing_framework.New(state, `./tests`, `testing-1`,
+	testing_framework.New(state, `./tests`, `./tests/cache`, `testing-1`,
 		`/tmp`, "gatherer", "gatherer", "", 5432, nil)
 
 	if err := state.DoFile("./tests/testing-1/test.lua"); err != nil {

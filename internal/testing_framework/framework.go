@@ -1,8 +1,6 @@
 package testing_framework
 
 import (
-	"path/filepath"
-
 	"github.com/vadv/pg_gatherer/internal/plugins"
 	lua "github.com/yuin/gopher-lua"
 )
@@ -28,8 +26,8 @@ func Preload(L *lua.LState) int {
 }
 
 // New create new testing_framework into lua state as user data
-func New(L *lua.LState, rootDir, pluginName, host, dbname, user, password string, port int, params map[string]string) error {
-	pool := plugins.NewPool(rootDir, filepath.Join(rootDir, "./cache/"))
+func New(L *lua.LState, rootDir, cacheDir, pluginName, host, dbname, user, password string, port int, params map[string]string) error {
+	pool := plugins.NewPool(rootDir, cacheDir)
 	conn := &plugins.Connection{
 		Host:     host,
 		DBName:   dbname,
