@@ -5,6 +5,7 @@ time = require("time")
 inspect = require("inspect")
 json = require("json")
 ioutil = require("ioutil")
+crypto = require("crypto")
 
 -- current directory (root)
 root = filepath.dir(debug.getinfo(1).source)
