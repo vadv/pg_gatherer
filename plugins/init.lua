@@ -26,6 +26,12 @@ function get_pg_server_version()
   return pg_server_version
 end
 
+-- return in pg_in_recovery
+function get_pg_is_in_recovery()
+  local pg_is_in_recovery = connection:query("select pg_catalog.pg_is_in_recovery()")
+  return pg_is_in_recovery.rows[1][1]
+end
+
 -- run function f every sec
 -- this function run in plugin context, then we use cache key `last_run`
 function run_every(f, every)
