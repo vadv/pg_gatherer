@@ -18,6 +18,14 @@ function is_rds()
   ))
 end
 
+-- return postgresql version
+function get_pg_server_version()
+  if pg_server_version then return pg_server_version end
+  local version = connection:query("show server_version")
+  pg_server_version = tonumber(version.rows[1][1])
+  return pg_server_version
+end
+
 -- run function f every sec
 -- this function run in plugin context, then we use cache key `last_run`
 function run_every(f, every)

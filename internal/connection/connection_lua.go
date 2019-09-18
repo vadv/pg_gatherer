@@ -2,6 +2,7 @@ package connection
 
 import (
 	"context"
+	"log"
 
 	lua "github.com/yuin/gopher-lua"
 )
@@ -67,6 +68,7 @@ func query(L *lua.LState) int {
 	ud := checkUserDataConnection(L, 1)
 	sqlQuery := L.CheckString(2)
 	args := parseArgs(L, 3)
+	log.Printf("[DEBUG] run query: %s\n", sqlQuery)
 	execResult, err := processQuery(L, ud.db, context.Background(), sqlQuery, args...)
 	if err != nil {
 		L.RaiseError("error: %s", err.Error())

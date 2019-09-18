@@ -44,6 +44,7 @@ func parseRows(sqlRows *sql.Rows, L *lua.LState) (*queryResult, error) {
 	if sqlRows == nil {
 		return nil, fmt.Errorf("rows is nil, program bug")
 	}
+	defer sqlRows.Close()
 	cols, err := sqlRows.Columns()
 	if err != nil {
 		return nil, err

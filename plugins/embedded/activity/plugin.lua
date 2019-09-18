@@ -1,7 +1,10 @@
 local plugin_name = 'pg.activity'
 
 local current_dir = filepath.join(root, "embedded", "activity")
-local sql_activity, err = ioutil.read_file(filepath.join(current_dir, "activity.sql"))
+
+local activity_file = filepath.join(current_dir, "activity_9.sql")
+if get_pg_server_version() >= 10 then activity_file = filepath.join(current_dir, "activity_10.sql") end
+local sql_activity, err = ioutil.read_file(activity_file)
 if err then error(err) end
 
 local sql_states, err = ioutil.read_file(filepath.join(current_dir, "states.sql"))

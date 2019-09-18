@@ -5,10 +5,10 @@ with states as (
 )
 select
     extract(epoch from now())::int - (extract(epoch from now())::int % 60),
-    s.state,
+    s.unnest,
     count(a.pid) as count
 from
   states s
-  left join pg_catalog.pg_stat_activity a on s.state = a.state
+  left join pg_catalog.pg_stat_activity a on s.unnest = a.state
 group by
-  s.state;
+  s.unnest;
