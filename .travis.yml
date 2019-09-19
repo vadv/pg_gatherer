@@ -12,9 +12,10 @@ jobs:
         - docker run -ti --rm pg_gatherer_test bash -ec "make test_in_docker"
 
     - stage: build release docker image and push
+      if: branch = master
       script:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - docker build -t pg_gatherer . -f ./docker/release.Dockerfile
         - docker images
-        - docker tag pg_gatherer $DOCKER_USERNAME/pg_gatherer:$TRAVIS_BRANCH
-        - docker push $DOCKER_USERNAME/pg_gatherer:$TRAVIS_BRANCH
+        - docker tag pg_gatherer $DOCKER_USERNAME/pg_gatherer:latest
+        - docker push $DOCKER_USERNAME/pg_gatherer:latest
