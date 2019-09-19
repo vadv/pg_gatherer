@@ -28,20 +28,22 @@ Targets databases, which agent monitoring.
 
 ## Manager
 
-PostgreSQL database (with [TimescaleDB](https://docs.timescale.com/latest/introduction) extension) in which information is stored.
+PostgreSQL database (recommended use [TimescaleDB](https://docs.timescale.com/latest/introduction) extension) in which information is stored.
 
 ## Agent
 
 The agent is golang-binary, with plugins written in Lua (without any system dependencies).
 
-You can run agent locally on machine `Target`, then you get additional statistics (link /proc/{pid}/io) info with query.
+You can run agent locally on machine `Target`,
+then you get additional statistics, for example link /proc/{pid}/io stats with query.
 
 ## Installation
 
 * Install manager database.
 * Apply [migration](/schema/schema.sql) on manager database.
 * Create user on targets with [pg_monitor](https://www.postgresql.org/docs/10/default-roles.html) rights.
-* Get agent.
+* Get && run agent.
+* Also, if you use TimescaleDB, when you can use Grafana [dashboard](/grafana).
 
 ```bash
 go get github.com/vadv/pg_gatherer/gatherer/cmd/pg_gatherer
