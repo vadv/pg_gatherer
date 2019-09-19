@@ -1,3 +1,29 @@
+build:
+	go build -o ./bin/server --tags netcgo ./gatherer/cmd/server/
+
+dashboard: submodule_check
+	jsonnet -J ./grafana/jsonnet ./grafana/jsonnet/dashboard.jsonnet -o ./gatherer/dashboard.json
+
+submodules:
+	git submodule init
+	git submodule update
+
+submodule_update:
+	git submodule update
+
+submodule_pull:
+	git submodule foreach "git pull"
+
+submodule_check:
+	@-test -d .git -a .gitmodules && \
+		git submodule status \
+		| grep -q "^-" \
+		&& $(MAKE) submodules || true
+	@-test -d .git -a .gitmodules && \
+		git submodule status \
+		| grep -q "^+" \
+		&& $(MAKE) submodule_update || true
+
 test_in_docker:
 	# init && start database
 	sudo -H -u postgres bash -l -c '/usr/pgsql-11/bin/initdb -D /tmp/db'
@@ -27,6 +53,3 @@ test_in_docker:
 	go test -v -race ./...
 	go build -o ./bin/testing --tags netcgo ./gatherer/cmd/testing/
 	./bin/testing --plugin-dir ./plugins --cache-dir /tmp/cache --host /tmp --dbname gatherer --username gatherer
-
-build:
-	go build -o ./bin/server --tags netcgo ./gatherer/cmd/server/
