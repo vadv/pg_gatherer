@@ -10,12 +10,16 @@ The project is designed to collect and store statistical data of PostgreSQL into
        |      +------------------+
        v
 +------+-------+                        +---------------+
-|   Manager    |     +----------------->+   Target #1   |
+|   Manager    |     +----------------->+   Target # 1  |
 +------+-------+     |                  +---------------+
        ^             |
        |     +-------+--------+         +---------------+
-       +-----+     Agent      +-------->+   Target #N   |
-             +----------------+         +---------------+
+       +-----+     Agent      +-------->+   Target # N  |
+             +---------+------+         +---------------+
+                       |
++----------------+     |         +-----------------------+
+|Pager Dutty Api +<----+-------> | Other api (zabbix, ..)|
++----------------+               +-----------------------+
 ```
 
 ## Targets
@@ -36,8 +40,8 @@ You can run agent locally on machine `Target`, then you get additional statistic
 
 * Install manager database.
 * Apply [migration](/schema/schema.sql) on manager database.
-* Get [plugins](/plugins).
-* Get agent:
+* Create user on targets with [pg_monitor](https://www.postgresql.org/docs/10/default-roles.html) rights.
+* Get agent.
 
 ```bash
 go get github.com/vadv/pg_gatherer/gatherer/cmd/pg_gatherer
@@ -47,26 +51,28 @@ pg_gatherer --config config.yaml
 Config example:
 
 ```yaml
-plugins_dir: ./plugins # path to plugins
-cache_dir: /tmp/gatherer # plugins cache
+plugins_dir: ./plugins # path to directory with plugins
+cache_dir: /tmp/gatherer # plugins cache, temporary dir
 
 hosts:
 
   - host: peripheral-db-1 # name of target in manager-db
 
-    plugins:
-      - activity # list of plugins
+    plugins: # list of plugins which can be activated on this target
+      - activity
+      - databases
+      ...
 
-    manager: # manager (TimescaleDB) connection
+    manager: # manager connection
       host: /tmp
       dbname: gatherer
-      username: gatherer
+      username: manager
       port: 5432
 
-    agent: # target connection
-      host: /tmp
-      dbname: gatherer
-      username: gatherer
+    agent: # target agent connection
+      host: 192.168.1.1
+      dbname: your_database
+      username: monitor
       port: 5432
 ```
 
