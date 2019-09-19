@@ -16,7 +16,7 @@ from
   metric m
 where
   plugin = md5('pg.activity')::uuid
-  and ts > extract( epoch from (now()-'1 minute'::interval) )
+  and ts > extract( epoch from (now()-'2 minute'::interval) )
 ]]).rows[1][1]
 if count == 0 then error('pg.activity') end
 
@@ -28,7 +28,7 @@ from
   metric m
 where
   plugin = md5('pg.activity.states')::uuid
-  and ts > extract( epoch from (now()-'1 minute'::interval) )
+  and ts > extract( epoch from (now()-'2 minute'::interval) )
 ]]).rows[1][1]
 if count == 0 then error('pg.activity.states') end
 
@@ -40,6 +40,6 @@ from
   metric m
 where
   plugin = md5('pg.activity.waits')::uuid
-  and ts > extract( epoch from (now()-'1 minute'::interval) )
+  and ts > extract( epoch from (now()-'2 minute'::interval) )
 ]]).rows[1][1]
 if count == 0 then error('pg.activity.waits') end

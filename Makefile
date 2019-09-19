@@ -12,7 +12,7 @@ test_in_docker:
 	psql -U postgres -d gatherer -Atc "create extension pg_buffercache"
 	psql -U postgres -d gatherer -Atc "create extension pg_stat_statements"
 	psql -U postgres -Atc  "alter system set shared_preload_libraries TO 'pg_stat_statements'"
-	sudo -H -u postgres bash -l -c '/usr/pgsql-11/bin/pg_ctl start -W -D /tmp/db'
+	sudo -H -u postgres bash -l -c '/usr/pgsql-11/bin/pg_ctl restart -W -D /tmp/db'
 	sleep 3
 	# start tests
 	go test -v -race ./...
