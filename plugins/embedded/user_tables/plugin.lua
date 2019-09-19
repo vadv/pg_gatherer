@@ -53,14 +53,14 @@ local function collect_for_db()
     if err then error(err) end
 
     local table_name = jsonb.full_table_name
-    jsonb.heap_blks_read = cache:diff_and_set(table_name..".heap_blks_read", jsonb.heap_blks_read)
-    jsonb.heap_blks_hit = cache:diff_and_set(table_name..".heap_blks_hit", jsonb.heap_blks_hit)
-    jsonb.idx_blks_read = cache:diff_and_set(table_name..".idx_blks_read", jsonb.idx_blks_read)
-    jsonb.idx_blks_hit = cache:diff_and_set(table_name..".idx_blks_hit", jsonb.idx_blks_hit)
-    jsonb.toast_blks_read = cache:diff_and_set(table_name..".toast_blks_read", jsonb.toast_blks_read)
-    jsonb.toast_blks_hit = cache:diff_and_set(table_name..".toast_blks_hit", jsonb.toast_blks_hit)
-    jsonb.tidx_blks_read = cache:diff_and_set(table_name..".tidx_blks_read", jsonb.tidx_blks_read)
-    jsonb.tidx_blks_hit = cache:diff_and_set(table_name..".tidx_blks_hit", jsonb.tidx_blks_hit)
+    jsonb.heap_blks_read = cache:diff_and_set(table_name..".heap_blks_read", jsonb.heap_blks_read or 0)
+    jsonb.heap_blks_hit = cache:diff_and_set(table_name..".heap_blks_hit", jsonb.heap_blks_hit or 0)
+    jsonb.idx_blks_read = cache:diff_and_set(table_name..".idx_blks_read", jsonb.idx_blks_read or 0)
+    jsonb.idx_blks_hit = cache:diff_and_set(table_name..".idx_blks_hit", jsonb.idx_blks_hit or 0)
+    jsonb.toast_blks_read = cache:diff_and_set(table_name..".toast_blks_read", jsonb.toast_blks_read or 0)
+    jsonb.toast_blks_hit = cache:diff_and_set(table_name..".toast_blks_hit", jsonb.toast_blks_hit or 0)
+    jsonb.tidx_blks_read = cache:diff_and_set(table_name..".tidx_blks_read", jsonb.tidx_blks_read or 0)
+    jsonb.tidx_blks_hit = cache:diff_and_set(table_name..".tidx_blks_hit", jsonb.tidx_blks_hit or 0)
 
     if jsonb.heap_blks_read or jsonb.heap_blks_hit or jsonb.idx_blks_read or jsonb.idx_blks_hit or
         jsonb.toast_blks_read or jsonb.toast_blks_hit or jsonb.tidx_blks_read or jsonb.tidx_blks_hit then
