@@ -119,6 +119,9 @@ func testPlugin(pluginDir, cacheDir, pluginName, testFile string) error {
 	manager.New(state, `manager`, pluginName,
 		connection.BuildConnectionString(
 			*hostName, *dbName, *dbPort, *userName, *password, nil))
+	if err := state.DoFile(filepath.Join(pluginDir, "init.test.lua")); err != nil {
+		return err
+	}
 	return state.DoFile(testFile)
 }
 

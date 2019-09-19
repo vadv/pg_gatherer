@@ -1,36 +1,5 @@
-local time = require("time")
-
-plugin:create()
-local timeout = 120
-while timeout > 0 do
-  if plugin:error_count() > 0 then error(plugin:last_error()) end
-  time.sleep(1)
-  timeout = timeout - 1
+local user_tables_metric_exists = function()
+  return (metric_exists('pg.user_tables') and metric_exists('pg.user_tables.io'))
 end
-plugin:remove()
 
--- pg.user_tables
-local count = connection:query([[
-select
-  count(*)
-from
-  metric m
-where
-  plugin = md5('pg.user_tables')::uuid
-  and ts > extract( epoch from (now()-'3 minute'::interval) )
-  and value_jsonb::text <> '[]'
-]]).rows[1][1]
-if count == 0 then error('pg.user_tables') end
-
--- pg.user_tables.io
-local count = connection:query([[
-select
-  count(*)
-from
-  metric m
-where
-  plugin = md5('pg.user_tables.io')::uuid
-  and ts > extract( epoch from (now()-'3 minute'::interval) )
-  and value_jsonb::text <> '[]'
-]]).rows[1][1]
-if count == 0 then error('pg.user_tables.io') end
+run_plugin_test(120, user_tables_metric_exists)
