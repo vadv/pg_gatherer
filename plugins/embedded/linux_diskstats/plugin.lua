@@ -8,7 +8,7 @@ if not goos.stat(HOST_PROC_DIR..'/diskstats') then
   end
 end
 
-local helper = dofile(filepath.join(current_dir, "helper_disk_stat.lua"))
+local helper = dofile(filepath.join(root, "linux_diskstats", "helper_disk_stat.lua"))
 
 local function collect()
 
