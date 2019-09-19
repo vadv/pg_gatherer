@@ -10,6 +10,8 @@ crypto = require("crypto")
 -- current directory (root)
 root = filepath.dir(debug.getinfo(1).source)
 
+HOST_PROC_DIR = os.getenv('HOST_PROC_DIR') or '/proc'
+
 -- return true if database hosted on rds
 function is_rds()
   return not(not(

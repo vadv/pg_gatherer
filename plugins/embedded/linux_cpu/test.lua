@@ -1,7 +1,7 @@
 local time = require("time")
 
 plugin:create()
-local timeout = 120
+local timeout = 10
 while timeout > 0 do
   if plugin:error_count() > 0 then error(plugin:last_error()) end
   time.sleep(1)
@@ -9,14 +9,14 @@ while timeout > 0 do
 end
 plugin:remove()
 
--- pg.wal.speed
+-- linux.cpu
 local count = connection:query([[
 select
   count(*)
 from
   metric m
 where
-  plugin = md5('pg.wal.speed')::uuid
+  plugin = md5('linux.cpu')::uuid
   and ts > extract( epoch from (now()-'3 minute'::interval) )
 ]]).rows[1][1]
-if count == 0 then error('pg.wal.speed') end
+if count == 0 then error('linux.cpu') end

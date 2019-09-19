@@ -1,5 +1,3 @@
-local HOST_PROC_DIR = os.getenv('HOST_PROC_DIR') or '/proc'
-
 local helpers = {}
 
 -- /proc/<pid>/io
