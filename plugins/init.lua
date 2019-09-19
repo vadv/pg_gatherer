@@ -6,10 +6,13 @@ inspect = require("inspect")
 json = require("json")
 ioutil = require("ioutil")
 crypto = require("crypto")
+goos = require("goos")
 
 -- current directory (root)
 root = filepath.dir(debug.getinfo(1).source)
 
+HOST_DEV_DIR = os.getenv('HOST_DEV_DIR') or '/dev'
+HOST_SYS_DIR = os.getenv('HOST_SYS_DIR') or '/sys'
 HOST_PROC_DIR = os.getenv('HOST_PROC_DIR') or '/proc'
 
 -- return true if database hosted on rds
