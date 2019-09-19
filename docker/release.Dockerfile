@@ -10,5 +10,5 @@ COPY . .
 RUN make build
 
 FROM alpine
-COPY --from=builder /go/github.com/vadv/pg_gatherer/bin/server /app/bin/
+COPY --from=builder /go/github.com/vadv/pg_gatherer/bin/pg_gatherer /app/bin/
 COPY --from=builder /go/github.com/vadv/pg_gatherer/plugins /app/plugins

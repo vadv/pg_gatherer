@@ -1,5 +1,7 @@
+all: build
+
 build:
-	go build -o ./bin/server --tags netcgo ./gatherer/cmd/server/
+	go build -o ./bin/pg_gatherer --tags netcgo ./gatherer/cmd/pg_gatherer/
 
 dashboard: submodule_check
 	jsonnet -J ./grafana/jsonnet ./grafana/jsonnet/dashboard.jsonnet -o ./gatherer/dashboard.json
@@ -53,3 +55,5 @@ test_in_docker:
 	go test -v -race ./...
 	go build -o ./bin/testing --tags netcgo ./gatherer/cmd/testing/
 	./bin/testing --plugin-dir ./plugins --cache-dir /tmp/cache --host /tmp --dbname gatherer --username gatherer
+
+.DEFAULT_GOAL: all
