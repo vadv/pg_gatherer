@@ -1,0 +1,1 @@
+select extract(epoch from now())::int - (extract(epoch from now())::int % $1);

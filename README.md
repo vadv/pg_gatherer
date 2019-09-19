@@ -1,123 +1,83 @@
 # pg_gatherer
 
-project is designed to collect and store statistical data of postgresql into other postgresql.
+The project is designed to collect and store statistical data of PostgreSQL into other PostgreSQL.
 
 # Architecture
 
-* target: target database
-* manager: database in which information is stored
-
-![Architecture](/img/arch.png)
-
-# Agent
-
-Agent is golang-binary with plugins written in lua ( [vadv/gopher-lua-libs](https://github.com/vadv/gopher-lua-libs) ).
-
-# AlertManager
-
-AlertManager is also lua-pluginable. Currently supports telegram and PagerDuty only.
-
-# Deploy
-
-on manager database:
-
 ```
-$ psql -h manager -d manager -U postgres -1 -f ./schema/manager/schema.sql
-$ psql -h manager -d manager -U postgres -1 -f ./schema/manager/functions.sql
+              +------------------+
+       +------+     Grafana      |
+       |      +------------------+
+       v
++------+-------+                        +---------------+
+|   Manager    |     +----------------->+   Target # 1  |
++------+-------+     |                  +---------------+
+       ^             |
+       |     +-------+--------+         +---------------+
+       +-----+     Agent      +-------->+   Target # N  |
+             +---------+------+         +---------------+
+                       |
++----------------+     |         +-----------------------+
+|Pager Dutty Api +<----+-------> | Other api (zabbix, ..)|
++----------------+               +-----------------------+
 ```
 
-on target database:
+## Targets
 
-```
-$ psql -h target -d target -U postgres -1 -f ./schema/agent/init.sql
-$ psql -h target -d target -U postgres -1 -f ./schema/agent/plugin*_.sql
+Targets databases, which agent monitoring.
 
-or
+## Manager
 
-$ AGENT_PRIV="host=target user=postgres" glua-libs ./schema/agent/deploy.lua
-```
+PostgreSQL database (recommended use [TimescaleDB](https://docs.timescale.com/latest/introduction) extension) in which information is stored.
 
-# Seed
+## Agent
 
-```sql
-insert into manager.host (token, agent_token, main_connection, additional_connections, maintenance, severity_policy_id)
-    values ( 'hostname', 'token-key', 'host=xxx dbname=xxx', '{"host=xxx dbname=yyy"}'::text[], false, null);
-```
+The agent is golang-binary, with plugins written in Lua (without any system dependencies).
 
-# Start Agent
+You can run agent locally on machine `Target`,
+then you get additional statistics, for example link /proc/{pid}/io stats with query.
 
-```
-$ go get --tags 'sqlite' github.com/vadv/gopher-lua-libs/cmd/glua-libs
-$ TOKEN=xxx MANAGER="host=xxx" glua-libs ./agent/init.lua
-```
+## Installation
 
-# Start AlertManager
+* Install manager database.
+* Apply [migration](/schema/schema.sql) on manager database.
+* Create user on targets with [pg_monitor](https://www.postgresql.org/docs/10/default-roles.html) rights.
+* Get && run agent.
+* Also, if you use TimescaleDB, when you can use Grafana [dashboard](/grafana).
 
-```
-$ go get --tags 'sqlite' github.com/vadv/gopher-lua-libs/cmd/glua-libs
-$ MANAGER="host=xxx" PAGERDUTY_TOKEN=xxx PAGERDUTY_RK_DEFAULT=xxx glua-libs ./alertmanager/init.lua
+```bash
+go get github.com/vadv/pg_gatherer/gatherer/cmd/pg_gatherer
+pg_gatherer --config config.yaml
 ```
 
-# Metrics
+Config example:
 
-You can easily to add new metrics to dashboard grafana using sql:
+```yaml
+plugins_dir: ./plugins # path to directory with plugins
+cache_dir: /tmp/gatherer # plugins cache, temporary dir
 
-```sql
-WITH top_20_tables AS(
-    SELECT
-        m.value_jsonb->>'full_table_name' as "table",
-        sum( coalesce((m.value_jsonb->>'heap_blks_read')::float8, 0) )  as "rows"
-    FROM manager.metric m
-    WHERE
-        $__unixEpochFilter(snapshot) AND
-        host = md5('$host')::uuid AND
-        plugin = md5('pg.user_tables.io')::uuid
-    GROUP BY 1
-    ORDER BY 2 DESC
-    LIMIT 20
-)
+hosts:
 
-SELECT
-  m.snapshot AS "time",
-  m.value_jsonb->>'full_table_name' as "table",
-  sum( coalesce((m.value_jsonb->>'heap_blks_read')::float8, 0) )  * 8 * 1024 as "heap"
-FROM manager.metric m
-INNER JOIN top_20_tables t ON t.table = m.value_jsonb->>'full_table_name'
-WHERE
-  $__unixEpochFilter(snapshot) AND
-  host = md5('$host')::uuid AND
-  plugin = md5('pg.user_tables.io')::uuid
-GROUP BY 1,2
-ORDER BY 1
+  - host: peripheral-db-1 # name of target in manager-db
+
+    plugins: # list of plugins which can be activated on this target
+      - activity
+      - databases
+      ...
+
+    manager: # manager connection
+      host: /tmp
+      dbname: gatherer
+      username: manager
+      port: 5432
+
+    agent: # target agent connection
+      host: 192.168.1.1
+      dbname: your_database
+      username: monitor
+      port: 5432
 ```
 
-or use the sql language to find problem :)
+# Build status
 
-```sql
-SELECT
-  snapshot as "time",
-  sum( coalesce((value_jsonb->>'seq_scan')::float8, 0) )
-from manager.metric where
-  ts > 1500000000 AND
-  host = md5('hostname')::uuid AND
-  plugin = md5('pg.user_tables')::uuid AND
-  coalesce((value_jsonb->>'relpages')::bigint, 0)> (256*1024*1024) / (8*1024)
-group by snapshot
-order by snapshot;
-```
-
-![common](/img/common-stats.png)
-![databases](/img/databases.png)
-![backends status](/img/backends-status.png)
-![backends waits](/img/backends-waits.png)
-![statements](/img/statements.png)
-![locks](/img/locks.png)
-![long queries](/img/long-queries.png)
-![read per table](/img/read-per-table.png)
-![tuples per table](/img/tuples-per-table.png)
-![seq scans per table](/img/seq-scans-per-table.png)
-![cpu](/img/cpu.png)
-![disk](/img/disk.png)
-![memory](/img/memory.png)
-![vacuum-activity](/img/vacuum-activity.png)
-![buffers-write](/img/buffers-write.png)
+[![Travis](https://travis-ci.org/vadv/pg_gatherer.svg)](https://travis-ci.org/vadv/pg_gatherer)
