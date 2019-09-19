@@ -15,6 +15,12 @@ test_in_docker:
 	psql -U postgres -d gatherer -Atc "create extension pg_buffercache"
 	psql -U postgres -d gatherer -Atc "create extension pg_stat_statements"
 	psql -U postgres -d gatherer -Atc "create extension timescaledb"
+	# update statistics
+	/usr/pgsql-11/bin/pgbench -U postgres -h /tmp -i -s 2 postgres
+	/usr/pgsql-11/bin/pgbench -U postgres -h /tmp -i -s 2 gatherer
+	/usr/pgsql-11/bin/pgbench -U postgres -h /tmp -T 5 postgres
+	/usr/pgsql-11/bin/pgbench -U postgres -h /tmp -T 5 gatherer
+	/usr/pgsql-11/bin/vacuumdb --analyze-only -U postgres -h /tmp --all
 	# deploy schema gatherer
 	psql -U gatherer -At -1 -f ./schema/schema.sql -d gatherer
 	# start tests

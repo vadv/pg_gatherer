@@ -9,4 +9,4 @@ create table metric (
     value_jsonb  jsonb
 );
 select create_hypertable('metric', 'ts', chunk_time_interval => 43200);
-create index ON metric (ts, plugin, host);
+create index on metric (ts, plugin, host);
