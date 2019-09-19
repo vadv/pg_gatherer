@@ -4,7 +4,7 @@ build:
 	go build -o ./bin/pg_gatherer --tags netcgo ./gatherer/cmd/pg_gatherer/
 
 dashboard: submodule_check
-	jsonnet -J ./grafana/jsonnet ./grafana/jsonnet/dashboard.jsonnet -o ./gatherer/dashboard.json
+	jsonnet -J ./grafana/jsonnet ./grafana/jsonnet/dashboard.jsonnet -o ./grafana/dashboard.json
 
 submodules:
 	git submodule init
