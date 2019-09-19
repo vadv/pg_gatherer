@@ -8,11 +8,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/vadv/pg_gatherer/internal/cache"
+	"github.com/vadv/pg_gatherer/gatherer/internal/cache"
 
-	"github.com/vadv/pg_gatherer/internal/manager"
+	"github.com/vadv/pg_gatherer/gatherer/internal/manager"
 
-	"github.com/vadv/pg_gatherer/internal/connection"
+	"github.com/vadv/pg_gatherer/gatherer/internal/connection"
 
 	libs "github.com/vadv/gopher-lua-libs"
 

@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/vadv/gopher-lua-libs/inspect"
-	"github.com/vadv/pg_gatherer/internal/connection"
-	"github.com/vadv/pg_gatherer/internal/manager"
+	"github.com/vadv/pg_gatherer/gatherer/internal/connection"
+	"github.com/vadv/pg_gatherer/gatherer/internal/manager"
 	lua "github.com/yuin/gopher-lua"
 )
 

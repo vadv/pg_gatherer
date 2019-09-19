@@ -4,9 +4,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/vadv/pg_gatherer/internal/cache"
 	"github.com/vadv/gopher-lua-libs/inspect"
 	"github.com/vadv/gopher-lua-libs/time"
+	"github.com/vadv/pg_gatherer/gatherer/internal/cache"
 	lua "github.com/yuin/gopher-lua"
 )
 

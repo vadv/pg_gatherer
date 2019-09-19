@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/vadv/pg_gatherer/internal/plugins"
+	"github.com/vadv/pg_gatherer/gatherer/internal/plugins"
 )
 
 // Config represent configuration of plugins

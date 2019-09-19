@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/vadv/pg_gatherer/internal/plugins"
+	"github.com/vadv/pg_gatherer/gatherer/internal/plugins"
 )
 
 const hostname = "localhost-test"

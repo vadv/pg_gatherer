@@ -1,7 +1,7 @@
 package testing_framework
 
 import (
-	"github.com/vadv/pg_gatherer/internal/plugins"
+	"github.com/vadv/pg_gatherer/gatherer/internal/plugins"
 	lua "github.com/yuin/gopher-lua"
 )
 

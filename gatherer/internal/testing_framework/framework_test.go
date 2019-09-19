@@ -5,7 +5,7 @@ import (
 
 	libs "github.com/vadv/gopher-lua-libs"
 
-	"github.com/vadv/pg_gatherer/internal/testing_framework"
+	"github.com/vadv/pg_gatherer/gatherer/internal/testing_framework"
 	lua "github.com/yuin/gopher-lua"
 )
 

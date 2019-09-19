@@ -7,7 +7,7 @@ import (
 
 	"github.com/vadv/gopher-lua-libs/inspect"
 
-	"github.com/vadv/pg_gatherer/internal/connection"
+	"github.com/vadv/pg_gatherer/gatherer/internal/connection"
 	lua "github.com/yuin/gopher-lua"
 )
 

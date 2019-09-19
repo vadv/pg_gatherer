@@ -11,12 +11,12 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/vadv/pg_gatherer/internal/manager"
+	"github.com/vadv/pg_gatherer/gatherer/internal/manager"
 
-	"github.com/vadv/pg_gatherer/internal/connection"
+	"github.com/vadv/pg_gatherer/gatherer/internal/connection"
 
 	libs "github.com/vadv/gopher-lua-libs"
-	"github.com/vadv/pg_gatherer/internal/testing_framework"
+	"github.com/vadv/pg_gatherer/gatherer/internal/testing_framework"
 	lua "github.com/yuin/gopher-lua"
 )
 

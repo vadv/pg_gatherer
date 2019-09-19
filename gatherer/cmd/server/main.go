@@ -8,7 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/vadv/pg_gatherer/internal/plugins"
+	"github.com/vadv/pg_gatherer/gatherer/internal/plugins"
 
 	"gopkg.in/yaml.v2"
 )
