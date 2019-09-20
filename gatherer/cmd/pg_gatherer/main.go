@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -14,12 +15,20 @@ import (
 )
 
 var (
-	configPath = flag.String(`config`, `config.yaml`, `Path to config file`)
+	version     = `v0.0.2`
+	configPath  = flag.String(`config`, `config.yaml`, `Path to config file`)
+	versionFlag = flag.Bool(`version`, false, `Print version and exit`)
 )
 
 func main() {
+
 	if !flag.Parsed() {
 		flag.Parse()
+	}
+
+	if *versionFlag {
+		fmt.Printf("version: %s\n", version)
+		os.Exit(0)
 	}
 
 	data, err := ioutil.ReadFile(*configPath)

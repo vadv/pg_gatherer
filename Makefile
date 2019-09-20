@@ -42,6 +42,8 @@ test_in_docker:
 	# install extensions
 	psql -U postgres -d gatherer -Atc "create extension pg_buffercache"
 	psql -U postgres -d gatherer -Atc "create extension pg_stat_statements"
+	psql -U postgres -d postgres -Atc "create extension pg_buffercache"
+	psql -U postgres -d postgres -Atc "create extension pg_stat_statements"
 	psql -U postgres -d gatherer -Atc "create extension timescaledb"
 	# update statistics
 	/usr/pgsql-11/bin/pgbench -U postgres -h /tmp -i -s 2 postgres
