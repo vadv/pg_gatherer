@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	version     = `v0.0.2`
+	version     = `unknown`
 	configPath  = flag.String(`config`, `config.yaml`, `Path to config file`)
 	versionFlag = flag.Bool(`version`, false, `Print version and exit`)
 )
