@@ -54,7 +54,7 @@ func New(L *lua.LState, userDataName, host, dbname, user, password string, port 
 
 // ConnectionString return connection string
 func (c *connection) connectionString() string {
-	return BuildConnectionString(c.host, c.password, c.port, c.user, c.password, c.params)
+	return BuildConnectionString(c.host, c.dbname, c.port, c.user, c.password, c.params)
 }
 
 // BuildConnectionString create connection string
