@@ -1,11 +1,9 @@
-local plugin               = 'pg.buffercache'
-local every                = 300
+local plugin_name     = 'pg.buffercache'
+local every           = 300
 
-local current_dir          = filepath.join(root, "buffercache")
-local sql_buffercache, err = ioutil.read_file(filepath.join(current_dir, "buffercache.sql"))
-if err then error(err) end
+local sql_buffercache = read_file_in_current_dir("buffercache.sql")
 
-local snapshot = nil
+local snapshot        = nil
 
 local function collect_for_db(conn)
   local result            = conn:query(sql_buffercache, every)
@@ -77,7 +75,7 @@ local function collect_for_db(conn)
   jsonb.per_relation_stat = per_relation_stat
   local jsonb, err        = json.encode(jsonb)
   if err then error(err) end
-  storage:insert_metric({ plugin = plugin, snapshot = snapshot, json = jsonb })
+  storage:insert_metric({ plugin = plugin_name, snapshot = snapshot, json = jsonb })
 end
 
 local function collect()

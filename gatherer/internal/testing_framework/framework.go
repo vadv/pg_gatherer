@@ -48,6 +48,6 @@ func New(L *lua.LState, rootDir, cacheDir, pluginName, host, dbname, user, passw
 	ud := L.NewUserData()
 	ud.Value = f
 	L.SetMetatable(ud, L.GetTypeMetatable(`testing_framework_ud`))
-	L.SetGlobal("plugin", ud)
+	L.SetGlobal("tested_plugin", ud)
 	return nil
 }

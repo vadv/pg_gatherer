@@ -1,5 +1,5 @@
-local plugin = 'linux.memory'
-local every  = 60
+local plugin_name = 'linux.memory'
+local every       = 60
 
 local function collect()
   local jsonb = {}
@@ -11,7 +11,7 @@ local function collect()
   end
   local jsonb, err = json.encode(jsonb)
   if err then error(err) end
-  storage:insert_metric({ plugin = plugin, json = jsonb })
+  storage:insert_metric({ plugin = plugin_name, json = jsonb })
 end
 
 run_every(collect, every)

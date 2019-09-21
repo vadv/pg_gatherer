@@ -1,20 +1,14 @@
 local plugin_name   = 'pg.activity'
 local every         = 60
 
-local current_dir   = filepath.join(root, "activity")
+local activity_file = "activity_9.sql"
+if get_pg_server_version() >= 10 then activity_file = "activity_10.sql" end
 
-local activity_file = filepath.join(current_dir, "activity_9.sql")
-if get_pg_server_version() >= 10 then activity_file = filepath.join(current_dir, "activity_10.sql") end
-local sql_activity, err = ioutil.read_file(activity_file)
-if err then error(err) end
+local sql_activity = read_file_in_current_dir(activity_file)
+local sql_states   = read_file_in_current_dir("states.sql")
+local sql_waits    = read_file_in_current_dir("waits.sql")
 
-local sql_states, err = ioutil.read_file(filepath.join(current_dir, "states.sql"))
-if err then error(err) end
-
-local sql_waits, err = ioutil.read_file(filepath.join(current_dir, "waits.sql"))
-if err then error(err) end
-
-local helpers = dofile(filepath.join(current_dir, "linux_helper_proc_stat.lua"))
+local helpers      = dofile(filepath.join(plugin:dir(), "linux_helper_proc_stat.lua"))
 
 -- process states
 local function states()

@@ -1,28 +1,24 @@
-local plugin      = 'pg.wal'
+local plugin_name = 'pg.wal'
 local every       = 60
-
-local current_dir = filepath.join(root, "wal")
 
 local function get_sql()
   local filename = ""
   if get_pg_is_in_recovery() then
     -- slave
     if get_pg_server_version() >= 10 then
-      filename = filepath.join(current_dir, "wal_slave_10.sql")
+      filename = "wal_slave_10.sql"
     else
-      filename = filepath.join(current_dir, "wal_slave_9.sql")
+      filename = "wal_slave_9.sql"
     end
   else
     -- master
     if get_pg_server_version() >= 10 then
-      filename = filepath.join(current_dir, "wal_master_10.sql")
+      filename = "wal_master_10.sql"
     else
-      filename = filepath.join(current_dir, "wal_master_10.sql")
+      filename = "wal_master_10.sql"
     end
   end
-  local sql, err = ioutil.read_file(filename)
-  if err then error(err) end
-  return sql
+  return read_file_in_current_dir(filename)
 end
 
 local function collect()
@@ -31,10 +27,10 @@ local function collect()
     local wal_position, pg_is_in_recovery, time_lag = row[1], row[2], row[3]
     local wal_speed                                 = cache:speed_and_set("wal_speed", wal_position)
     if wal_speed then
-      storage:insert_metric({ plugin = plugin .. ".speed", float = wal_speed })
+      storage:insert_metric({ plugin = plugin_name .. ".speed", float = wal_speed })
     end
     if pg_is_in_recovery then
-      storage:insert_metric({ plugin = plugin .. ".replication_time_lag", float = time_lag })
+      storage:insert_metric({ plugin = plugin_name .. ".replication_time_lag", float = time_lag })
     end
   end
 end

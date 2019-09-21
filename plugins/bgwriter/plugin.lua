@@ -1,9 +1,7 @@
-local plugin_name       = 'pg.bgwriter'
-local every             = 60
+local plugin_name  = 'pg.bgwriter'
+local every        = 60
 
-local current_dir       = filepath.join(root, "bgwriter")
-local sql_bgwriter, err = ioutil.read_file(filepath.join(current_dir, "bgwriter.sql"))
-if err then error(err) end
+local sql_bgwriter = read_file_in_current_dir("bgwriter.sql")
 
 local function collect()
   local result = target:query(sql_bgwriter, every)

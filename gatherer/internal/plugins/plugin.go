@@ -104,7 +104,7 @@ func (p *plugin) prepareState() error {
 	pluginUD := state.NewUserData()
 	pluginUD.Value = p
 	state.SetMetatable(pluginUD, state.GetTypeMetatable(`plugin_status_ud`))
-	state.SetGlobal(`plugin_status`, pluginUD)
+	state.SetGlobal(`plugin`, pluginUD)
 	libs.Preload(state)
 	if err := state.DoFile(filepath.Join(p.config.rootDir, "init.lua")); err != nil {
 		return fmt.Errorf("while load init.lua: %s", err.Error())

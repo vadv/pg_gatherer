@@ -1,9 +1,7 @@
-local plugin             = 'pg.databases'
-local every              = 60
+local plugin_name   = 'pg.databases'
+local every         = 60
 
-local current_dir        = filepath.join(root, "databases")
-local sql_databases, err = ioutil.read_file(filepath.join(current_dir, "databases.sql"))
-if err then error(err) end
+local sql_databases = read_file_in_current_dir("databases.sql")
 
 local function collect()
   local result = target:query(sql_databases, 60)
@@ -29,7 +27,7 @@ local function collect()
 
     local jsonb, err     = json.encode(jsonb)
     if err then error(err) end
-    storage:insert_metric({ plugin = plugin, snapshot = row[1], json = jsonb })
+    storage:insert_metric({ plugin = plugin_name, snapshot = row[1], json = jsonb })
   end
 end
 

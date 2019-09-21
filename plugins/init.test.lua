@@ -18,24 +18,24 @@ where
 end
 
 function plugin_check_error()
-  if plugin:error_count() > 0 then
-    error(plugin:last_error())
+  if tested_plugin:error_count() > 0 then
+    error(tested_plugin:last_error())
   end
 end
 
 function run_plugin_test(timeout, success_exit_function, check_error_function)
   check_error_function = check_error_function or plugin_check_error
   success_exit_function = success_exit_function or function() return false end
-  plugin:create()
+  tested_plugin:create()
   timeout = 120 or timeout
   while timeout > 0 do
     check_error_function()
     if success_exit_function() then
-        plugin:remove()
+      tested_plugin:remove()
         return
     end
     time.sleep(1)
     timeout = timeout - 1
   end
-  plugin:remove()
+  tested_plugin:remove()
 end
