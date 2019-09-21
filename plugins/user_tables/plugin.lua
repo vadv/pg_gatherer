@@ -77,11 +77,11 @@ local function collect()
   end
   local jsonb, err = json.encode(user_tables_stat_data)
   if err then error(err) end
-  manager:send_metric({plugin=plugin, snapshot=snapshot, json=jsonb})
+  manager:insert_metric({plugin=plugin, snapshot=snapshot, json=jsonb})
 
   local jsonb, err = json.encode(user_tables_io_data)
   if err then error(err) end
-  manager:send_metric({plugin=plugin..".io", snapshot=snapshot, json=jsonb})
+  manager:insert_metric({plugin=plugin..".io", snapshot=snapshot, json=jsonb})
 end
 
 run_every(collect, every)

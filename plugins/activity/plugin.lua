@@ -25,14 +25,14 @@ local function states()
   end
   local jsonb, err = json.encode(jsonb)
   if err then error(err) end
-  manager:send_metric({ plugin = plugin_name .. ".states", json = jsonb })
+  manager:insert_metric({ plugin = plugin_name .. ".states", json = jsonb })
 end
 
 -- process waits
 local function waits()
   local result = agent:query(sql_waits, every)
   for _, row in pairs(result.rows) do
-    manager:send_metric({ plugin = plugin_name .. ".waits", snapshot = row[1], json = row[2] })
+    manager:insert_metric({ plugin = plugin_name .. ".waits", snapshot = row[1], json = row[2] })
   end
 end
 
@@ -40,7 +40,7 @@ end
 local function collect_rds()
   local result = agent:query(sql_activity, every)
   for _, row in pairs(result.rows) do
-    manager:send_metric({ plugin = plugin_name, snapshot = row[1], json = row[2] })
+    manager:insert_metric({ plugin = plugin_name, snapshot = row[1], json = row[2] })
   end
   states()
   waits()
@@ -74,7 +74,7 @@ local function collect_local()
     end
     local jsonb, err = json.encode(jsonb)
     if err then error(err) end
-    manager:send_metric({ plugin = plugin_name, snapshot = row[1], json = jsonb })
+    manager:insert_metric({ plugin = plugin_name, snapshot = row[1], json = jsonb })
   end
   states()
   waits()

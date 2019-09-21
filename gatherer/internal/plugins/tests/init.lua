@@ -10,18 +10,20 @@ ioutil = require("ioutil")
 root = filepath.dir(debug.getinfo(1).source)
 
 -- return true if database hosted on rds
-function is_rds()
+function is_rds(conn)
+  conn = conn or agent
   return not(not(
           pcall(function()
-              connection:query("show rds.extensions")
+              agent:query("show rds.extensions")
           end)
   ))
 end
 
 -- return postgresql version
-function get_pg_server_version()
+function get_pg_server_version(conn)
+  conn = conn or agent
   if pg_server_version then return pg_server_version end
-  local version = connection:query("show server_version")
+  local version = agent:query("show server_version")
   pg_server_version = tonumber(version.rows[1][1])
   return pg_server_version
 end

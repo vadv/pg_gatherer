@@ -34,7 +34,7 @@ local function collect()
   end
   local jsonb, err = json.encode(statements_data)
   if err then error(err) end
-  manager:send_metric({ plugin = plugin, snapshot = snapshot, json = jsonb })
+  manager:insert_metric({ plugin = plugin, snapshot = snapshot, json = jsonb })
 end
 
 run_every(collect, every)

@@ -29,7 +29,7 @@ local function collect()
 
     local jsonb, err     = json.encode(jsonb)
     if err then error(err) end
-    manager:send_metric({ plugin = plugin, snapshot = row[1], json = jsonb })
+    manager:insert_metric({ plugin = plugin, snapshot = row[1], json = jsonb })
   end
 end
 

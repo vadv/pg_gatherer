@@ -23,9 +23,9 @@ func (c *Config) validate() error {
 	if len(c.Hosts) == 0 {
 		return fmt.Errorf("`hosts` is empty")
 	}
-	for _, h := range c.Hosts {
-		if len(h.Plugins) == 0 {
-			return fmt.Errorf("plugins is empty for host: %s", h.Host)
+	for host, config := range c.Hosts {
+		if len(config.Plugins) == 0 {
+			return fmt.Errorf("plugins is empty for host: %s", host)
 		}
 	}
 	return nil

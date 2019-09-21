@@ -31,10 +31,10 @@ local function collect()
     local wal_position, pg_is_in_recovery, time_lag = row[1], row[2], row[3]
     local wal_speed = cache:speed_and_set("wal_speed", wal_position)
     if wal_speed then
-      manager:send_metric({plugin=plugin..".speed", float=wal_speed})
+      manager:insert_metric({plugin=plugin..".speed", float=wal_speed})
     end
     if pg_is_in_recovery then
-      manager:send_metric({plugin=plugin..".replication_time_lag", float=time_lag})
+      manager:insert_metric({plugin=plugin..".replication_time_lag", float=time_lag})
     end
   end
 end

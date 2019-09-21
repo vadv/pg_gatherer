@@ -21,7 +21,10 @@ func TestPool(t *testing.T) {
 		Port:     5432,
 		UserName: "gatherer",
 	}
-	pool.RegisterHost(hostname, conn, conn)
+	connections := make(map[string]*plugins.Connection, 0)
+	connections[`agent`] = conn
+	connections[`manager`] = conn
+	pool.RegisterHost(hostname, connections)
 
 	// delete caches
 	os.RemoveAll("./tests/cache")
