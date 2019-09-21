@@ -1,7 +1,7 @@
 local plugin               = 'pg.healthcheck'
 local every                = 10
 
-local current_dir          = filepath.join(root, "embedded", "healthcheck")
+local current_dir          = filepath.join(root, "healthcheck")
 local sql_healthcheck, err = ioutil.read_file(filepath.join(current_dir, "healthcheck.sql"))
 if err then error(err) end
 

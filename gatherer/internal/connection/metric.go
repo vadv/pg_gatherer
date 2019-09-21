@@ -1,4 +1,4 @@
-package manager
+package connection
 
 import (
 	"fmt"
@@ -17,7 +17,7 @@ type metric struct {
 }
 
 func parseMetric(host string, table *lua.LTable) (*metric, error) {
-	m := &metric{host:host}
+	m := &metric{host: host}
 	var err error
 	table.ForEach(func(k lua.LValue, v lua.LValue) {
 		switch strings.ToLower(k.String()) {

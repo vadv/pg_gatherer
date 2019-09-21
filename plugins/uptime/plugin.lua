@@ -1,7 +1,7 @@
 local plugin          = 'pg.uptime'
 local every           = 300
 
-local current_dir     = filepath.join(root, "embedded", "uptime")
+local current_dir     = filepath.join(root, "uptime")
 local sql_uptime, err = ioutil.read_file(filepath.join(current_dir, "uptime.sql"))
 if err then error(err) end
 local sql_checkpointer_uptime, err = ioutil.read_file(filepath.join(current_dir, "checkpointer_uptime_10.sql"))

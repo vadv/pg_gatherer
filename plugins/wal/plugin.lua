@@ -1,7 +1,7 @@
 local plugin          = 'pg.wal'
 local every           = 60
 
-local current_dir     = filepath.join(root, "embedded", "wal")
+local current_dir     = filepath.join(root, "wal")
 
 local function get_sql()
   local filename = ""

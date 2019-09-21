@@ -1,7 +1,7 @@
 local plugin              = 'pg.statements'
 local every               = 60
 
-local current_dir         = filepath.join(root, "embedded", "statements")
+local current_dir         = filepath.join(root, "statements")
 local sql_statements, err = ioutil.read_file(filepath.join(current_dir, "statements.sql"))
 if err then error(err) end
 

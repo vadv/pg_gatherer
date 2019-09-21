@@ -1,7 +1,7 @@
 local plugin         = 'pg.block'
 local every          = 5
 
-local current_dir    = filepath.join(root, "embedded", "block")
+local current_dir    = filepath.join(root, "block")
 local sql_block, err = ioutil.read_file(filepath.join(current_dir, "block.sql"))
 if err then error(err) end
 

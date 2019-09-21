@@ -1,7 +1,7 @@
 local plugin          = 'pg.user_tables'
 local every           = 60
 
-local current_dir     = filepath.join(root, "embedded", "user_tables")
+local current_dir     = filepath.join(root, "user_tables")
 local sql_user_tables, err = ioutil.read_file(filepath.join(current_dir, "user_tables.sql"))
 if err then error(err) end
 

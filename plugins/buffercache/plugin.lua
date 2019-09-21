@@ -1,7 +1,7 @@
 local plugin               = 'pg.buffercache'
 local every                = 300
 
-local current_dir          = filepath.join(root, "embedded", "buffercache")
+local current_dir          = filepath.join(root, "buffercache")
 local sql_buffercache, err = ioutil.read_file(filepath.join(current_dir, "buffercache.sql"))
 if err then error(err) end
 

@@ -1,7 +1,7 @@
 local plugin_name   = 'pg.activity'
 local every         = 60
 
-local current_dir   = filepath.join(root, "embedded", "activity")
+local current_dir   = filepath.join(root, "activity")
 
 local activity_file = filepath.join(current_dir, "activity_9.sql")
 if get_pg_server_version() >= 10 then activity_file = filepath.join(current_dir, "activity_10.sql") end

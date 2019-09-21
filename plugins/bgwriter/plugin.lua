@@ -1,7 +1,7 @@
 local plugin_name       = 'pg.bgwriter'
 local every             = 60
 
-local current_dir       = filepath.join(root, "embedded", "bgwriter")
+local current_dir       = filepath.join(root, "bgwriter")
 local sql_bgwriter, err = ioutil.read_file(filepath.join(current_dir, "bgwriter.sql"))
 if err then error(err) end
 

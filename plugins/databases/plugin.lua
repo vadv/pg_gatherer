@@ -1,7 +1,7 @@
 local plugin             = 'pg.databases'
 local every              = 60
 
-local current_dir        = filepath.join(root, "embedded", "databases")
+local current_dir        = filepath.join(root, "databases")
 local sql_databases, err = ioutil.read_file(filepath.join(current_dir, "databases.sql"))
 if err then error(err) end
 

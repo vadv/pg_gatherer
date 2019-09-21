@@ -1,7 +1,7 @@
 local plugin                 = 'pg.replication_slots'
 local every                  = 60
 
-local current_dir            = filepath.join(root, "embedded", "replication_slots")
+local current_dir            = filepath.join(root, "replication_slots")
 
 local replication_slots_file = filepath.join(current_dir, "replication_slots_9.sql")
 if get_pg_server_version() >= 10 then replication_slots_file = filepath.join(current_dir, "replication_slots_10.sql") end
