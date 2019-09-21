@@ -54,6 +54,11 @@ func TestPool(t *testing.T) {
 		t.Fatalf("add plugin: %s\n", err.Error())
 	}
 
+	// add pl_stat
+	if err := pool.AddPluginToHost("pl_stat", hostname); err != nil {
+		t.Fatalf("add plugin: %s\n", err.Error())
+	}
+
 	// add pl_stop
 	os.RemoveAll("./tests/pl_stop/must_exist.txt")
 	os.RemoveAll("./tests/pl_stop/must_not_exist.txt")
@@ -100,6 +105,13 @@ func TestPool(t *testing.T) {
 			}
 			if pl.Starts != 3 {
 				t.Fatalf("must start 3 times: %d\n", pl.Starts)
+			}
+		}
+
+		// pl_stat
+		if pl.PluginName == `pl_stat` {
+			if pl.Errors > 0 {
+				t.Fatalf("must not restarted with error: %d\n", pl.Errors)
 			}
 		}
 

@@ -90,6 +90,21 @@ func (p *plugin) prepareState() error {
 	state := lua.NewState()
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	state.SetContext(ctx)
+	// load plugin api
+	pluginStatusUD := state.NewTypeMetatable(`plugin_status_ud`)
+	state.SetGlobal(`plugin_status_ud`, pluginStatusUD)
+	state.SetField(pluginStatusUD, "__index", state.SetFuncs(state.NewTable(), map[string]lua.LGFunction{
+		"name":        pluginName,
+		"dir":         pluginDir,
+		"host":        pluginHost,
+		"error_count": pluginErrorCount,
+		"start_count": pluginStartCount,
+		"last_error":  pluginLastError,
+	}))
+	pluginUD := state.NewUserData()
+	pluginUD.Value = p
+	state.SetMetatable(pluginUD, state.GetTypeMetatable(`plugin_status_ud`))
+	state.SetGlobal(`plugin_status`, pluginUD)
 	libs.Preload(state)
 	if err := state.DoFile(filepath.Join(p.config.rootDir, "init.lua")); err != nil {
 		return fmt.Errorf("while load init.lua: %s", err.Error())
