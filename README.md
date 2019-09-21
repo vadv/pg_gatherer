@@ -10,7 +10,7 @@ The project is designed to collect and store statistical data of PostgreSQL into
        |      +------------------+
        v
 +------+-------+                        +---------------+
-|   storage    |     +----------------->+   Target # 1  |
+|   Storage    |     +----------------->+   Target # 1  |
 +------+-------+     |                  +---------------+
        ^             |
        |     +-------+--------+         +---------------+
