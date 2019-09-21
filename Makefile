@@ -39,6 +39,7 @@ test_in_docker:
 	psql -U postgres -Atc "create user gatherer"
 	psql -U postgres -Atc "create database gatherer owner gatherer"
 	psql -U postgres -Atc "grant pg_monitor to gatherer"
+	psql -U postgres -Atc "create database nobuffercache"
 	# install extensions
 	psql -U postgres -d gatherer -Atc "create extension pg_buffercache"
 	psql -U postgres -d gatherer -Atc "create extension pg_stat_statements"

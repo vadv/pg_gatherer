@@ -38,6 +38,12 @@ function get_pg_is_in_recovery()
   return pg_is_in_recovery.rows[1][1]
 end
 
+-- return true if extension installed
+function extension_present(conn, extname)
+  local extension = conn:query("select count(extname) from pg_catalog.pg_extension where extname = $1", extname)
+  return (extension.rows[1][1] == 1)
+end
+
 -- run function f every sec
 -- this function run in plugin context, then we use cache key `last_run`
 function run_every(f, every)

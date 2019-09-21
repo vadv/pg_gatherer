@@ -43,6 +43,7 @@ then you get additional statistics, for example link `/proc/{pid}/io` stats with
 * Apply [migration](/schema/schema.sql) on storage database.
 * Create user on targets with [pg_monitor](https://www.postgresql.org/docs/10/default-roles.html) rights.
 * Get && run agent.
+* Populate table host on storage database.
 * Also, if you use TimescaleDB, when you can use Grafana [dashboard](/grafana).
 
 ```bash

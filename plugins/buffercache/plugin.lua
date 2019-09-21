@@ -82,7 +82,9 @@ end
 
 local function collect()
   for _, conn in pairs(target:available_connections()) do
-    collect_for_db(conn)
+    if extension_present(conn, 'pg_buffercache') then
+      collect_for_db(conn)
+    end
   end
 end
 
