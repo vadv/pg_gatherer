@@ -38,6 +38,10 @@ if err then error(err) end
 connections[1]:query("select 1")
 ```
 
+## connection:insert_metric({plugin="", [int=0,float=0,json=""]})
+
+Save metric to database, raises error.
+
 ## connection:background_query(string, args...)
 
 Execute query with args in background, return user data `background_query_ud`.

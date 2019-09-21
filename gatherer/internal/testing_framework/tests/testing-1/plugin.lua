@@ -1,1 +1,1 @@
-connection:query("select pg_sleep(1000)")
+target:query("select pg_sleep(1000)")

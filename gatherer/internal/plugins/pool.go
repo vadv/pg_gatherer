@@ -17,9 +17,8 @@ type Pool struct {
 
 // pluginsForHost list of plugins for host
 type pluginsForHost struct {
-	manager *Connection
-	conn    *Connection
-	plugins []*plugin
+	connections map[string]*Connection
+	plugins     []*plugin
 }
 
 // NewPool return new Pool
@@ -62,14 +61,13 @@ func (p *Pool) supervisor() error {
 }
 
 // RegisterHost register new host
-func (p *Pool) RegisterHost(host string, conn *Connection, manager *Connection) {
+func (p *Pool) RegisterHost(host string, connections map[string]*Connection) {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 	if _, ok := p.hosts[host]; !ok {
 		p.hosts[host] = &pluginsForHost{
-			manager: manager,
-			conn:    conn,
-			plugins: make([]*plugin, 0),
+			connections: connections,
+			plugins:     make([]*plugin, 0),
 		}
 	}
 }
@@ -108,8 +106,7 @@ func (p *Pool) AddPluginToHost(pluginName, host string) error {
 		rootDir:        p.rootDir,
 		pluginName:     pluginName,
 		globalCacheDir: p.globalCacheDir,
-		db:             p.hosts[host].conn,
-		manager:        p.hosts[host].manager,
+		connections:    p.hosts[host].connections,
 	}
 	pl, err := createPlugin(plConfig)
 	if err != nil {

@@ -47,10 +47,9 @@ func main() {
 	}
 
 	pool := plugins.NewPool(config.PluginsDir, config.CacheDir)
-	for _, hostConfig := range config.Hosts {
-		host := hostConfig.Host
+	for host, hostConfig := range config.Hosts {
 		log.Printf("[INFO] register host: '%s'\n", host)
-		pool.RegisterHost(host, hostConfig.Agent, hostConfig.Manager)
+		pool.RegisterHost(host, hostConfig.Connections)
 		for _, pl := range hostConfig.Plugins {
 			log.Printf("[INFO] register plugin '%s' for host: '%s'\n", pl, host)
 			if errPl := pool.AddPluginToHost(pl, host); errPl != nil {
@@ -67,8 +66,8 @@ func main() {
 	<-sig
 
 	log.Printf("[INFO] shutdown\n")
-	for _, hostConfig := range config.Hosts {
-		pool.RemoveHostAndPlugins(hostConfig.Host)
+	for host, _ := range config.Hosts {
+		pool.RemoveHostAndPlugins(host)
 	}
 	log.Printf("[INFO] stopped\n")
 

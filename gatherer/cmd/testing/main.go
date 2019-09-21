@@ -11,8 +11,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/vadv/pg_gatherer/gatherer/internal/manager"
-
 	"github.com/vadv/pg_gatherer/gatherer/internal/connection"
 
 	libs "github.com/vadv/gopher-lua-libs"
@@ -113,12 +111,10 @@ func testPlugin(pluginDir, cacheDir, pluginName, testFile string) error {
 	testing_framework.New(state, pluginDir, cacheDir, pluginName,
 		*hostName, *dbName, *userName, *password, *dbPort, nil)
 	connection.Preload(state)
-	connection.New(state, `connection`,
+	connection.New(state, `target`,
 		*hostName, *dbName, *userName, *password, *dbPort, nil)
-	manager.Preload(state)
-	manager.New(state, `manager`, pluginName,
-		connection.BuildConnectionString(
-			*hostName, *dbName, *dbPort, *userName, *password, nil))
+	connection.New(state, `storage`,
+		*hostName, *dbName, *userName, *password, *dbPort, nil)
 	if err := state.DoFile(filepath.Join(pluginDir, "init.test.lua")); err != nil {
 		return err
 	}

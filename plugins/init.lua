@@ -19,7 +19,7 @@ HOST_PROC_DIR = os.getenv('HOST_PROC_DIR') or '/proc'
 function is_rds()
   return not(not(
           pcall(function()
-              connection:query("show rds.extensions")
+              target:query("show rds.extensions")
           end)
   ))
 end
@@ -27,15 +27,21 @@ end
 -- return postgresql version
 function get_pg_server_version()
   if pg_server_version then return pg_server_version end
-  local version = connection:query("show server_version")
+  local version = target:query("show server_version")
   pg_server_version = tonumber(version.rows[1][1])
   return pg_server_version
 end
 
 -- return in pg_in_recovery
 function get_pg_is_in_recovery()
-  local pg_is_in_recovery = connection:query("select pg_catalog.pg_is_in_recovery()")
+  local pg_is_in_recovery = target:query("select pg_catalog.pg_is_in_recovery()")
   return pg_is_in_recovery.rows[1][1]
+end
+
+-- return true if extension installed
+function extension_present(conn, extname)
+  local extension = conn:query("select count(extname) from pg_catalog.pg_extension where extname = $1", extname)
+  return (extension.rows[1][1] == 1)
 end
 
 -- run function f every sec

@@ -36,7 +36,7 @@ Get string with error text, raise error if plugin was removed.
 Execute read-only query in manager-db with args. Return table with `rows` and `columns`, raise error.
 
 ```lua
-local result = manager_connection:query("select $1::integer, $1::text, $2", 1, "tests")
+local result = connection:query("select $1::integer, $1::text, $2", 1, "tests")
 --[[
 result:
   {

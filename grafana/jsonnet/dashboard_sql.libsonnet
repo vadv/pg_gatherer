@@ -1,9 +1,9 @@
 {
     stat_uptime:: |||
  select
-    manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+    time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
     max(value_bigint)
- from manager.metric where
+ from metric where
     $__unixEpochFilter(ts) AND
     host = md5('$host')::uuid AND
     plugin = md5('pg.uptime')::uuid
@@ -15,7 +15,7 @@
  select
    ts,
    sum( coalesce((value_jsonb->>'size')::float8, 0) ) as value
- from manager.metric where
+ from metric where
    $__unixEpochFilter(ts) AND
    host = md5('$host')::uuid AND
    plugin = md5('pg.databases')::uuid
@@ -23,17 +23,17 @@
  order by 1
  )
  select
-     manager.time_bucket_gapfill('"$interval"'::interval, to_timestamp(data.ts) AT TIME ZONE 'UTC', $__timeFrom(), $__timeTo() ) AS "time",
-     manager.locf( avg(value) )
+     time_bucket_gapfill('"$interval"'::interval, to_timestamp(data.ts) AT TIME ZONE 'UTC', $__timeFrom(), $__timeTo() ) AS "time",
+     locf( avg(value) )
  from data
  group by 1
  order by 1
 |||,
     stat_wal:: |||
  select
-   manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+   time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
    avg( value_double ) as "value"
- from manager.metric where
+ from metric where
    $__unixEpochFilter(ts) AND
    host = md5('$host')::uuid AND
    plugin = md5('pg.wal.speed')::uuid
@@ -44,7 +44,7 @@
  select
    ts as "time",
    value_double as "value"
- from manager.metric where
+ from metric where
    $__unixEpochFilter(ts) AND
    host = md5('$host')::uuid AND
    plugin = md5('pg.wal.replication_time_lag')::uuid
@@ -53,16 +53,16 @@
   with slots as (
    select
     distinct(jsonb_object_keys(value_jsonb)) as name
-   from manager.metric where
+   from metric where
     $__unixEpochFilter(ts) AND
     host = md5('$host')::uuid AND
     plugin = md5('pg.replication_slots')::uuid
   )
 
   select
-    manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+    time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
     max( coalesce((m.value_jsonb->>(s.name))::bigint, 0) ) as "value"
-  from manager.metric m, slots s
+  from metric m, slots s
   where
     $__unixEpochFilter(ts) AND
     host = md5('$host')::uuid AND
@@ -75,7 +75,7 @@
  select
    ts,
    sum( coalesce((value_jsonb->>'blks_hit')::float8, 0) ) / (1 + sum( coalesce((value_jsonb->>'blks_read')::float8, 0) ) + sum( coalesce((value_jsonb->>'blks_hit')::float8, 0) ) ) as value
- from manager.metric where
+ from metric where
    $__unixEpochFilter(ts) AND
    host = md5('$host')::uuid AND
    plugin = md5('pg.databases')::uuid
@@ -83,7 +83,7 @@
  order by ts
  )
  select
-     manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
      avg(value)
  from data
  group by 1
@@ -93,14 +93,14 @@
  with data as (select
    ts as "ts",
    sum( coalesce((value_jsonb->>'xact_commit')::float8, 0) + coalesce((value_jsonb->>'xact_rollback')::float8, 0) ) as value
- from manager.metric where
+ from metric where
    $__unixEpochFilter(ts) AND
    host = md5('$host')::uuid AND
    plugin = md5('pg.databases')::uuid
  group by 1
  order by 1)
  select
-     manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
      avg(value)
  from data
  group by 1
@@ -111,7 +111,7 @@
      select
          snapshot,
          jsonb_array_elements(value_jsonb) as value_jsonb
-     from manager.metric where
+     from metric where
          $__unixEpochFilter(ts) AND
          host = md5('$host')::uuid AND
          plugin = md5('pg.statements')::uuid
@@ -123,7 +123,7 @@
  group by snapshot
  order by snapshot)
  select
-     manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
      avg(value) as qps
  from data2
  group by 1
@@ -134,7 +134,7 @@
  select
    snapshot as "ts",
    sum((value_jsonb->>'xact_rollback')::float8) as value
- from manager.metric where
+ from metric where
    $__unixEpochFilter(ts) AND
    host = md5('$host')::uuid AND
    plugin = md5('pg.databases')::uuid
@@ -142,7 +142,7 @@
  order by snapshot
  )
  select
-     manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
      avg(value)
  from data
  group by 1
@@ -153,7 +153,7 @@
      select
          snapshot,
          jsonb_array_elements(value_jsonb) as value_jsonb
-     from manager.metric where
+     from metric where
          $__unixEpochFilter(ts) AND
          host = md5('$host')::uuid AND
          plugin = md5('pg.statements')::uuid
@@ -169,7 +169,7 @@
  )
 
  select
-     manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
      avg(value)
  from data2
  group by 1
@@ -177,9 +177,9 @@
 |||,
     stat_long_query: |||
  select
-   manager.time_bucket('"$interval"'::interval, to_timestamp(snapshot) AT TIME ZONE 'UTC' ) AS "time",
+   time_bucket('"$interval"'::interval, to_timestamp(snapshot) AT TIME ZONE 'UTC' ) AS "time",
    max( coalesce((value_jsonb->>'query_start_duration')::bigint, 0) )
- from manager.metric where
+ from metric where
    $__unixEpochFilter(ts) AND
    host = md5('$host')::uuid AND
    plugin = md5('pg.activity')::uuid AND
@@ -191,7 +191,7 @@
  with data as (select
    snapshot as "ts",
    sum(coalesce((value_jsonb->>'count')::float8,0)) as "value"
- from manager.metric where
+ from metric where
    $__unixEpochFilter(ts) and
    host = md5('$host')::uuid and
    plugin = md5('pg.activity.waits')::uuid and
@@ -199,7 +199,7 @@
  group by snapshot
  order by snapshot)
  select
-     manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
      avg(value)
  from data
   group by 1
@@ -209,7 +209,7 @@
  with data as (select
    snapshot as "ts",
    sum((value_jsonb->>'count')::float8) as value
- from manager.metric where
+ from metric where
    $__unixEpochFilter(ts) AND
    host = md5('$host')::uuid AND
    plugin = md5('pg.activity.waits')::uuid AND
@@ -217,7 +217,7 @@
  group by snapshot
  order by snapshot)
  select
-     manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
      avg(value)
  from data
  group by 1
@@ -228,7 +228,7 @@
      select
          snapshot,
          jsonb_array_elements(value_jsonb) as value_jsonb
-     from manager.metric where
+     from metric where
          $__unixEpochFilter(ts) AND
          host = md5('$host')::uuid AND
          plugin = md5('pg.user_tables')::uuid
@@ -242,7 +242,7 @@
  order by snapshot)
 
  select
-     manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
      avg(value)
  from data2
   group by 1
@@ -253,7 +253,7 @@
      select
          snapshot,
          jsonb_array_elements(value_jsonb) as value_jsonb
-     from manager.metric where
+     from metric where
          $__unixEpochFilter(ts) AND
          host = md5('$host')::uuid AND
          plugin = md5('pg.user_tables')::uuid
@@ -271,7 +271,7 @@
  SELECT
    m.snapshot AS "time",
    sum(COALESCE( (m.value_jsonb->>'dirty_count')::bigint, 0 ) * 8 * 1024) as "size"
- FROM manager.metric m
+ FROM metric m
  WHERE
    $__unixEpochFilter(m.ts) AND
    m.host = md5('$host')::uuid AND
@@ -283,7 +283,7 @@
  SELECT
    m.snapshot AS "time",
    sum(COALESCE( (m.value_jsonb->>'buffers_count')::bigint, 0 ) * 8 * 1024) as "size"
- FROM manager.metric m
+ FROM metric m
  WHERE
    $__unixEpochFilter(m.ts) AND
    m.host = md5('$host')::uuid AND
@@ -298,7 +298,7 @@
  INNER JOIN dirty on dirty.time = total.time)
 
  SELECT
-     manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
      avg(value)
  from data
  GROUP BY 1
@@ -309,7 +309,7 @@
  SELECT
    m.snapshot AS "time",
    sum(COALESCE( (m.value_jsonb->>'usage_count_0')::bigint, 0 ) * 8 * 1024) as "size"
- FROM manager.metric m
+ FROM metric m
  WHERE
    $__unixEpochFilter(m.ts) AND
    m.host = md5('$host')::uuid AND
@@ -321,7 +321,7 @@
  SELECT
    m.snapshot AS "time",
    sum(COALESCE( (m.value_jsonb->>'buffers_count')::bigint, 0 ) * 8 * 1024) as "size"
- FROM manager.metric m
+ FROM metric m
  WHERE
    $__unixEpochFilter(m.ts) AND
    m.host = md5('$host')::uuid AND
@@ -338,7 +338,7 @@
  )
 
  SELECT
-     manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
      avg(value)
  from data
  GROUP BY 1
@@ -355,7 +355,7 @@
     TO_CHAR(( sum( (value_jsonb->>'blk_write_time')::float8  )  * interval '1 millisecond' ) , 'HH24:MI:SS') as "write time",
     round( avg( (value_jsonb->>'xact_commit')::numeric ), 2) as "commits",
     round( avg( (value_jsonb->>'xact_rollback')::numeric ), 2) as "rollback"
- from manager.metric where
+ from metric where
     $__unixEpochFilter(ts) AND
     host = md5('$host')::uuid AND
     plugin = md5('pg.databases')::uuid
@@ -364,13 +364,13 @@
 |||,
     row_backend_states: |||
  SELECT
-   manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+   time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
  --  avg( (value_jsonb->>'idle')::int ) as "idle",
    avg( (value_jsonb->>'active')::int ) as "active",
    avg( (value_jsonb->>'idle in transaction')::int ) as "idle in transaction",
    avg( (value_jsonb->>'idle in transaction (aborted)')::int ) as "idle in transaction (aborted)",
    avg( (value_jsonb->>'fastpath function call')::int ) as "fastpath function call"
- FROM manager.metric
+ FROM metric
  WHERE
    $__unixEpochFilter(ts) AND
    host = md5('$host')::uuid AND
@@ -382,7 +382,7 @@
  with wait_event_type as (
      select
          distinct(m.value_jsonb->>'wait_event_type') as wait_event_type
-     from manager.metric m
+     from metric m
      where
          $__unixEpochFilter(ts) AND
          host = md5('$host')::uuid AND
@@ -394,7 +394,7 @@
     sum( coalesce((value_jsonb->>'count')::bigint, 0) ) as value,
     t.wait_event_type as "type"
  FROM wait_event_type t
-     LEFT JOIN manager.metric m on t.wait_event_type = m.value_jsonb->>'wait_event_type'
+     LEFT JOIN metric m on t.wait_event_type = m.value_jsonb->>'wait_event_type'
  WHERE
    $__unixEpochFilter(m.ts) AND
    host = md5('$host')::uuid AND
@@ -403,7 +403,7 @@
  ORDER BY 1,3)
 
  SELECT
-     manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
      type,
      avg(value)
  from data2
@@ -415,7 +415,7 @@
    ts AS "ts",
     sum((value_jsonb->>'count')::bigint) as value,
     coalesce( (value_jsonb->>'wait_event')::text, 'CPU') as "type"
- FROM manager.metric
+ FROM metric
  WHERE
    $__unixEpochFilter(ts) AND
    host = md5('$host')::uuid AND
@@ -423,7 +423,7 @@
  GROUP BY 1,3
  ORDER BY 1,3)
  SELECT
-     manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
      type,
      avg(value)
  from data
@@ -435,7 +435,7 @@
      select
          snapshot,
          jsonb_array_elements(value_jsonb) as value_jsonb
-     from manager.metric where
+     from metric where
          $__unixEpochFilter(ts) AND
          host = md5('$host')::uuid AND
          plugin = md5('pg.statements')::uuid
@@ -447,7 +447,7 @@
  group by snapshot
  order by snapshot)
  SELECT
-     manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
      avg(value) as qps
  from data2
  GROUP BY 1
@@ -458,7 +458,7 @@
    ts as "ts",
    value_jsonb->>'datname' as "database",
    sum( coalesce((value_jsonb->>'xact_commit')::float8, 0) + coalesce((value_jsonb->>'xact_rollback')::float8, 0) ) as value
- from manager.metric where
+ from metric where
    $__unixEpochFilter(ts) AND
    host = md5('$host')::uuid AND
    plugin = md5('pg.databases')::uuid
@@ -466,7 +466,7 @@
  order by ts)
 
  SELECT
-     manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
      database,
      avg(value)
  from data
@@ -477,7 +477,7 @@
  with data as (
      select
          jsonb_array_elements(value_jsonb) as value_jsonb
-     from manager.metric where
+     from metric where
          $__unixEpochFilter(ts) AND
          host = md5('$host')::uuid AND
          plugin = md5('pg.statements')::uuid
@@ -510,7 +510,7 @@
  with data as (
      select
          jsonb_array_elements(value_jsonb) as value_jsonb
-     from manager.metric where
+     from metric where
          $__unixEpochFilter(ts) AND
          host = md5('$host')::uuid AND
          plugin = md5('pg.statements')::uuid
@@ -546,7 +546,7 @@
  with data as (
      select
          jsonb_array_elements(value_jsonb) as value_jsonb
-     from manager.metric where
+     from metric where
          $__unixEpochFilter(ts) AND
          host = md5('$host')::uuid AND
          plugin = md5('pg.statements')::uuid
@@ -569,7 +569,7 @@
  with data as (
      select
          jsonb_array_elements(value_jsonb) as value_jsonb
-     from manager.metric where
+     from metric where
          $__unixEpochFilter(ts) AND
          host = md5('$host')::uuid AND
          plugin = md5('pg.statements')::uuid
@@ -604,7 +604,7 @@
      value_jsonb->>'blocked_query_id' as blocked_query_id,
      value_jsonb->>'blocking_query_id' as blocking_query_id,
      (max(ts) - min(ts)) as "duration"
-     from manager.metric where
+     from metric where
          $__unixEpochFilter(ts) AND
          host = md5('$host')::uuid AND
          plugin = md5('pg.block')::uuid
@@ -625,7 +625,7 @@
     (max(value_jsonb->>'wchar')::float8)::bigint as "write",
     (max(value_jsonb->>'utime')::float8)/100 as "user",
     (max(value_jsonb->>'stime')::float8)/100 as "system"
-    from manager.metric where
+    from metric where
         $__unixEpochFilter(ts) AND
         host = md5('$host')::uuid AND
         plugin = md5('pg.activity')::uuid
@@ -638,7 +638,7 @@
      select
          snapshot,
          jsonb_array_elements(value_jsonb) as value_jsonb
-     from manager.metric where
+     from metric where
          $__unixEpochFilter(ts) AND
          host = md5('$host')::uuid AND
          plugin = md5('pg.user_tables')::uuid
@@ -657,7 +657,7 @@
      select
          snapshot,
          jsonb_array_elements(value_jsonb) as value_jsonb
-     from manager.metric where
+     from metric where
          $__unixEpochFilter(ts) AND
          host = md5('$host')::uuid AND
          plugin = md5('pg.user_tables')::uuid
@@ -676,7 +676,7 @@
      select
          snapshot,
          jsonb_array_elements(value_jsonb) as value_jsonb
-     from manager.metric where
+     from metric where
          $__unixEpochFilter(ts) AND
          host = md5('$host')::uuid AND
          plugin = md5('pg.user_tables')::uuid
@@ -698,7 +698,7 @@
        m.snapshot as "time",
        j.key as "relation",
        sum(coalesce((j.value->>'buffers')::bigint, 0)*8*1024) as "size"
-   FROM manager.metric m
+   FROM metric m
    CROSS JOIN LATERAL jsonb_each((m.value_jsonb->>'per_relation_stat')::jsonb) j
    WHERE
      $__unixEpochFilter(m.ts) AND
@@ -717,7 +717,7 @@
    LIMIT 20
  )
  SELECT
-   manager.time_bucket('"$interval"'::interval, to_timestamp(d.time) AT TIME ZONE 'UTC' ) AS "time",
+   time_bucket('"$interval"'::interval, to_timestamp(d.time) AT TIME ZONE 'UTC' ) AS "time",
    d.relation,
    avg(d.size)
  FROM data d
@@ -731,7 +731,7 @@
    m.snapshot,
    sum(COALESCE( (m.value_jsonb->>'dirty_count')::bigint, 0 ) * 8 * 1024) as "dirty",
    m.value_jsonb->>'datname' as "database"
- FROM manager.metric m
+ FROM metric m
  WHERE
    $__unixEpochFilter(m.ts) AND
    m.host = md5('$host')::uuid AND
@@ -740,7 +740,7 @@
  ORDER BY 1
  )
  SELECT
-     manager.time_bucket('"$interval"'::interval, to_timestamp(d.snapshot) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(d.snapshot) AT TIME ZONE 'UTC' ) AS "time",
      avg( d.dirty ),
      d.database
  FROM data d
@@ -753,7 +753,7 @@
    m.snapshot AS "time",
    sum(COALESCE( (m.value_jsonb->>'usage_count_0')::bigint, 0 ) * 8 * 1024) as "usage",
    m.value_jsonb->>'datname' as "database"
- FROM manager.metric m
+ FROM metric m
  WHERE
    $__unixEpochFilter(m.ts) AND
    m.host = md5('$host')::uuid AND
@@ -762,7 +762,7 @@
  ORDER BY 1
  )
  SELECT
-     manager.time_bucket('"$interval"'::interval, to_timestamp(d.time) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(d.time) AT TIME ZONE 'UTC' ) AS "time",
      avg( d.usage ),
      d.database
  FROM data d
@@ -775,7 +775,7 @@
    m.snapshot AS "time",
    sum(COALESCE( (m.value_jsonb->>'usage_count_3')::bigint, 0 ) * 8 * 1024) as "usage",
    m.value_jsonb->>'datname' as "database"
- FROM manager.metric m
+ FROM metric m
  WHERE
    $__unixEpochFilter(m.ts) AND
    m.host = md5('$host')::uuid AND
@@ -785,7 +785,7 @@
  )
 
  SELECT
-     manager.time_bucket('"$interval"'::interval, to_timestamp(d.time) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(d.time) AT TIME ZONE 'UTC' ) AS "time",
      avg( d.usage ),
      d.database
  FROM data d
@@ -798,7 +798,7 @@
    m.snapshot AS "time",
    sum(COALESCE( (m.value_jsonb->>'buffers_count')::bigint, 0 ) * 8 * 1024) as "usage",
    m.value_jsonb->>'datname' as "database"
- FROM manager.metric m
+ FROM metric m
  WHERE
    $__unixEpochFilter(m.ts) AND
    m.host = md5('$host')::uuid AND
@@ -808,7 +808,7 @@
  )
 
  SELECT
-     manager.time_bucket('"$interval"'::interval, to_timestamp(d.time) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(d.time) AT TIME ZONE 'UTC' ) AS "time",
      avg( d.usage ),
      d.database
  FROM data d
@@ -820,7 +820,7 @@
      select
          snapshot,
          jsonb_array_elements(value_jsonb) as value_jsonb
-     from manager.metric where
+     from metric where
          $__unixEpochFilter(ts) AND
          host = md5('$host')::uuid AND
          plugin = md5('pg.user_tables')::uuid
@@ -843,7 +843,7 @@
  GROUP BY 1,2
  ORDER BY 1,2)
  SELECT
-     manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
      "table", avg(value)
  from data2
  GROUP BY 1,2
@@ -854,7 +854,7 @@
      select
          snapshot,
          jsonb_array_elements(value_jsonb) as value_jsonb
-     from manager.metric where
+     from metric where
          $__unixEpochFilter(ts) AND
          host = md5('$host')::uuid AND
          plugin = md5('pg.user_tables')::uuid
@@ -878,7 +878,7 @@
  ORDER BY 1,2)
 
  SELECT
-     manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
      "table", avg(value)
  from data2
  GROUP BY 1,2
@@ -889,7 +889,7 @@
      select
          snapshot,
          jsonb_array_elements(value_jsonb) as value_jsonb
-     from manager.metric where
+     from metric where
          $__unixEpochFilter(ts) AND
          host = md5('$host')::uuid AND
          plugin = md5('pg.user_tables')::uuid
@@ -912,7 +912,7 @@
  ORDER BY 1,2)
 
  SELECT
-     manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
      "table", avg(value)
  from data2
  GROUP BY 1,2
@@ -923,7 +923,7 @@
      select
          snapshot,
          jsonb_array_elements(value_jsonb) as value_jsonb
-     from manager.metric where
+     from metric where
          $__unixEpochFilter(ts) AND
          host = md5('$host')::uuid AND
          plugin = md5('pg.user_tables.io')::uuid
@@ -948,7 +948,7 @@
  ORDER BY 1 )
 
  SELECT
-     manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
      "table",
      avg(value)
  from data2
@@ -960,7 +960,7 @@
      select
          snapshot,
          jsonb_array_elements(value_jsonb) as value_jsonb
-     from manager.metric where
+     from metric where
          $__unixEpochFilter(ts) AND
          host = md5('$host')::uuid AND
          plugin = md5('pg.user_tables.io')::uuid
@@ -986,7 +986,7 @@
  )
 
  SELECT
-     manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
      "table", avg(value)
  from data2
  GROUP BY 1,2
@@ -997,7 +997,7 @@
      select
          snapshot,
          jsonb_array_elements(value_jsonb) as value_jsonb
-     from manager.metric where
+     from metric where
          $__unixEpochFilter(ts) AND
          host = md5('$host')::uuid AND
          plugin = md5('pg.user_tables.io')::uuid
@@ -1021,7 +1021,7 @@
  ORDER BY 1)
 
  SELECT
-     manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
      "table", avg(value)
  from data2
  GROUP BY 1,2
@@ -1029,10 +1029,10 @@
 |||,
     row_wal_checkpoint_count: |||
  SELECT
-   manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+   time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
    avg( (value_jsonb->>'checkpoints_timed')::bigint ) as "timed",
    avg( (value_jsonb->>'checkpoints_req')::bigint ) as "required"
- FROM manager.metric
+ FROM metric
  WHERE
    $__unixEpochFilter(ts) AND
    host = md5('$host')::uuid AND
@@ -1042,10 +1042,10 @@
 |||,
     row_wal_checkpoint_time: |||
  SELECT
-   manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+   time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
    avg( (value_jsonb->>'checkpoint_write_time')::float8 ) as "write",
    avg( (value_jsonb->>'checkpoint_sync_time')::float8 ) as "sync"
- FROM manager.metric
+ FROM metric
  WHERE
    $__unixEpochFilter(ts) AND
    host = md5('$host')::uuid AND
@@ -1055,9 +1055,9 @@
 |||,
     row_wal_generation: |||
  SELECT
-   manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+   time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
    avg(value_double) as "wal generation speed"
- from manager.metric where
+ from metric where
    $__unixEpochFilter(ts) AND
    host = md5('$host')::uuid AND
    plugin = md5('pg.wal.speed')::uuid
@@ -1068,7 +1068,7 @@
  with slots as (
   select
    distinct(jsonb_object_keys(value_jsonb)) as name
-  from manager.metric where
+  from metric where
    $__unixEpochFilter(ts) AND
    host = md5('$host')::uuid AND
    plugin = md5('pg.replication_slots')::uuid
@@ -1077,7 +1077,7 @@
    ts as "ts",
    sum(coalesce((m.value_jsonb->>(s.name))::bigint, 0)) as "value",
    s.name
- from manager.metric m, slots s
+ from metric m, slots s
  where
    $__unixEpochFilter(ts) AND
    host = md5('$host')::uuid AND
@@ -1086,7 +1086,7 @@
  order by ts, s.name
  )
  SELECT
-     manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
      avg(value),
      name
  from data2
@@ -1099,7 +1099,7 @@
    (value_jsonb->>'buffers_checkpoint')::float8 * 8 * 1024 as "checkpoint",
    (value_jsonb->>'buffers_clean')::float8 * 8 * 1024 as "bgwriter",
    (value_jsonb->>'buffers_backend')::float8 * 8 * 1024 as "backend"
- FROM manager.metric
+ FROM metric
  WHERE
    $__unixEpochFilter(ts) AND
    host = md5('$host')::uuid AND
@@ -1107,7 +1107,7 @@
  ORDER BY 1)
 
  SELECT
-     manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
      avg(checkpoint) as "checkpoint",
      avg(bgwriter) as "bgwriter",
      avg(backend) as "backend"
@@ -1117,7 +1117,7 @@
 |||,
     row_system_cpu: |||
  SELECT
-   manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+   time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
    avg( (value_jsonb->>'user')::float8 ) / 100 AS "user",
    avg( (value_jsonb->>'nice')::float8 ) / 100 AS "nice",
    avg( (value_jsonb->>'system')::float8 ) / 100 AS "system",
@@ -1128,7 +1128,7 @@
    avg( (value_jsonb->>'steal')::float8 ) / 100 AS "steal",
    avg( (value_jsonb->>'guest')::float8 ) / 100 AS "guest",
    avg( (value_jsonb->>'guest_nice')::float8 ) AS "guest_nice"
- FROM manager.metric
+ FROM metric
  WHERE
    $__unixEpochFilter(ts) AND
    host = md5('$host')::uuid AND
@@ -1138,9 +1138,9 @@
 |||,
     row_system_cpu_processes_running: |||
  SELECT
-   manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+   time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
    avg( value_bigint ) AS "running process"
- FROM manager.metric
+ FROM metric
  WHERE
    $__unixEpochFilter(ts) AND
    host = md5('$host')::uuid AND
@@ -1150,9 +1150,9 @@
 |||,
     row_system_cpu_processes_blocked: |||
  SELECT
-   manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+   time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
    avg( value_bigint ) AS "blocked process"
- FROM manager.metric
+ FROM metric
  WHERE
    $__unixEpochFilter(ts) AND
    host = md5('$host')::uuid AND
@@ -1162,9 +1162,9 @@
 |||,
     row_system_cpu_processes_fork_rate: |||
  SELECT
-   manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+   time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
    avg( value_double ) AS "fork-rate"
- FROM manager.metric
+ FROM metric
  WHERE
    $__unixEpochFilter(ts) AND
    host = md5('$host')::uuid AND
@@ -1174,13 +1174,13 @@
 |||,
     row_system_memory: |||
  SELECT
-   manager.time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+   time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
    avg( (value_jsonb->>'MemFree')::bigint) AS "MemFree",
    avg( (value_jsonb->>'Buffers')::bigint) AS "Buffers",
    avg( (value_jsonb->>'Cached')::bigint) AS "Cached",
    avg( (value_jsonb->>'Dirty')::bigint) AS "Dirty",
    avg( (value_jsonb->>'Slab')::bigint) AS "Slab"
- FROM manager.metric
+ FROM metric
  WHERE
    $__unixEpochFilter(ts) AND
    host = md5('$host')::uuid AND
@@ -1194,7 +1194,7 @@
    ts AS "time",
    value_jsonb->>'mountpoint' as "mountpoint",
    sum(coalesce((value_jsonb->>'utilization')::float8,0)) as "value"
- FROM manager.metric
+ FROM metric
  WHERE
    $__unixEpochFilter(ts) AND
    host = md5('$host')::uuid AND
@@ -1203,7 +1203,7 @@
  ORDER BY 1
  )
  SELECT
-     manager.time_bucket('"$interval"'::interval, to_timestamp(time) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(time) AT TIME ZONE 'UTC' ) AS "time",
      mountpoint, avg(value) / 100
  from data
  GROUP BY 1,2
@@ -1215,7 +1215,7 @@
    ts AS "time",
    value_jsonb->>'mountpoint' as "mountpoint",
    sum((value_jsonb->>'await')::float8) as "value"
- FROM manager.metric
+ FROM metric
  WHERE
    $__unixEpochFilter(ts) AND
    host = md5('$host')::uuid AND
@@ -1225,7 +1225,7 @@
  )
 
  SELECT
-     manager.time_bucket('"$interval"'::interval, to_timestamp(time) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(time) AT TIME ZONE 'UTC' ) AS "time",
      mountpoint, avg(value)
  from data
  GROUP BY 1,2

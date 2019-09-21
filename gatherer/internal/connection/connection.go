@@ -27,6 +27,7 @@ func Preload(L *lua.LState) int {
 		"query":                 query,
 		"available_connections": availableConnections,
 		"background_query":      runBackgroundQuery,
+		"insert_metric":         setMetric,
 	}))
 	backgroundQueryUd := L.NewTypeMetatable(`background_query_ud`)
 	L.SetGlobal(`background_query_ud`, backgroundQueryUd)

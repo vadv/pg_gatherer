@@ -10,8 +10,6 @@ import (
 
 	"github.com/vadv/pg_gatherer/gatherer/internal/cache"
 
-	"github.com/vadv/pg_gatherer/gatherer/internal/manager"
-
 	"github.com/vadv/pg_gatherer/gatherer/internal/connection"
 
 	libs "github.com/vadv/gopher-lua-libs"
@@ -58,17 +56,10 @@ type pluginConfig struct {
 	rootDir        string // root directory of plugins
 	pluginName     string // directory name of plugin
 	globalCacheDir string // cache directory
-	db             *Connection
-	manager        *Connection
+	connections    map[string]*Connection
 }
 
 func createPlugin(config *pluginConfig) (*plugin, error) {
-	if config.db == nil {
-		return nil, fmt.Errorf("empty db info")
-	}
-	if config.manager == nil {
-		return nil, fmt.Errorf("empty manager info")
-	}
 	if config.host == `` {
 		return nil, fmt.Errorf("empty host info")
 	}
@@ -79,11 +70,6 @@ func createPlugin(config *pluginConfig) (*plugin, error) {
 			Host:       config.host,
 		},
 	}
-	// try to find in embedded
-	if _, err := os.Stat(filepath.Join(config.rootDir, "embedded", config.pluginName, "plugin.lua")); err == nil {
-		result.fileName = filepath.Join(config.rootDir, "embedded", config.pluginName, "plugin.lua")
-	}
-	// try to find in main place
 	if _, err := os.Stat(filepath.Join(config.rootDir, config.pluginName, "plugin.lua")); err == nil {
 		result.fileName = filepath.Join(config.rootDir, config.pluginName, "plugin.lua")
 	}
@@ -108,15 +94,12 @@ func (p *plugin) prepareState() error {
 	if err := state.DoFile(filepath.Join(p.config.rootDir, "init.lua")); err != nil {
 		return fmt.Errorf("while load init.lua: %s", err.Error())
 	}
-	// connection
 	connection.Preload(state)
-	connection.New(state, `connection`, p.config.db.Host, p.config.db.DBName,
-		p.config.db.UserName, p.config.db.Password, p.config.db.Port, p.config.db.Params)
-	// manager
-	manager.Preload(state)
-	manager.New(state, `manager`, p.config.host, connection.BuildConnectionString(p.config.manager.Host,
-		p.config.manager.DBName, p.config.manager.Port, p.config.manager.UserName, p.config.manager.Password,
-		p.config.manager.Params))
+	for name, conn := range p.config.connections {
+		// connection
+		connection.New(state, name, conn.Host, conn.DBName,
+			conn.UserName, conn.Password, conn.Port, conn.Params)
+	}
 	// cache
 	cache.Preload(state)
 	cachePath := filepath.Join(p.config.globalCacheDir, p.config.host, p.config.pluginName, "cache.sqlite")
