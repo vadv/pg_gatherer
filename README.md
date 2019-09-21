@@ -58,24 +58,25 @@ cache_dir: /tmp/gatherer # plugins cache, temporary dir
 
 hosts:
 
-  - host: peripheral-db-1 # name of target in manager-db
+  peripheral-db-1: # name of target in manager-db
 
     plugins: # list of plugins which can be activated on this target
       - activity
       - databases
       ...
 
-    manager: # manager connection
-      host: /tmp
-      dbname: gatherer
-      username: manager
-      port: 5432
+    connections:
+      manager: # manager connection
+        host: /tmp
+        dbname: gatherer
+        username: manager
+        port: 5432
 
-    agent: # target agent connection
-      host: 192.168.1.1
-      dbname: your_database
-      username: monitor
-      port: 5432
+      agent: # target agent connection
+        host: 192.168.1.1
+        dbname: your_database
+        username: monitor
+        port: 5432
 ```
 
 # Build status
