@@ -39,8 +39,8 @@ then you get additional statistics, for example link /proc/{pid}/io stats with q
 
 ## Installation
 
-* Install manager database.
-* Apply [migration](/schema/schema.sql) on manager database.
+* Install storage database.
+* Apply [migration](/schema/schema.sql) on storage database.
 * Create user on targets with [pg_monitor](https://www.postgresql.org/docs/10/default-roles.html) rights.
 * Get && run agent.
 * Also, if you use TimescaleDB, when you can use Grafana [dashboard](/grafana).
@@ -58,7 +58,7 @@ cache_dir: /tmp/gatherer # plugins cache, temporary dir
 
 hosts:
 
-  peripheral-db-1: # name of target in manager-db
+  peripheral-db-1: # name of target in storage-db
 
     plugins: # list of plugins which can be activated on this target
       - activity
