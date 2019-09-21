@@ -5,9 +5,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/vadv/pg_gatherer/gatherer/internal/plugins"
 
@@ -46,6 +49,18 @@ func main() {
 		os.Exit(1)
 	}
 
+	// http
+	m := http.NewServeMux()
+	httpServer := &http.Server{Addr: config.HttpListen, Handler: m}
+	m.Handle("/", http.RedirectHandler("/metrics", http.StatusFound))
+	m.Handle("/metrics", promhttp.Handler())
+	go func() {
+		if errListen := httpServer.ListenAndServe(); errListen != nil {
+			log.Printf("[FATAL] http listen: %s\n", errListen.Error())
+			os.Exit(2)
+		}
+	}()
+
 	pool := plugins.NewPool(config.PluginsDir, config.CacheDir)
 	for host, hostConfig := range config.Hosts {
 		log.Printf("[INFO] register host: '%s'\n", host)
@@ -55,7 +70,7 @@ func main() {
 			if errPl := pool.AddPluginToHost(pl, host); errPl != nil {
 				log.Printf("[FATAL] register plugin '%s' for host '%s': %s\n",
 					pl, host, errPl.Error())
-				os.Exit(2)
+				os.Exit(3)
 			}
 		}
 	}

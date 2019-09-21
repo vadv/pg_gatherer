@@ -10,6 +10,7 @@ import (
 type Config struct {
 	PluginsDir string                        `yaml:"plugins_dir"`
 	CacheDir   string                        `yaml:"cache_dir"`
+	HttpListen string                        `yaml:"http_listen"`
 	Hosts      map[string]HostConfigurations `yaml:"hosts"`
 }
 
