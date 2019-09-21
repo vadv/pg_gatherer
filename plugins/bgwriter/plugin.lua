@@ -6,7 +6,7 @@ local sql_bgwriter, err = ioutil.read_file(filepath.join(current_dir, "bgwriter.
 if err then error(err) end
 
 local function collect()
-  local result = connection:query(sql_bgwriter, every)
+  local result = agent:query(sql_bgwriter, every)
   for _, row in pairs(result.rows) do
     local jsonb, err = json.decode(row[2])
     if err then error(err) end

@@ -6,7 +6,7 @@ local sql_statements, err = ioutil.read_file(filepath.join(current_dir, "stateme
 if err then error(err) end
 
 local function collect()
-  local result                    = connection:query(sql_statements, every)
+  local result                    = agent:query(sql_statements, every)
   local statements_data, snapshot = {}, nil
   for _, row in pairs(result.rows) do
     if not snapshot then snapshot = row[1] end

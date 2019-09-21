@@ -12,7 +12,7 @@ local snapshot = nil
 local user_tables_stat_data, user_tables_io_data = {}, {}
 
 local function collect_for_db()
-  local result = connection:query(sql_user_tables, every)
+  local result = agent:query(sql_user_tables, every)
   for _, row in pairs(result.rows) do
     if not snapshot then snapshot = row[1] end
     local jsonb, err = json.decode(row[2])
@@ -46,7 +46,7 @@ local function collect_for_db()
 
   snapshot = nil
 
-  local result = connection:query(sql_user_tables_io, every)
+  local result = agent:query(sql_user_tables_io, every)
   for _, row in pairs(result.rows) do
     if not snapshot then snapshot = row[1] end
     local jsonb, err = json.decode(row[2])
@@ -72,7 +72,7 @@ end
 
 local function collect()
   snapshot, user_tables_stat_data, user_tables_io_data = nil, {}, {}
-  for _, conn in pairs(connection:available_connections()) do
+  for _, conn in pairs(agent:available_agents()) do
     collect_for_db(conn)
   end
   local jsonb, err = json.encode(user_tables_stat_data)

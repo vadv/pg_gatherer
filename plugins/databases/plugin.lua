@@ -6,7 +6,7 @@ local sql_databases, err = ioutil.read_file(filepath.join(current_dir, "database
 if err then error(err) end
 
 local function collect()
-  local result = connection:query(sql_databases, 60)
+  local result = agent:query(sql_databases, 60)
   for _, row in pairs(result.rows) do
     local jsonb, err = json.decode(row[2])
     if err then error(err) end

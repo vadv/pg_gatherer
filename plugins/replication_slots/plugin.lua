@@ -9,7 +9,7 @@ local sql_replication_slots, err = ioutil.read_file(replication_slots_file)
 if err then error(err) end
 
 local function collect()
-  local result = connection:query(sql_replication_slots)
+  local result = agent:query(sql_replication_slots)
   local jsonb  = {}
   for _, row in pairs(result.rows) do
     jsonb[row[1]] = tonumber(row[2])

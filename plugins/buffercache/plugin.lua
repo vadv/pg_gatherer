@@ -81,7 +81,7 @@ local function collect_for_db(conn)
 end
 
 local function collect()
-  for _, conn in pairs(connection:available_connections()) do
+  for _, conn in pairs(agent:available_agents()) do
     collect_for_db(conn)
   end
 end

@@ -6,7 +6,7 @@ local sql_block, err = ioutil.read_file(filepath.join(current_dir, "block.sql"))
 if err then error(err) end
 
 local function collect()
-  local result = connection:query(sql_block, every)
+  local result = agent:query(sql_block, every)
   for _, row in pairs(result.rows) do
     manager:send_metric({ plugin = plugin, snapshot = row[1], json = row[2] })
   end
