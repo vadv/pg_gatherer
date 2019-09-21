@@ -15,6 +15,13 @@ HOST_DEV_DIR = os.getenv('HOST_DEV_DIR') or '/dev'
 HOST_SYS_DIR = os.getenv('HOST_SYS_DIR') or '/sys'
 HOST_PROC_DIR = os.getenv('HOST_PROC_DIR') or '/proc'
 
+-- read file in plugin dir
+function read_file_in_current_dir(filename)
+  local data, err = ioutil.read_file(filepath.join(plugin:dir(), filename))
+  if err then error(err) end
+  return data
+end
+
 -- return true if database hosted on rds
 function is_rds()
   return not(not(

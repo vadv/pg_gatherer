@@ -1,27 +1,24 @@
-local plugin          = 'pg.uptime'
-local every           = 300
+local plugin_name             = 'pg.uptime'
+local every                   = 300
 
-local current_dir     = filepath.join(root, "uptime")
-local sql_uptime, err = ioutil.read_file(filepath.join(current_dir, "uptime.sql"))
-if err then error(err) end
-local sql_checkpointer_uptime, err = ioutil.read_file(filepath.join(current_dir, "checkpointer_uptime_10.sql"))
-if err then error(err) end
+local sql_uptime              = read_file_in_current_dir("uptime.sql")
+local sql_checkpointer_uptime = read_file_in_current_dir("checkpointer_uptime_10.sql")
 
 local function collect_9()
   local result = target:query(sql_uptime)
   for _, row in pairs(result.rows) do
-    storage:insert_metric({ plugin = plugin, int = row[1] })
+    storage:insert_metric({ plugin = plugin_name, int = row[1] })
   end
 end
 
 local function collect_10()
   local result = target:query(sql_uptime)
   for _, row in pairs(result.rows) do
-    storage:insert_metric({ plugin = plugin, int = row[1] })
+    storage:insert_metric({ plugin = plugin_name, int = row[1] })
   end
   local result = target:query(sql_checkpointer_uptime)
   for _, row in pairs(result.rows) do
-    storage:insert_metric({ plugin = plugin .. ".checkpointer", int = row[1] })
+    storage:insert_metric({ plugin = plugin_name .. ".checkpointer", int = row[1] })
   end
 end
 

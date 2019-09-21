@@ -1,5 +1,5 @@
-local plugin = 'linux.diskstats'
-local every  = 10
+local plugin_name = 'linux.diskstats'
+local every       = 10
 
 if not goos.stat(HOST_PROC_DIR .. '/diskstats') then
   print('disabled diskstats plugin, because /proc/diskstats not found')
@@ -8,8 +8,7 @@ if not goos.stat(HOST_PROC_DIR .. '/diskstats') then
   end
 end
 
-local current_dir = filepath.join(root, "linux_diskstats")
-local helper      = dofile(filepath.join(current_dir, "helper_disk_stat.lua"))
+local helper = dofile(filepath.join(plugin:dir(), "helper_disk_stat.lua"))
 
 local function collect()
 
@@ -57,14 +56,14 @@ local function collect()
     end
     -- send calculated values
     local jsonb       = { mountpoint = mountpoint }
-    jsonb.utilization = cache:speed_and_set(plugin .. "utilization" .. mountpoint, utilization)
+    jsonb.utilization = cache:speed_and_set(plugin_name .. "utilization" .. mountpoint, utilization)
     jsonb.await       = await
     for _, key in pairs({ 'read_bytes', 'write_bytes', 'read_ops', 'write_ops' }) do
-      jsonb[key] = cache:speed_and_set(plugin .. key .. mountpoint, all_stats[dev][key])
+      jsonb[key] = cache:speed_and_set(plugin_name .. key .. mountpoint, all_stats[dev][key])
     end
     local jsonb, err = json.encode(jsonb)
     if err then error(err) end
-    storage:insert_metric({ plugin = plugin, json = jsonb })
+    storage:insert_metric({ plugin = plugin_name, json = jsonb })
   end
 
 end

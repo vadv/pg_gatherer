@@ -1,9 +1,7 @@
-local plugin              = 'pg.statements'
-local every               = 60
+local plugin_name    = 'pg.statements'
+local every          = 60
 
-local current_dir         = filepath.join(root, "statements")
-local sql_statements, err = ioutil.read_file(filepath.join(current_dir, "statements.sql"))
-if err then error(err) end
+local sql_statements = read_file_in_current_dir("statements.sql")
 
 local function collect()
   local result                    = target:query(sql_statements, every)
@@ -34,7 +32,7 @@ local function collect()
   end
   local jsonb, err = json.encode(statements_data)
   if err then error(err) end
-  storage:insert_metric({ plugin = plugin, snapshot = snapshot, json = jsonb })
+  storage:insert_metric({ plugin = plugin_name, snapshot = snapshot, json = jsonb })
 end
 
 run_every(collect, every)
