@@ -9,14 +9,14 @@ local sql_replication_slots, err = ioutil.read_file(replication_slots_file)
 if err then error(err) end
 
 local function collect()
-  local result = agent:query(sql_replication_slots)
+  local result = target:query(sql_replication_slots)
   local jsonb  = {}
   for _, row in pairs(result.rows) do
     jsonb[row[1]] = tonumber(row[2])
   end
   local jsonb, err = json.encode(jsonb)
   if err then error(err) end
-  manager:insert_metric({ plugin = plugin, json = jsonb })
+  storage:insert_metric({ plugin = plugin, json = jsonb })
 end
 
 run_every(collect, every)

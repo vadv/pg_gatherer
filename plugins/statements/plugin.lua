@@ -6,7 +6,7 @@ local sql_statements, err = ioutil.read_file(filepath.join(current_dir, "stateme
 if err then error(err) end
 
 local function collect()
-  local result                    = agent:query(sql_statements, every)
+  local result                    = target:query(sql_statements, every)
   local statements_data, snapshot = {}, nil
   for _, row in pairs(result.rows) do
     if not snapshot then snapshot = row[1] end
@@ -34,7 +34,7 @@ local function collect()
   end
   local jsonb, err = json.encode(statements_data)
   if err then error(err) end
-  manager:insert_metric({ plugin = plugin, snapshot = snapshot, json = jsonb })
+  storage:insert_metric({ plugin = plugin, snapshot = snapshot, json = jsonb })
 end
 
 run_every(collect, every)

@@ -22,8 +22,8 @@ func TestPool(t *testing.T) {
 		UserName: "gatherer",
 	}
 	connections := make(map[string]*plugins.Connection, 0)
-	connections[`agent`] = conn
-	connections[`manager`] = conn
+	connections[`target`] = conn
+	connections[`storage`] = conn
 	pool.RegisterHost(hostname, connections)
 
 	// delete caches

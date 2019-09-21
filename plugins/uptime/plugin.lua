@@ -8,20 +8,20 @@ local sql_checkpointer_uptime, err = ioutil.read_file(filepath.join(current_dir,
 if err then error(err) end
 
 local function collect_9()
-  local result = agent:query(sql_uptime)
+  local result = target:query(sql_uptime)
   for _, row in pairs(result.rows) do
-    manager:insert_metric({ plugin = plugin, int = row[1] })
+    storage:insert_metric({ plugin = plugin, int = row[1] })
   end
 end
 
 local function collect_10()
-  local result = agent:query(sql_uptime)
+  local result = target:query(sql_uptime)
   for _, row in pairs(result.rows) do
-    manager:insert_metric({ plugin = plugin, int = row[1] })
+    storage:insert_metric({ plugin = plugin, int = row[1] })
   end
-  local result = agent:query(sql_checkpointer_uptime)
+  local result = target:query(sql_checkpointer_uptime)
   for _, row in pairs(result.rows) do
-    manager:insert_metric({ plugin = plugin .. ".checkpointer", int = row[1] })
+    storage:insert_metric({ plugin = plugin .. ".checkpointer", int = row[1] })
   end
 end
 

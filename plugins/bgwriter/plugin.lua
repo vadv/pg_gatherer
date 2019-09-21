@@ -6,7 +6,7 @@ local sql_bgwriter, err = ioutil.read_file(filepath.join(current_dir, "bgwriter.
 if err then error(err) end
 
 local function collect()
-  local result = agent:query(sql_bgwriter, every)
+  local result = target:query(sql_bgwriter, every)
   for _, row in pairs(result.rows) do
     local jsonb, err = json.decode(row[2])
     if err then error(err) end
@@ -22,7 +22,7 @@ local function collect()
     jsonb.buffers_backend       = cache:speed_and_set("buffers_backend", jsonb.buffers_backend)
     jsonb, err                  = json.encode(jsonb)
     if err then error(err) end
-    manager:insert_metric({ plugin = plugin_name, snapshot = row[1], json = jsonb })
+    storage:insert_metric({ plugin = plugin_name, snapshot = row[1], json = jsonb })
   end
 end
 

@@ -18,29 +18,29 @@ local helpers = dofile(filepath.join(current_dir, "linux_helper_proc_stat.lua"))
 
 -- process states
 local function states()
-  local result = agent:query(sql_states, every)
+  local result = target:query(sql_states, every)
   local jsonb  = {}
   for _, row in pairs(result.rows) do
     jsonb[row[1]] = tonumber(row[2])
   end
   local jsonb, err = json.encode(jsonb)
   if err then error(err) end
-  manager:insert_metric({ plugin = plugin_name .. ".states", json = jsonb })
+  storage:insert_metric({ plugin = plugin_name .. ".states", json = jsonb })
 end
 
 -- process waits
 local function waits()
-  local result = agent:query(sql_waits, every)
+  local result = target:query(sql_waits, every)
   for _, row in pairs(result.rows) do
-    manager:insert_metric({ plugin = plugin_name .. ".waits", snapshot = row[1], json = row[2] })
+    storage:insert_metric({ plugin = plugin_name .. ".waits", snapshot = row[1], json = row[2] })
   end
 end
 
 -- collect on rds
 local function collect_rds()
-  local result = agent:query(sql_activity, every)
+  local result = target:query(sql_activity, every)
   for _, row in pairs(result.rows) do
-    manager:insert_metric({ plugin = plugin_name, snapshot = row[1], json = row[2] })
+    storage:insert_metric({ plugin = plugin_name, snapshot = row[1], json = row[2] })
   end
   states()
   waits()
@@ -49,7 +49,7 @@ end
 -- collect on localhost
 local function collect_local()
   -- process activity
-  local result = agent:query(sql_activity, every)
+  local result = target:query(sql_activity, every)
   for _, row in pairs(result.rows) do
     local jsonb, err = json.decode(row[2])
     if err then error(err) end
@@ -74,7 +74,7 @@ local function collect_local()
     end
     local jsonb, err = json.encode(jsonb)
     if err then error(err) end
-    manager:insert_metric({ plugin = plugin_name, snapshot = row[1], json = jsonb })
+    storage:insert_metric({ plugin = plugin_name, snapshot = row[1], json = jsonb })
   end
   states()
   waits()

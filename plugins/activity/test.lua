@@ -1,4 +1,4 @@
-agent:background_query("select pg_sleep(120)")
+target:background_query("select pg_sleep(120)")
 
 local activity_metric_exists = function()
   return (

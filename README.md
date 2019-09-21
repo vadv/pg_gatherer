@@ -10,11 +10,11 @@ The project is designed to collect and store statistical data of PostgreSQL into
        |      +------------------+
        v
 +------+-------+                        +---------------+
-|   Manager    |     +----------------->+   Target # 1  |
+|   storage    |     +----------------->+   Target # 1  |
 +------+-------+     |                  +---------------+
        ^             |
        |     +-------+--------+         +---------------+
-       +-----+     Agent      +-------->+   Target # N  |
+       +-----+   pg_gatherer  +-------->+   Target # N  |
              +---------+------+         +---------------+
                        |
 +----------------+     |         +-----------------------+
@@ -26,7 +26,7 @@ The project is designed to collect and store statistical data of PostgreSQL into
 
 Targets databases, which agent monitoring.
 
-## Manager
+## Storage
 
 PostgreSQL database (recommended use [TimescaleDB](https://docs.timescale.com/latest/introduction) extension) in which information is stored.
 
@@ -66,16 +66,15 @@ hosts:
       ...
 
     connections:
-      manager: # manager connection
-        host: /tmp
-        dbname: gatherer
-        username: manager
-        port: 5432
-
-      agent: # target agent connection
+      target: # target agent connection
         host: 192.168.1.1
         dbname: your_database
         username: monitor
+        port: 5432
+      storage: # storage connection
+        host: /tmp
+        dbname: gatherer
+        username: storage
         port: 5432
 ```
 

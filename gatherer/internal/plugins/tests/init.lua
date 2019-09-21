@@ -14,7 +14,7 @@ function is_rds(conn)
   conn = conn or agent
   return not(not(
           pcall(function()
-              agent:query("show rds.extensions")
+              target:query("show rds.extensions")
           end)
   ))
 end
@@ -23,7 +23,7 @@ end
 function get_pg_server_version(conn)
   conn = conn or agent
   if pg_server_version then return pg_server_version end
-  local version = agent:query("show server_version")
+  local version = target:query("show server_version")
   pg_server_version = tonumber(version.rows[1][1])
   return pg_server_version
 end

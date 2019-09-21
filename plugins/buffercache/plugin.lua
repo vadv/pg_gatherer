@@ -77,11 +77,11 @@ local function collect_for_db(conn)
   jsonb.per_relation_stat = per_relation_stat
   local jsonb, err        = json.encode(jsonb)
   if err then error(err) end
-  manager:insert_metric({ plugin = plugin, snapshot = snapshot, json = jsonb })
+  storage:insert_metric({ plugin = plugin, snapshot = snapshot, json = jsonb })
 end
 
 local function collect()
-  for _, conn in pairs(agent:available_connections()) do
+  for _, conn in pairs(target:available_connections()) do
     collect_for_db(conn)
   end
 end
