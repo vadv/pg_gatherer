@@ -4,7 +4,7 @@ local sql = import 'dashboard_sql.libsonnet';
 local dashboard = grafana.dashboard.new('PostgreSQL (pg_gatherer)', tags=['postgresql', 'rds'], time_from='now-3h', timezone='UTC')
     .addTemplate(grafana.template.datasource('POSTGRES_DS', 'postgres', 'PostgreSQL', hide='label'))
     .addTemplate(grafana.template.datasource('PROMETHEUS_DS', 'prometheus', 'Prometheus', hide='label'))
-    .addTemplate(grafana.template.new('host', '$POSTGRES_DS', 'select name from manager.host order by name;', refresh='load'))
+    .addTemplate(grafana.template.new('host', '$POSTGRES_DS', 'select name from host order by name;', refresh='load'))
     .addTemplate(grafana.template.custom('interval', '1 minute,10 minute,20 minute,1 hour', '20 minute'));
 
 local statInstanceRow = grafana.row.new( title='Instance stat', collapse=false, height='40px')

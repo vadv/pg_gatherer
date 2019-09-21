@@ -30,12 +30,12 @@ Targets databases, which agent monitoring.
 
 PostgreSQL database (recommended use [TimescaleDB](https://docs.timescale.com/latest/introduction) extension) in which information is stored.
 
-## Agent
+## Pg_Gatherer
 
 The agent is golang-binary, with plugins written in Lua (without any system dependencies).
 
 You can run agent locally on machine `Target`,
-then you get additional statistics, for example link /proc/{pid}/io stats with query.
+then you get additional statistics, for example link `/proc/{pid}/io` stats with query.
 
 ## Installation
 
