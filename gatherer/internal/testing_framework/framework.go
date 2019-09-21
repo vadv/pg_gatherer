@@ -37,7 +37,7 @@ func New(L *lua.LState, rootDir, cacheDir, pluginName, host, dbname, user, passw
 		Params:   params,
 	}
 	connections := make(map[string]*plugins.Connection)
-	connections[`connection`] = conn
+	connections[`agent`] = conn
 	connections[`manager`] = conn
 	f := &framework{
 		pool:       pool,
