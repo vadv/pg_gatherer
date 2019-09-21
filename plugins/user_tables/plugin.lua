@@ -72,7 +72,7 @@ end
 
 local function collect()
   snapshot, user_tables_stat_data, user_tables_io_data = nil, {}, {}
-  for _, conn in pairs(agent:available_agents()) do
+  for _, conn in pairs(agent:available_connections()) do
     collect_for_db(conn)
   end
   local jsonb, err = json.encode(user_tables_stat_data)
