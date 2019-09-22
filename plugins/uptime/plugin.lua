@@ -7,18 +7,18 @@ local sql_checkpointer_uptime = read_file_in_current_dir("checkpointer_uptime_10
 local function collect_9()
   local result = target:query(sql_uptime)
   for _, row in pairs(result.rows) do
-    storage:insert_metric({ plugin = plugin_name, int = row[1] })
+    storage_insert_metric({ plugin = plugin_name, int = row[1] })
   end
 end
 
 local function collect_10()
   local result = target:query(sql_uptime)
   for _, row in pairs(result.rows) do
-    storage:insert_metric({ plugin = plugin_name, int = row[1] })
+    storage_insert_metric({ plugin = plugin_name, int = row[1] })
   end
   local result = target:query(sql_checkpointer_uptime)
   for _, row in pairs(result.rows) do
-    storage:insert_metric({ plugin = plugin_name .. ".checkpointer", int = row[1] })
+    storage_insert_metric({ plugin = plugin_name .. ".checkpointer", int = row[1] })
   end
 end
 

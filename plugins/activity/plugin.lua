@@ -19,14 +19,14 @@ local function states()
   end
   local jsonb, err = json.encode(jsonb)
   if err then error(err) end
-  storage:insert_metric({ plugin = plugin_name .. ".states", json = jsonb })
+  storage_insert_metric({ plugin = plugin_name .. ".states", json = jsonb })
 end
 
 -- process waits
 local function waits()
   local result = target:query(sql_waits, every)
   for _, row in pairs(result.rows) do
-    storage:insert_metric({ plugin = plugin_name .. ".waits", snapshot = row[1], json = row[2] })
+    storage_insert_metric({ plugin = plugin_name .. ".waits", snapshot = row[1], json = row[2] })
   end
 end
 
@@ -34,7 +34,7 @@ end
 local function collect_rds()
   local result = target:query(sql_activity, every)
   for _, row in pairs(result.rows) do
-    storage:insert_metric({ plugin = plugin_name, snapshot = row[1], json = row[2] })
+    storage_insert_metric({ plugin = plugin_name, snapshot = row[1], json = row[2] })
   end
   states()
   waits()
@@ -68,7 +68,7 @@ local function collect_local()
     end
     local jsonb, err = json.encode(jsonb)
     if err then error(err) end
-    storage:insert_metric({ plugin = plugin_name, snapshot = row[1], json = jsonb })
+    storage_insert_metric({ plugin = plugin_name, snapshot = row[1], json = jsonb })
   end
   states()
   waits()

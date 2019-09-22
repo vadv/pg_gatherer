@@ -75,7 +75,7 @@ local function collect_for_db(conn)
   jsonb.per_relation_stat = per_relation_stat
   local jsonb, err        = json.encode(jsonb)
   if err then error(err) end
-  storage:insert_metric({ plugin = plugin_name, snapshot = snapshot, json = jsonb })
+  storage_insert_metric({ plugin = plugin_name, snapshot = snapshot, json = jsonb })
 end
 
 local function collect()

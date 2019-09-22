@@ -73,11 +73,11 @@ local function collect()
   end
   local jsonb, err = json.encode(user_tables_stat_data)
   if err then error(err) end
-  storage:insert_metric({ plugin = plugin_name, snapshot = snapshot, json = jsonb })
+  storage_insert_metric({ plugin = plugin_name, snapshot = snapshot, json = jsonb })
 
   local jsonb, err = json.encode(user_tables_io_data)
   if err then error(err) end
-  storage:insert_metric({ plugin = plugin_name .. ".io", snapshot = snapshot, json = jsonb })
+  storage_insert_metric({ plugin = plugin_name .. ".io", snapshot = snapshot, json = jsonb })
 end
 
 run_every(collect, every)
