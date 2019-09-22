@@ -22,7 +22,7 @@ func setMetric(L *lua.LState) int {
 	if err != nil {
 		L.RaiseError("parse metric: %s", err.Error())
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	_, err = ud.db.ExecContext(ctx, queryInsert,
 		m.host, m.plugin, m.snapshot, m.valueInteger, m.valueFloat64, m.valueJson)
