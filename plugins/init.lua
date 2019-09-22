@@ -7,6 +7,7 @@ json = require("json")
 ioutil = require("ioutil")
 crypto = require("crypto")
 goos = require("goos")
+humanize = require("humanize")
 
 -- current directory (root)
 root = filepath.dir(debug.getinfo(1).source)
@@ -65,8 +66,10 @@ function run_every(f, every)
       f()
       local exec_time = (time.unix() - start_at)
       if exec_time > every then
-        print(debug.getinfo(2).source, "execution timeout:", exec_time)
+        print("[ERROR] plugin", plugin:name(), "on host", plugin:host(), "execution timeout:", humanize.si(exec_time, "s"))
         time.sleep(1)
+      else
+        print("[INFO] plugin", plugin:name(), "on host", plugin:host(), "execution time:", humanize.si(exec_time, "s"))
       end
     else
       -- wait

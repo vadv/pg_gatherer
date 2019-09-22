@@ -1,6 +1,11 @@
 package connection
 
-import lua "github.com/yuin/gopher-lua"
+import (
+	"context"
+	"time"
+
+	lua "github.com/yuin/gopher-lua"
+)
 
 const (
 	queryInsert = `
@@ -17,7 +22,9 @@ func setMetric(L *lua.LState) int {
 	if err != nil {
 		L.RaiseError("parse metric: %s", err.Error())
 	}
-	_, err = ud.db.Exec(queryInsert,
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	_, err = ud.db.ExecContext(ctx, queryInsert,
 		m.host, m.plugin, m.snapshot, m.valueInteger, m.valueFloat64, m.valueJson)
 	if err != nil {
 		L.RaiseError("save metric: %s", err.Error())
