@@ -5,16 +5,16 @@ The project is designed to collect and store statistical data of PostgreSQL into
 # Architecture
 
 ```
-              +------------------+
-       +------+     Grafana      |
-       |      +------------------+
-       v
-+------+-------+                        +---------------+
-|   Storage    |     +----------------->+   Target # 1  |
+           +------------+               +---------------+
+       +---+   Grafana  |          +--->+  Target # 1   |
+       |   +------------+          |    +---------------+
+       v                           |
++------+-------+                   |    +---------------+
+|   Storage    |     +-------------+--->+  Target # N   |
 +------+-------+     |                  +---------------+
        ^             |
        |     +-------+--------+         +---------------+
-       +-----+   pg_gatherer  +-------->+   Target # N  |
+       +-----+   pg_gatherer  +<--------+  Prometheus   |
              +---------+------+         +---------------+
                        |
 +----------------+     |         +-----------------------+
@@ -48,35 +48,30 @@ then you get additional statistics, for example link `/proc/{pid}/io` stats with
 
 ```bash
 go get github.com/vadv/pg_gatherer/gatherer/cmd/pg_gatherer
-pg_gatherer --config config.yaml
+pg_gatherer --config host-config.yaml --plugins /etc/pg_gatherer/plugins --cache /var/cache --http-listen 8080
 ```
 
-Config example:
+Host config example:
 
 ```yaml
-plugins_dir: ./plugins # path to directory with plugins
-cache_dir: /tmp/gatherer # plugins cache, temporary dir
+peripheral-db-1: # name of target in storage-db
 
-hosts:
+  plugins: # list of plugins which can be activated on this target
+    - activity
+    - databases
+    ...
 
-  peripheral-db-1: # name of target in storage-db
-
-    plugins: # list of plugins which can be activated on this target
-      - activity
-      - databases
-      ...
-
-    connections:
-      target: # target agent connection
-        host: 192.168.1.1
-        dbname: your_database
-        username: monitor
-        port: 5432
-      storage: # storage connection
-        host: /tmp
-        dbname: gatherer
-        username: storage
-        port: 5432
+  connections:
+    target: # target agent connection
+      host: 192.168.1.1
+      dbname: your_database
+      username: monitor
+      port: 5432
+    storage: # storage connection
+      host: /tmp
+      dbname: gatherer
+      username: storage
+      port: 5432
 ```
 
 # Build status

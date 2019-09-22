@@ -7,24 +7,19 @@ import (
 )
 
 // Config represent configuration of plugins
-type Config struct {
-	PluginsDir string                        `yaml:"plugins_dir"`
-	CacheDir   string                        `yaml:"cache_dir"`
-	HttpListen string                        `yaml:"http_listen"`
-	Hosts      map[string]HostConfigurations `yaml:"hosts"`
-}
+type Config map[string]HostConfiguration
 
-// HostConfigurations represent configurations of hosts
-type HostConfigurations struct {
+// HostConfiguration represent configurations of hosts
+type HostConfiguration struct {
 	Plugins     []string                       `yaml:"plugins,omitempty"`
 	Connections map[string]*plugins.Connection `yaml:"connections"`
 }
 
-func (c *Config) validate() error {
-	if len(c.Hosts) == 0 {
-		return fmt.Errorf("`hosts` is empty")
+func (c Config) validate() error {
+	if len(c) == 0 {
+		return fmt.Errorf("hosts configuration is empty")
 	}
-	for host, config := range c.Hosts {
+	for host, config := range c {
 		if len(config.Plugins) == 0 {
 			return fmt.Errorf("plugins is empty for host: %s", host)
 		}
