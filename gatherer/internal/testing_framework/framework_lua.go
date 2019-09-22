@@ -53,6 +53,12 @@ func lastError(L *lua.LState) int {
 	return 1
 }
 
+func hostName(L *lua.LState) int {
+	ud := checkUserDataFramework(L, 1)
+	L.Push(lua.LString(ud.host))
+	return 1
+}
+
 func getStatistic(L *lua.LState, ud *framework) *plugins.PluginStatistic {
 	statistic := ud.pool.PluginStatisticPerHost()
 	hostPluginStat, okPluginStatForHost := statistic[ud.host]

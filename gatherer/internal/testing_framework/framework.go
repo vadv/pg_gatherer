@@ -21,6 +21,7 @@ func Preload(L *lua.LState) int {
 		"restart_count": restartCount,
 		"error_count":   errorCount,
 		"last_error":    lastError,
+		"host":          hostName,
 	}))
 	return 0
 }
