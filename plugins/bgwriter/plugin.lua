@@ -20,7 +20,7 @@ local function collect()
     jsonb.buffers_backend       = cache:speed_and_set("buffers_backend", jsonb.buffers_backend)
     jsonb, err                  = json.encode(jsonb)
     if err then error(err) end
-    storage:insert_metric({ plugin = plugin_name, snapshot = row[1], json = jsonb })
+    storage_insert_metric({ plugin = plugin_name, snapshot = row[1], json = jsonb })
   end
 end
 

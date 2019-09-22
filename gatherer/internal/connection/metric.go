@@ -16,12 +16,12 @@ type metric struct {
 	valueJson    *string
 }
 
-func parseMetric(host string, table *lua.LTable) (*metric, error) {
-	m := &metric{host: host}
+func parseMetric(table *lua.LTable) (*metric, error) {
+	m := &metric{}
 	var err error
 	table.ForEach(func(k lua.LValue, v lua.LValue) {
 		switch strings.ToLower(k.String()) {
-		case `host`, `hostname`:
+		case `host`:
 			m.host = v.String()
 		case `plugin`:
 			m.plugin = v.String()
@@ -31,17 +31,17 @@ func parseMetric(host string, table *lua.LTable) (*metric, error) {
 				return
 			}
 			m.snapshot = int64(v.(lua.LNumber))
-		case `json`, `jsonb`, `value_json`, `value_jsonb`:
+		case `json`:
 			value := v.String()
 			m.valueJson = &value
-		case `int`, `integer`, `bigint`:
+		case `int`:
 			if v.Type() != lua.LTNumber {
 				err = fmt.Errorf("`int` must be number")
 				return
 			}
 			n := int64(v.(lua.LNumber))
 			m.valueInteger = &n
-		case `float`, `float64`:
+		case `float`:
 			if v.Type() != lua.LTNumber {
 				err = fmt.Errorf("`float` must be number")
 				return

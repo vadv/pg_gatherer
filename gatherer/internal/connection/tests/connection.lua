@@ -18,7 +18,7 @@ for _, v in pairs(connections) do
     check_ud(v)
 end
 
-local err = connection:insert_metric({plugin="plugin.int", int=10})
+local err = connection:insert_metric({host="tmp", plugin="plugin.int", int=10})
 if err then error(err) end
 
 local result, err = connection:query("select value_bigint from metric where plugin = md5('plugin.int')::uuid ")

@@ -27,10 +27,10 @@ local function collect()
     local wal_position, pg_is_in_recovery, time_lag = row[1], row[2], row[3]
     local wal_speed                                 = cache:speed_and_set("wal_speed", wal_position)
     if wal_speed then
-      storage:insert_metric({ plugin = plugin_name .. ".speed", float = wal_speed })
+      storage_insert_metric({ plugin = plugin_name .. ".speed", float = wal_speed })
     end
     if pg_is_in_recovery then
-      storage:insert_metric({ plugin = plugin_name .. ".replication_time_lag", float = time_lag })
+      storage_insert_metric({ plugin = plugin_name .. ".replication_time_lag", float = time_lag })
     end
   end
 end

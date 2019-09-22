@@ -13,7 +13,7 @@ local function collect()
   end
   local jsonb, err = json.encode(jsonb)
   if err then error(err) end
-  storage:insert_metric({ plugin = plugin_name, json = jsonb })
+  storage_insert_metric({ plugin = plugin_name, json = jsonb })
 end
 
 run_every(collect, every)

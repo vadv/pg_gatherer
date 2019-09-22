@@ -15,10 +15,10 @@ insert into metric
 `
 )
 
-func setMetric(L *lua.LState) int {
+func insertMetric(L *lua.LState) int {
 	ud := checkUserDataConnection(L, 1)
 	table := L.CheckTable(2)
-	m, err := parseMetric(ud.host, table)
+	m, err := parseMetric(table)
 	if err != nil {
 		L.RaiseError("parse metric: %s", err.Error())
 	}

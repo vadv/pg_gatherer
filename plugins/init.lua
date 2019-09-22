@@ -35,6 +35,12 @@ function is_rds()
   ))
 end
 
+-- insert metric with plugin:host()
+function storage_insert_metric(metric)
+  if not(metric.host) then metric.host = plugin:host() end
+  storage:insert_metric(metric)
+end
+
 -- return postgresql version
 function get_pg_server_version()
   if pg_server_version then return pg_server_version end
