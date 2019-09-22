@@ -11,8 +11,9 @@ from
   metric m
 where
   plugin = md5('%s')::uuid
+  and host = md5('%s')::uuid
   and ts > extract( epoch from (now()-'3 minute'::interval) )
-  ]], metric)
+  ]], metric, tested_plugin:host())
   local count = target:query(sql_query).rows[1][1]
   return not(count == 0)
 end
