@@ -11,7 +11,9 @@ create table metric (
 select create_hypertable('metric', 'ts', chunk_time_interval => 43200); /* comment if you don't use timescaledb */
 create index on metric (ts, plugin, host);
 
+-- table with registered host (with trigger you may decline changes in table metric)
 create table host (
   name text primary key,
-  maintenance bool default false
+  maintenance bool default false,
+  created_at timestamptz default now()
 );

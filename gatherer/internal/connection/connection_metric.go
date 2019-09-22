@@ -21,6 +21,12 @@ func insertMetric(L *lua.LState) int {
 	m, err := parseMetric(table)
 	if err != nil {
 		L.RaiseError("parse metric: %s", err.Error())
+		return 0
+	}
+	// create host
+	if errCreateHost := createHostIfNotExists(ud, m.host); errCreateHost != nil {
+		L.RaiseError("create host error: %s", errCreateHost.Error())
+		return 0
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
