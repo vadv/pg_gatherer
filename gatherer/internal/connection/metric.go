@@ -62,5 +62,13 @@ func parseMetric(host string, table *lua.LTable) (*metric, error) {
 	if m.valueInteger == nil && m.valueFloat64 == nil && m.valueJson == nil {
 		return nil, fmt.Errorf("empty value")
 	}
+	// lua `[]` -> json `{}`
+	if m.valueJson != nil {
+		valueJson := *m.valueJson
+		if valueJson == `[]` {
+			valueJson = `{}`
+			m.valueJson = &valueJson
+		}
+	}
 	return m, err
 }
