@@ -13,6 +13,7 @@ where
   plugin = md5('%s')::uuid
   and host = md5('%s')::uuid
   and ts > extract( epoch from (now()-'3 minute'::interval) )
+  and (value_jsonb::text <> '{}' or value_jsonb is null)
   ]], metric, tested_plugin:host())
   local result = target:query(sql_query).rows[1]
   if result and result[1] then

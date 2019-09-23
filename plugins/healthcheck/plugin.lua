@@ -1,5 +1,5 @@
 local plugin_name     = 'pg.healthcheck'
-local every           = 10
+local every           = 60
 
 local sql_healthcheck = read_file_in_plugin_dir("healthcheck.sql")
 
