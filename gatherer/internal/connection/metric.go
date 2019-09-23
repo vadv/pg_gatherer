@@ -10,7 +10,7 @@ import (
 type metric struct {
 	host         string
 	plugin       string
-	snapshot     int64
+	snapshot     *int64
 	valueInteger *int64
 	valueFloat64 *float64
 	valueJson    *string
@@ -30,7 +30,8 @@ func parseMetric(table *lua.LTable) (*metric, error) {
 				err = fmt.Errorf("`snapshot` must be number")
 				return
 			}
-			m.snapshot = int64(v.(lua.LNumber))
+			n := int64(v.(lua.LNumber))
+			m.snapshot = &n
 		case `json`:
 			value := v.String()
 			m.valueJson = &value

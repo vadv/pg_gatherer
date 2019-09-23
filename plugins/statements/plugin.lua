@@ -1,7 +1,7 @@
 local plugin_name    = 'pg.statements'
 local every          = 60
 
-local sql_statements = read_file_in_current_dir("statements.sql")
+local sql_statements = read_file_in_plugin_dir("statements.sql")
 
 local function collect()
   local result                    = target:query(sql_statements, every)

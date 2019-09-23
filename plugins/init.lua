@@ -8,6 +8,8 @@ ioutil = require("ioutil")
 crypto = require("crypto")
 goos = require("goos")
 log = require("log")
+humanize = require("humanize")
+strings = require("strings")
 
 plugin_log = log.new()
 plugin_log:set_flags({date=true, time=true})
@@ -20,7 +22,7 @@ HOST_SYS_DIR = os.getenv('HOST_SYS_DIR') or '/sys'
 HOST_PROC_DIR = os.getenv('HOST_PROC_DIR') or '/proc'
 
 -- read file in plugin dir
-function read_file_in_current_dir(filename)
+function read_file_in_plugin_dir(filename)
   local data, err = ioutil.read_file(filepath.join(plugin:dir(), filename))
   if err then error(err) end
   return data
@@ -33,6 +35,12 @@ function is_rds()
               target:query("show rds.extensions")
           end)
   ))
+end
+
+-- return unix ts from connection
+function get_unix_ts(conn)
+  conn = conn or target
+  return conn:query("select extract(epoch from now())::int").rows[1][1]
 end
 
 -- insert metric with plugin:host()

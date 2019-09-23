@@ -1,7 +1,7 @@
 local plugin_name  = 'pg.bgwriter'
 local every        = 60
 
-local sql_bgwriter = read_file_in_current_dir("bgwriter.sql")
+local sql_bgwriter = read_file_in_plugin_dir("bgwriter.sql")
 
 local function collect()
   local result = target:query(sql_bgwriter, every)

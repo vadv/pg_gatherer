@@ -1,7 +1,7 @@
 local plugin_name     = 'pg.buffercache'
 local every           = 300
 
-local sql_buffercache = read_file_in_current_dir("buffercache.sql")
+local sql_buffercache = read_file_in_plugin_dir("buffercache.sql")
 
 local snapshot        = nil
 

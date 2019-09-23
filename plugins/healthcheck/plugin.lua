@@ -1,7 +1,7 @@
 local plugin_name     = 'pg.healthcheck'
 local every           = 10
 
-local sql_healthcheck = read_file_in_current_dir("healthcheck.sql")
+local sql_healthcheck = read_file_in_plugin_dir("healthcheck.sql")
 
 local function collect()
   local result = target:query(sql_healthcheck, every)

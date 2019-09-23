@@ -14,8 +14,11 @@ where
   and host = md5('%s')::uuid
   and ts > extract( epoch from (now()-'3 minute'::interval) )
   ]], metric, tested_plugin:host())
-  local count = target:query(sql_query).rows[1][1]
-  return not(count == 0)
+  local result = target:query(sql_query).rows[1]
+  if result and result[1] then
+    return result[1] > 0
+  end
+  return false
 end
 
 function plugin_check_error()
@@ -33,10 +36,11 @@ function run_plugin_test(timeout, success_exit_function, check_error_function)
     check_error_function()
     if success_exit_function() then
       tested_plugin:remove()
-        return
+      return
     end
     time.sleep(1)
     timeout = timeout - 1
   end
   tested_plugin:remove()
+  error("execution timeout")
 end
