@@ -18,7 +18,7 @@ local function get_sql()
       filename = "wal_master_10.sql"
     end
   end
-  return read_file_in_current_dir(filename)
+  return read_file_in_plugin_dir(filename)
 end
 
 local function collect()

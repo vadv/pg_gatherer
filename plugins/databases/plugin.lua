@@ -1,7 +1,7 @@
 local plugin_name   = 'pg.databases'
 local every         = 60
 
-local sql_databases = read_file_in_current_dir("databases.sql")
+local sql_databases = read_file_in_plugin_dir("databases.sql")
 
 local function collect()
   local result = target:query(sql_databases, 60)

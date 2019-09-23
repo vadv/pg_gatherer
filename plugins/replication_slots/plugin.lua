@@ -3,7 +3,7 @@ local every                  = 60
 
 local replication_slots_file = "replication_slots_9.sql"
 if get_pg_server_version() >= 10 then replication_slots_file = "replication_slots_10.sql" end
-local sql_replication_slots = read_file_in_current_dir(replication_slots_file)
+local sql_replication_slots = read_file_in_plugin_dir(replication_slots_file)
 
 local function collect()
   local result = target:query(sql_replication_slots)

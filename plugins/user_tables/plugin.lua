@@ -1,8 +1,8 @@
 local plugin_name                                = 'pg.user_tables'
 local every                                      = 60
 
-local sql_user_tables                            = read_file_in_current_dir("user_tables.sql")
-local sql_user_tables_io                         = read_file_in_current_dir("user_tables_io.sql")
+local sql_user_tables                            = read_file_in_plugin_dir("user_tables.sql")
+local sql_user_tables_io                         = read_file_in_plugin_dir("user_tables_io.sql")
 
 local snapshot                                   = nil
 local user_tables_stat_data, user_tables_io_data = {}, {}

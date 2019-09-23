@@ -1,8 +1,8 @@
 local plugin_name             = 'pg.uptime'
 local every                   = 300
 
-local sql_uptime              = read_file_in_current_dir("uptime.sql")
-local sql_checkpointer_uptime = read_file_in_current_dir("checkpointer_uptime_10.sql")
+local sql_uptime              = read_file_in_plugin_dir("uptime.sql")
+local sql_checkpointer_uptime = read_file_in_plugin_dir("checkpointer_uptime_10.sql")
 
 local function collect_9()
   local result = target:query(sql_uptime)

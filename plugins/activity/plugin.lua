@@ -4,9 +4,9 @@ local every         = 60
 local activity_file = "activity_9.sql"
 if get_pg_server_version() >= 10 then activity_file = "activity_10.sql" end
 
-local sql_activity = read_file_in_current_dir(activity_file)
-local sql_states   = read_file_in_current_dir("states.sql")
-local sql_waits    = read_file_in_current_dir("waits.sql")
+local sql_activity = read_file_in_plugin_dir(activity_file)
+local sql_states   = read_file_in_plugin_dir("states.sql")
+local sql_waits    = read_file_in_plugin_dir("waits.sql")
 
 local helpers      = dofile(filepath.join(plugin:dir(), "linux_helper_proc_stat.lua"))
 
