@@ -7,6 +7,7 @@ from
 where
   plugin = md5('pg.alerts')::uuid
   and ts > extract( epoch from (now()-'3 minute'::interval) )
+  and ts > (value_jsonb->'created_at')::bigint + 10
   ]])
   local result    = target:query(sql_query).rows[1]
   if result and result[1] then
@@ -15,7 +16,7 @@ where
   return false
 end
 
-local timeout = 60
+local timeout = 120
 tested_plugin:create()
 while timeout > 0 do
   if tested_plugin:error_count() > 0 then

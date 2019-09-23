@@ -1,4 +1,5 @@
 local sql = read_file_in_plugin_dir("uptime.sql")
+local key = "checkpointer.uptime"
 
 local function check(host, unix_ts)
   local result = storage:query(sql, host, unix_ts)
@@ -8,7 +9,8 @@ local function check(host, unix_ts)
     if uptime < 300 then
       local jsonb      = {
         host           = host,
-        key            = 'checkpointer.uptime',
+        key            = key,
+        created_at     = get_last_created_at(host, key, unix_ts),
         custom_details = { uptime = uptime }
       }
       local jsonb, err = json.encode(jsonb)

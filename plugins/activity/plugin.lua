@@ -14,12 +14,14 @@ local helpers      = dofile(filepath.join(plugin:dir(), "linux_helper_proc_stat.
 local function states()
   local result = target:query(sql_states, every)
   local jsonb  = {}
+  local snapshot = nil
   for _, row in pairs(result.rows) do
-    jsonb[row[1]] = tonumber(row[2])
+    if not(snapshot) then snapshot = row[1] end
+    jsonb[row[2]] = tonumber(row[3])
   end
   local jsonb, err = json.encode(jsonb)
   if err then error(err) end
-  storage_insert_metric({ plugin = plugin_name .. ".states", json = jsonb })
+  storage_insert_metric({ plugin = plugin_name .. ".states", snapshot = snapshot, json = jsonb })
 end
 
 -- process waits
@@ -32,7 +34,7 @@ end
 
 -- collect on rds
 local function collect_rds()
-  local result = target:query(sql_activity, every)
+  local result = target:query(sql_activity, every, 30)
   for _, row in pairs(result.rows) do
     storage_insert_metric({ plugin = plugin_name, snapshot = row[1], json = row[2] })
   end
@@ -43,7 +45,7 @@ end
 -- collect on localhost
 local function collect_local()
   -- process activity
-  local result = target:query(sql_activity, every)
+  local result = target:query(sql_activity, every, 30)
   for _, row in pairs(result.rows) do
     local jsonb, err = json.decode(row[2])
     if err then error(err) end

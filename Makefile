@@ -56,6 +56,8 @@ test_in_docker:
 	psql -U gatherer -At -1 -f ./schema/schema.sql -d gatherer
 	# start tests
 	psql -U postgres -d gatherer -Atc "insert into host (name) values ('hostname-not-found-healthcheck-must-failed');"
+	psql -U postgres -d postgres -Atc "select pg_create_physical_replication_slot('standby_slot')"
+	timeout 10 /usr/pgsql-11/bin/pg_receivewal -h /tmp -U postgres -D /tmp/ -S standby_slot || echo ok
 	go test -v -race ./...
 	go build -o ./bin/testing --tags netcgo ./gatherer/cmd/testing/
 	./bin/testing --plugin-dir ./plugins --cache-dir /tmp/cache --host /tmp --dbname gatherer --username gatherer

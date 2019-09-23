@@ -1,4 +1,5 @@
 local sql = read_file_in_plugin_dir("wraparound.sql")
+local key = "wraparound"
 
 local function check(host, unix_ts)
   local result = storage:query(sql, host, unix_ts)
@@ -6,7 +7,8 @@ local function check(host, unix_ts)
     local database, age = result.rows[1][1], result.rows[1][2]
     local jsonb      = {
       host           = host,
-      key            = 'wraparound',
+      key            = key,
+      created_at     = get_last_created_at(host, key, unix_ts),
       custom_details = { database=database, age=age }
     }
     local jsonb, err = json.encode(jsonb)

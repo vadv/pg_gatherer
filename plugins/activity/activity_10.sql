@@ -25,4 +25,4 @@ where
     state <> 'idle'
 and query is not null
 and backend_type not in ('walsender', 'checkpointer', 'walwriter')
-and extract(epoch from now() - state_change)::int > 30
+and extract(epoch from now() - state_change)::int > $2

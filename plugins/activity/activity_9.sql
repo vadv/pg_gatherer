@@ -23,4 +23,4 @@ from
 where
     state <> 'idle'
 and query is not null
-and extract(epoch from now() - state_change)::int > 30;
+and extract(epoch from now() - state_change)::int > $2;
