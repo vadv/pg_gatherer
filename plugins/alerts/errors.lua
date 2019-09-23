@@ -15,7 +15,7 @@ local function check(host, unix_ts)
       }
       local jsonb, err = json.encode(jsonb)
       if err then error(err) end
-      storage:insert_metric({ host = host, plugin = 'pg.alerts', json = jsonb })
+      storage:insert_metric({ host = host, plugin = plugin_name, json = jsonb })
     end
   end
 end

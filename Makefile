@@ -55,6 +55,7 @@ test_in_docker:
 	# deploy schema gatherer
 	psql -U gatherer -At -1 -f ./schema/schema.sql -d gatherer
 	# start tests
+	psql -U postgres -d gatherer -Atc "insert into host (name) values ('hostname-not-found-healthcheck-must-failed');"
 	go test -v -race ./...
 	go build -o ./bin/testing --tags netcgo ./gatherer/cmd/testing/
 	./bin/testing --plugin-dir ./plugins --cache-dir /tmp/cache --host /tmp --dbname gatherer --username gatherer

@@ -15,7 +15,7 @@ where
   return false
 end
 
-local timeout = 120
+local timeout = 60
 tested_plugin:create()
 while timeout > 0 do
   if tested_plugin:error_count() > 0 then

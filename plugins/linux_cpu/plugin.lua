@@ -40,7 +40,7 @@ local function collect()
     local ctxt = line:match("^ctxt (%d+)")
     if ctxt then
       local diff = cache:speed_and_set("ctxt", tonumber(ctxt))
-      if diff then storage_insert_metric({ plugin_name .. ".ctxt", float = diff }) end
+      if diff then storage_insert_metric({ plugin = plugin_name .. ".ctxt", float = diff }) end
     end
 
     -- fork rate
