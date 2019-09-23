@@ -59,6 +59,7 @@ end
 local function get_mountpoint_by_dev(dev)
   if dev:match("^sd") then return sd_mountpoint(dev) end
   if dev:match("^nvme") then return sd_mountpoint(dev) end
+  if dev:match("^xvd") then return sd_mountpoint(dev) end
   if dev:match("^dm") then return dm_mountpoint(dev) end
   if dev:match("^md") then return md_mountpoint(dev) end
 end

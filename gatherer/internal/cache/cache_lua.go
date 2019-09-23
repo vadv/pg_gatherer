@@ -20,6 +20,12 @@ func checkUserDataCache(L *lua.LState, n int) *cacheUserData {
 func set(L *lua.LState) int {
 	ud := checkUserDataCache(L, 1)
 	key := L.CheckString(2)
+	if valueT := L.CheckAny(3); valueT.Type() == lua.LTNil {
+		if err := ud.Delete(key); err != nil {
+			L.RaiseError("cache error: %s", err.Error())
+		}
+		return 0
+	}
 	value := L.CheckNumber(3)
 	if err := ud.Set(key, float64(value)); err != nil {
 		L.RaiseError("cache error: %s", err.Error())
@@ -50,14 +56,20 @@ func get(L *lua.LState) int {
 func diffAndSet(L *lua.LState) int {
 	ud := checkUserDataCache(L, 1)
 	key := L.CheckString(2)
+	if currentValueT := L.CheckAny(3); currentValueT.Type() == lua.LTNil {
+		if err := ud.Delete(key); err != nil {
+			L.RaiseError("cache error: %s", err.Error())
+		}
+		return 0
+	}
 	currentValue := L.CheckNumber(3)
 	prevValue, _, found, err := ud.Get(key)
 	if err != nil {
 		L.RaiseError("cache error: %s", err.Error())
 		return 0
 	}
-	if err := ud.Set(key, float64(currentValue)); err != nil {
-		L.RaiseError("cache error: %s", err.Error())
+	if errSet := ud.Set(key, float64(currentValue)); errSet != nil {
+		L.RaiseError("cache error: %s", errSet.Error())
 		return 0
 	}
 	if !found {
@@ -74,14 +86,20 @@ func diffAndSet(L *lua.LState) int {
 func speedAndSet(L *lua.LState) int {
 	ud := checkUserDataCache(L, 1)
 	key := L.CheckString(2)
+	if currentValueT := L.CheckAny(3); currentValueT.Type() == lua.LTNil {
+		if err := ud.Delete(key); err != nil {
+			L.RaiseError("cache error: %s", err.Error())
+		}
+		return 0
+	}
 	currentValue := L.CheckNumber(3)
 	prevValue, updatedAt, found, err := ud.Get(key)
 	if err != nil {
 		L.RaiseError("cache error: %s", err.Error())
 		return 0
 	}
-	if err := ud.Set(key, float64(currentValue)); err != nil {
-		L.RaiseError("cache error: %s", err.Error())
+	if errSet := ud.Set(key, float64(currentValue)); errSet != nil {
+		L.RaiseError("cache error: %s", errSet.Error())
 		return 0
 	}
 	if !found {

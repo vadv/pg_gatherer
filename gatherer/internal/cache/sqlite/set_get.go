@@ -13,7 +13,8 @@ insert
 values (?, ?, ?) on conflict (key) do
 	update set value=excluded.value, updated_at=excluded.updated_at
 `
-	getQuery = `select value, updated_at from %s where key = ?`
+	getQuery    = `select value, updated_at from %s where key = ?`
+	deleteQuery = `delete from %s where key = ?`
 )
 
 func (c *Cache) checkTableExists(tableName string) error {
@@ -65,4 +66,17 @@ func (c *Cache) Get(key string) (value float64, updatedAt int64, found bool, err
 		return c.getFromTable(key, c.prevTableName())
 	}
 	return
+}
+
+// Delete value by key
+func (c *Cache) Delete(key string) error {
+	query := fmt.Sprintf(deleteQuery, c.currentTableName())
+	if _, err := c.db.Exec(query, key); err != nil {
+		return err
+	}
+	query = fmt.Sprintf(deleteQuery, c.prevTableName())
+	if _, err := c.db.Exec(query, key); err != nil {
+		return err
+	}
+	return nil
 }

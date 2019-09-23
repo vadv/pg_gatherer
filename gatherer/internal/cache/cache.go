@@ -8,6 +8,7 @@ import (
 type cache interface {
 	Set(key string, value float64) error
 	Get(key string) (float64, int64, bool, error)
+	Delete(key string) error
 }
 
 type cacheUserData struct {

@@ -8,6 +8,7 @@ local snapshot                                   = nil
 local user_tables_stat_data, user_tables_io_data = {}, {}
 
 local function collect_for_db()
+
   local result = target:query(sql_user_tables, every)
   for _, row in pairs(result.rows) do
     if not snapshot then snapshot = row[1] end
@@ -15,22 +16,22 @@ local function collect_for_db()
     if err then error(err) end
 
     local table_name          = jsonb.full_table_name
-    jsonb.vacuum_count        = cache:diff_and_set(table_name .. ".vacuum_count", jsonb.vacuum_count or 0)
-    jsonb.autovacuum_count    = cache:diff_and_set(table_name .. ".autovacuum_count", jsonb.autovacuum_count or 0)
-    jsonb.analyze_count       = cache:diff_and_set(table_name .. ".analyze_count", jsonb.analyze_count or 0)
-    jsonb.autoanalyze_count   = cache:diff_and_set(table_name .. ".autoanalyze_count", jsonb.autoanalyze_count or 0)
-    jsonb.seq_scan            = cache:diff_and_set(table_name .. ".seq_scan", jsonb.seq_scan or 0)
-    jsonb.seq_tup_read        = cache:diff_and_set(table_name .. ".seq_tup_read", jsonb.seq_tup_read or 0)
-    jsonb.idx_scan            = cache:diff_and_set(table_name .. ".idx_scan", jsonb.idx_scan or 0)
-    jsonb.idx_tup_fetch       = cache:diff_and_set(table_name .. ".idx_tup_fetch", jsonb.idx_tup_fetch or 0)
-    jsonb.n_tup_ins           = cache:diff_and_set(table_name .. ".n_tup_ins", jsonb.n_tup_ins or 0)
-    jsonb.n_tup_upd           = cache:diff_and_set(table_name .. ".n_tup_upd", jsonb.n_tup_upd or 0)
-    jsonb.n_tup_del           = cache:diff_and_set(table_name .. ".n_tup_del", jsonb.n_tup_del or 0)
-    jsonb.n_tup_hot_upd       = cache:diff_and_set(table_name .. ".n_tup_hot_upd", jsonb.n_tup_hot_upd or 0)
-    jsonb.n_live_tup          = jsonb.n_live_tup or 0
-    jsonb.n_dead_tup          = jsonb.n_dead_tup or 0
-    jsonb.n_mod_since_analyze = cache:diff_and_set(table_name .. ".n_mod_since_analyze", jsonb.n_mod_since_analyze or 0)
-    jsonb.relpages            = jsonb.relpages or 0
+    jsonb.vacuum_count        = cache:diff_and_set(table_name .. ".vacuum_count", jsonb.vacuum_count)
+    jsonb.autovacuum_count    = cache:diff_and_set(table_name .. ".autovacuum_count", jsonb.autovacuum_count)
+    jsonb.analyze_count       = cache:diff_and_set(table_name .. ".analyze_count", jsonb.analyze_count)
+    jsonb.autoanalyze_count   = cache:diff_and_set(table_name .. ".autoanalyze_count", jsonb.autoanalyze_count)
+    jsonb.seq_scan            = cache:diff_and_set(table_name .. ".seq_scan", jsonb.seq_scan)
+    jsonb.seq_tup_read        = cache:diff_and_set(table_name .. ".seq_tup_read", jsonb.seq_tup_read)
+    jsonb.idx_scan            = cache:diff_and_set(table_name .. ".idx_scan", jsonb.idx_scan)
+    jsonb.idx_tup_fetch       = cache:diff_and_set(table_name .. ".idx_tup_fetch", jsonb.idx_tup_fetch)
+    jsonb.n_tup_ins           = cache:diff_and_set(table_name .. ".n_tup_ins", jsonb.n_tup_ins)
+    jsonb.n_tup_upd           = cache:diff_and_set(table_name .. ".n_tup_upd", jsonb.n_tup_upd)
+    jsonb.n_tup_del           = cache:diff_and_set(table_name .. ".n_tup_del", jsonb.n_tup_del)
+    jsonb.n_tup_hot_upd       = cache:diff_and_set(table_name .. ".n_tup_hot_upd", jsonb.n_tup_hot_upd)
+    jsonb.n_live_tup          = jsonb.n_live_tup
+    jsonb.n_dead_tup          = jsonb.n_dead_tup
+    jsonb.n_mod_since_analyze = cache:diff_and_set(table_name .. ".n_mod_since_analyze", jsonb.n_mod_since_analyze)
+    jsonb.relpages            = jsonb.relpages
 
     if jsonb.vacuum_count or jsonb.autovacuum_count or jsonb.analyze_count or
         jsonb.autoanalyze_count or jsonb.seq_scan or jsonb.seq_tup_read or jsonb.idx_scan or
@@ -49,14 +50,14 @@ local function collect_for_db()
     if err then error(err) end
 
     local table_name      = jsonb.full_table_name
-    jsonb.heap_blks_read  = cache:diff_and_set(table_name .. ".heap_blks_read", jsonb.heap_blks_read or 0)
-    jsonb.heap_blks_hit   = cache:diff_and_set(table_name .. ".heap_blks_hit", jsonb.heap_blks_hit or 0)
-    jsonb.idx_blks_read   = cache:diff_and_set(table_name .. ".idx_blks_read", jsonb.idx_blks_read or 0)
-    jsonb.idx_blks_hit    = cache:diff_and_set(table_name .. ".idx_blks_hit", jsonb.idx_blks_hit or 0)
-    jsonb.toast_blks_read = cache:diff_and_set(table_name .. ".toast_blks_read", jsonb.toast_blks_read or 0)
-    jsonb.toast_blks_hit  = cache:diff_and_set(table_name .. ".toast_blks_hit", jsonb.toast_blks_hit or 0)
-    jsonb.tidx_blks_read  = cache:diff_and_set(table_name .. ".tidx_blks_read", jsonb.tidx_blks_read or 0)
-    jsonb.tidx_blks_hit   = cache:diff_and_set(table_name .. ".tidx_blks_hit", jsonb.tidx_blks_hit or 0)
+    jsonb.heap_blks_read  = cache:diff_and_set(table_name .. ".heap_blks_read", jsonb.heap_blks_read)
+    jsonb.heap_blks_hit   = cache:diff_and_set(table_name .. ".heap_blks_hit", jsonb.heap_blks_hit)
+    jsonb.idx_blks_read   = cache:diff_and_set(table_name .. ".idx_blks_read", jsonb.idx_blks_read)
+    jsonb.idx_blks_hit    = cache:diff_and_set(table_name .. ".idx_blks_hit", jsonb.idx_blks_hit)
+    jsonb.toast_blks_read = cache:diff_and_set(table_name .. ".toast_blks_read", jsonb.toast_blks_read)
+    jsonb.toast_blks_hit  = cache:diff_and_set(table_name .. ".toast_blks_hit", jsonb.toast_blks_hit)
+    jsonb.tidx_blks_read  = cache:diff_and_set(table_name .. ".tidx_blks_read", jsonb.tidx_blks_read)
+    jsonb.tidx_blks_hit   = cache:diff_and_set(table_name .. ".tidx_blks_hit", jsonb.tidx_blks_hit)
 
     if jsonb.heap_blks_read or jsonb.heap_blks_hit or jsonb.idx_blks_read or jsonb.idx_blks_hit or
         jsonb.toast_blks_read or jsonb.toast_blks_hit or jsonb.tidx_blks_read or jsonb.tidx_blks_hit then
