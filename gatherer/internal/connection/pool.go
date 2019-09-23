@@ -72,7 +72,7 @@ func createHostIfNotExists(c *connection, host string) error {
 	if _, ok := connectionPool.hostsCache[c.connectionString()][host]; ok {
 		return nil
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	tx, errTx := db.BeginTx(ctx, &sql.TxOptions{
 		Isolation: sql.LevelReadCommitted,
