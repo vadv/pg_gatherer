@@ -1,4 +1,5 @@
 local sql = read_file_in_plugin_dir("replication_slots.sql")
+local key = "replication_slots"
 
 local function check(host, unix_ts)
   local result = storage:query(sql, host, unix_ts)
@@ -18,7 +19,8 @@ local function check(host, unix_ts)
       end
       local jsonb      = {
         host           = host,
-        key            = 'replication_slots',
+        key            = key,
+        created_at     = get_last_created_at(host, key, unix_ts),
         custom_details = humanize_info,
       }
       local jsonb, err = json.encode(jsonb)

@@ -1,4 +1,5 @@
 local sql = read_file_in_plugin_dir("errors.sql")
+local key = "errors"
 
 local function check(host, unix_ts)
   local result = storage:query(sql, host, unix_ts)
@@ -7,7 +8,8 @@ local function check(host, unix_ts)
     if (percentile_90_rollbacks > 5000) or (percentile_90_conflicts > 100) then
       local jsonb      = {
         host           = host,
-        key            = 'errors',
+        key            = key,
+        created_at     = get_last_created_at(host, key, unix_ts),
         custom_details = {
           percentile_90_rollbacks = percentile_90_rollbacks,
           percentile_90_conflicts = percentile_90_conflicts,

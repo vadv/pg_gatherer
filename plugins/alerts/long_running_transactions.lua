@@ -1,4 +1,5 @@
 local sql = read_file_in_plugin_dir("long_running_transactions.sql")
+local key = "long_running_transactions"
 
 local function check(host, unix_ts)
   local result = storage:query(sql, host, unix_ts)
@@ -7,7 +8,8 @@ local function check(host, unix_ts)
     if err then error(err) end
     local jsonb      = {
       host           = host,
-      key            = 'long_running_transactions',
+      key            = key,
+      created_at     = get_last_created_at(host, key, unix_ts),
       custom_details = info,
     }
     local jsonb, err = json.encode(jsonb)

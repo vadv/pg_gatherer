@@ -14,6 +14,15 @@ for _, file in pairs(files) do
   end
 end
 
+-- get last value
+local last_created_at_sql = read_file_in_plugin_dir("last_created_at.sql")
+function get_last_created_at(host, key, unix_ts)
+  if storage:query(last_created_at_sql, host, key, unix_ts).rows[1] then
+    return storage:query(last_created_at_sql, host, key, unix_ts).rows[1][1]
+  end
+  return unix_ts
+end
+
 -- collect function
 function collect()
   local unix_ts = get_unix_ts(storage)
