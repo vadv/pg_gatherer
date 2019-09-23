@@ -65,6 +65,7 @@ func main() {
 	}()
 
 	pool := plugins.NewPool(*pluginDir, *cacheDir)
+	// register
 	for host, hostConfig := range *config {
 		log.Printf("[INFO] register host: '%s'\n", host)
 		pool.RegisterHost(host, hostConfig.Connections)
@@ -81,13 +82,38 @@ func main() {
 	log.Printf("[INFO] started\n")
 
 	sig := make(chan os.Signal, 1)
-	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
-	<-sig
+	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 
-	log.Printf("[INFO] shutdown\n")
-	for host, _ := range *config {
-		pool.RemoveHostAndPlugins(host)
+	for {
+		s := <-sig
+		switch s {
+		case syscall.SIGHUP:
+			// reload
+			log.Printf("[INFO] reload\n")
+			for host, hostConfig := range *config {
+				for _, pl := range hostConfig.Plugins {
+					log.Printf("[INFO] unregister plugin '%s' for host: '%s'\n", pl, host)
+					if errRemove := pool.StopAndRemovePluginFromHost(pl, host); errRemove != nil {
+						log.Printf("[FATAL] stop plugin '%s' for host '%s': %s\n", pl, host, errRemove.Error())
+						os.Exit(3)
+					}
+					log.Printf("[INFO] register plugin '%s' for host: '%s'\n", pl, host)
+					if errPl := pool.AddPluginToHost(pl, host); errPl != nil {
+						log.Printf("[FATAL] register plugin '%s' for host '%s': %s\n",
+							pl, host, errPl.Error())
+						os.Exit(3)
+					}
+				}
+			}
+		case syscall.SIGINT, syscall.SIGTERM:
+			// stop
+			log.Printf("[INFO] shutdown\n")
+			for host, _ := range *config {
+				pool.RemoveHostAndPlugins(host)
+			}
+			log.Printf("[INFO] stopped\n")
+			return
+		}
 	}
-	log.Printf("[INFO] stopped\n")
 
 }

@@ -30,7 +30,10 @@ function collect()
   for _, row in pairs(result.rows) do
     local host = row[1]
     for _, check in pairs(checks) do
-      check(host, unix_ts)
+      local status, err = pcall(check, host, unix_ts)
+      if not status then
+        plugin_log:printf("[ERROR] plugin '%s' on host '%s' error: %s\n", plugin:name(), plugin:host(), err)
+      end
     end
   end
 end
