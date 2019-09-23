@@ -8,6 +8,7 @@ import (
 )
 
 const (
+	queryGetAllHost            = `select name from host`
 	queryCreateHostOfNotExists = `insert into host (name) values ($1) on conflict do nothing;`
 )
 
@@ -72,7 +73,8 @@ func createHostIfNotExists(c *connection, host string) error {
 	if _, ok := connectionPool.hostsCache[c.connectionString()][host]; ok {
 		return nil
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	// insert
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	tx, errTx := db.BeginTx(ctx, &sql.TxOptions{
 		Isolation: sql.LevelReadCommitted,
@@ -85,6 +87,19 @@ func createHostIfNotExists(c *connection, host string) error {
 	_, err := tx.Exec(queryCreateHostOfNotExists, host)
 	if err == nil {
 		connectionPool.hostsCache[c.connectionString()][host] = true
+	}
+	// get all hosts
+	rows, err := tx.Query(queryGetAllHost)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		overHost := ""
+		if errScan := rows.Scan(&overHost); errScan != nil {
+			return errScan
+		}
+		connectionPool.hostsCache[c.connectionString()][overHost] = true
 	}
 	return err
 }
