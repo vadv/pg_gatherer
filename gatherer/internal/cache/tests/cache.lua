@@ -26,3 +26,15 @@ if speed == 0 then error("speed: "..tostring(speed)) end
 if not(speed > 0) then error("speed: "..tostring(speed)) end
 local speed = cache:get("value_speed")
 if not(speed == 1) then error("diff must be 1, but get: "..tostring(speed)) end
+
+-- check nil
+local err = cache:set("value_nil", nil)
+if err then error(err) end
+local value = cache:get("value_nil")
+if value then error("must be unknown") end
+cache:diff_and_set("value_nil", nil)
+local value = cache:get("value_nil")
+if value then error("must be unknown") end
+cache:speed_and_set("value_nil", nil)
+local value = cache:get("value_nil")
+if value then error("must be unknown") end
