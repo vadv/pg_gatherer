@@ -6,7 +6,9 @@ local function read_diskstat()
   local result  = {}
   -- https://www.kernel.org/doc/Documentation/ABI/testing/procfs-diskstats
   local pattern = "(%d+)%s+(%d+)%s+(%S+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)"
-  for line in io.lines(HOST_PROC_DIR .. "/diskstats") do
+  local data, err = ioutil.read_file(HOST_PROC_DIR .. "/diskstats")
+  if err then error(err) end
+  for line in strings.split(data, "\n") do
     local major, minor, dev_name,
     rd_ios, rd_merges_or_rd_sec, rd_sec_or_wr_ios, rd_ticks_or_wr_sec,
     wr_ios, wr_merges, wr_sec, wr_ticks, ios_pgr, tot_ticks, rq_ticks = line:match(pattern)
