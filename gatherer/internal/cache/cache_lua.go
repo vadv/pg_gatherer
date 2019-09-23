@@ -56,8 +56,8 @@ func diffAndSet(L *lua.LState) int {
 		L.RaiseError("cache error: %s", err.Error())
 		return 0
 	}
-	if err := ud.Set(key, float64(currentValue)); err != nil {
-		L.RaiseError("cache error: %s", err.Error())
+	if errSet := ud.Set(key, float64(currentValue)); errSet != nil {
+		L.RaiseError("cache error: %s", errSet.Error())
 		return 0
 	}
 	if !found {
@@ -80,8 +80,8 @@ func speedAndSet(L *lua.LState) int {
 		L.RaiseError("cache error: %s", err.Error())
 		return 0
 	}
-	if err := ud.Set(key, float64(currentValue)); err != nil {
-		L.RaiseError("cache error: %s", err.Error())
+	if errSet := ud.Set(key, float64(currentValue)); errSet != nil {
+		L.RaiseError("cache error: %s", errSet.Error())
 		return 0
 	}
 	if !found {

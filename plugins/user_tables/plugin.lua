@@ -14,7 +14,7 @@ local function collect_for_db()
     if not snapshot then snapshot = row[1] end
     local jsonb, err = json.decode(row[2])
     if err then error(err) end
-    print("user_tables:", jsonb)
+    print("user_tables:", row[2], inspect(jsonb))
 
     local table_name          = jsonb.full_table_name
     jsonb.vacuum_count        = cache:diff_and_set(table_name .. ".vacuum_count", jsonb.vacuum_count)
