@@ -3,7 +3,7 @@ local sql = read_file_in_plugin_dir("replication_slots.sql")
 local function check(host, unix_ts)
   local result = storage:query(sql, host, unix_ts)
   if not (result.rows[1] == nil) and not (result.rows[1][1] == nil) then
-    local info = result.rows[1][1]
+    local info     = result.rows[1][1]
     -- calc max_size
     local max_size = 0
     for _, size in pairs(info) do
@@ -23,7 +23,7 @@ local function check(host, unix_ts)
       }
       local jsonb, err = json.encode(jsonb)
       if err then error(err) end
-      storage:insert_metric({ host = host, plugin = 'pg.alerts', json = jsonb })
+      storage:insert_metric({ host = host, plugin = plugin_name, json = jsonb })
     end
   end
 end

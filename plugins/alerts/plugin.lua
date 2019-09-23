@@ -1,4 +1,5 @@
-local every = 60
+plugin_name      = 'pg.alerts'
+local every      = 60
 
 -- list of files
 local files, err = filepath.glob(filepath.join(plugin:dir(), "*.lua"))
@@ -16,7 +17,7 @@ end
 -- collect function
 function collect()
   local unix_ts = get_unix_ts(storage)
-  local result = storage:query("select name from host where not maintenance")
+  local result  = storage:query("select name from host where not maintenance")
   for _, row in pairs(result.rows) do
     local host = row[1]
     for _, check in pairs(checks) do

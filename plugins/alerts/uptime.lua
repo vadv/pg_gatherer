@@ -5,7 +5,7 @@ local function check(host, unix_ts)
   if not (result.rows[1] == nil) and not (result.rows[1][1] == nil) then
     local uptime = result.rows[1][1]
     print("uptime: ", host, uptime)
-    if uptime < 60 then
+    if uptime < 300 then
       local jsonb      = {
         host           = host,
         key            = 'checkpointer.uptime',
@@ -13,7 +13,7 @@ local function check(host, unix_ts)
       }
       local jsonb, err = json.encode(jsonb)
       if err then error(err) end
-      storage:insert_metric({ host = host, plugin = 'pg.alerts', json = jsonb })
+      storage:insert_metric({ host = host, plugin = plugin_name, json = jsonb })
     end
   end
 end

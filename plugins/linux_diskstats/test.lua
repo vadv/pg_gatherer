@@ -4,10 +4,10 @@ if not goos.stat(HOST_PROC_DIR .. '/diskstats') then
 end
 
 if os.getenv('CI') then
-  local helper = dofile(filepath.join(plugin:dir(), "helper_disk_stat.lua"))
-  local count = 0
+  local helper = dofile(filepath.join(tested_plugin:dir(), "helper_disk_stat.lua"))
+  local count  = 0
   for dev, value in pairs(helper.read_diskstat()) do
-    print("dev:", dev, "value:", value)
+    print("disk stat:", "dev:", dev, "value:", value)
     count = count + 1
   end
   if count == 0 then
