@@ -1,15 +1,15 @@
 local plugin_name                                = 'pg.user_tables'
-local every                                      = 60
+local every                                      = 5
 
 local sql_user_tables                            = read_file_in_plugin_dir("user_tables.sql")
 local sql_user_tables_io                         = read_file_in_plugin_dir("user_tables_io.sql")
 
-local snapshot                                   = nil
-local user_tables_stat_data, user_tables_io_data = {}, {}
+snapshot                                   = nil
+user_tables_stat_data, user_tables_io_data = {}, {}
 
-local function collect_for_db()
+local function collect_for_db(conn)
 
-  local result = target:query(sql_user_tables, every)
+  local result = conn:query(sql_user_tables, every)
   for _, row in pairs(result.rows) do
     if not snapshot then snapshot = row[1] end
     local jsonb, err = json.decode(row[2])
@@ -43,7 +43,7 @@ local function collect_for_db()
 
   snapshot     = nil
 
-  local result = target:query(sql_user_tables_io, every)
+  local result = conn:query(sql_user_tables_io, every)
   for _, row in pairs(result.rows) do
     if not snapshot then snapshot = row[1] end
     local jsonb, err = json.decode(row[2])

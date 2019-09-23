@@ -102,6 +102,7 @@ func availableConnections(L *lua.LState) int {
 			port:     ud.port,
 			user:     ud.user,
 			password: ud.password,
+			params:   ud.params,
 		}
 		newUd := c.userData(L)
 		result.Append(newUd)
