@@ -60,9 +60,6 @@ func parseMetric(table *lua.LTable) (*metric, error) {
 	if m.plugin == `` {
 		return nil, fmt.Errorf("empty `plugin` info")
 	}
-	if m.valueInteger == nil && m.valueFloat64 == nil && m.valueJson == nil {
-		return nil, fmt.Errorf("empty value")
-	}
 	// lua `[]` -> json `{}`
 	if m.valueJson != nil {
 		valueJson := *m.valueJson
@@ -70,6 +67,9 @@ func parseMetric(table *lua.LTable) (*metric, error) {
 			valueJson = `{}`
 			m.valueJson = &valueJson
 		}
+	}
+	if m.valueInteger == nil && m.valueFloat64 == nil && (m.valueJson == nil || *m.valueJson == `{}`) {
+		return nil, fmt.Errorf("empty value")
 	}
 	return m, err
 }

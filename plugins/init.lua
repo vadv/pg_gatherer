@@ -46,8 +46,16 @@ end
 -- insert metric with plugin:host()
 function storage_insert_metric(metric)
   if not(metric.host) then metric.host = plugin:host() end
+  if (metric.int == nil) and (metric.float == nil) and not(metric.json == nil) then
+    local jsonb, err = json.decode(metric.json)
+    if err then error(err) end
+    if next(jsonb) == nil then
+      plugin_log:printf("[ERROR] plugin '%s' on host '%s': empty metric\n", plugin:name(), plugin:host())
+      return
+    end
+  end
   storage:insert_metric(metric)
-end
+  end
 
 -- return postgresql version
 function get_pg_server_version()
