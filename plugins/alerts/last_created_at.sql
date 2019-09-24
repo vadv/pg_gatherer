@@ -1,5 +1,5 @@
 select
-  coalesce((value_jsonb -> 'created_at')::bigint, 0) as created_at
+  coalesce((value_jsonb ->> 'created_at')::bigint, 0) as created_at
 from
   metric
 where

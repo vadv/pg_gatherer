@@ -4,7 +4,8 @@ local key = "replication_slots"
 local function check(host, unix_ts)
   local result = storage:query(sql, host, unix_ts)
   if not (result.rows[1] == nil) and not (result.rows[1][1] == nil) then
-    local info     = result.rows[1][1]
+    local info, err = json.decode(result.rows[1][1])
+    if err then error(err) end
     -- calc max_size
     local max_size = 0
     for _, size in pairs(info) do

@@ -1,5 +1,5 @@
 select
-  value_jsonb
+  value_jsonb::text
 from
   metric
 where

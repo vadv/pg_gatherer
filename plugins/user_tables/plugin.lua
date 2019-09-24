@@ -1,8 +1,8 @@
-local plugin_name                                = 'pg.user_tables'
-local every                                      = 5
+local plugin_name                          = 'pg.user_tables'
+local every                                = 60
 
-local sql_user_tables                            = read_file_in_plugin_dir("user_tables.sql")
-local sql_user_tables_io                         = read_file_in_plugin_dir("user_tables_io.sql")
+local sql_user_tables                      = read_file_in_plugin_dir("user_tables.sql")
+local sql_user_tables_io                   = read_file_in_plugin_dir("user_tables_io.sql")
 
 snapshot                                   = nil
 user_tables_stat_data, user_tables_io_data = {}, {}
@@ -41,8 +41,6 @@ local function collect_for_db(conn)
     end
   end
 
-  snapshot     = nil
-
   local result = conn:query(sql_user_tables_io, every)
   for _, row in pairs(result.rows) do
     if not snapshot then snapshot = row[1] end
@@ -68,17 +66,24 @@ local function collect_for_db(conn)
 end
 
 local function collect()
+
   snapshot, user_tables_stat_data, user_tables_io_data = nil, {}, {}
+
   for _, conn in pairs(target:available_connections()) do
     collect_for_db(conn)
   end
-  local jsonb, err = json.encode(user_tables_stat_data)
-  if err then error(err) end
-  storage_insert_metric({ plugin = plugin_name, snapshot = snapshot, json = jsonb })
 
-  local jsonb, err = json.encode(user_tables_io_data)
-  if err then error(err) end
-  storage_insert_metric({ plugin = plugin_name .. ".io", snapshot = snapshot, json = jsonb })
+  if snapshot then
+    local jsonb, err = json.encode(user_tables_stat_data)
+    if err then error(err) end
+    storage_insert_metric({ plugin = plugin_name, snapshot = snapshot, json = jsonb })
+
+    local jsonb, err = json.encode(user_tables_io_data)
+    if err then error(err) end
+    storage_insert_metric({ plugin = plugin_name .. ".io", snapshot = snapshot, json = jsonb })
+  else
+    plugin_log:printf("[ERROR] user_tables information is empty, host %s\n", plugin:host())
+  end
 end
 
 run_every(collect, every)
