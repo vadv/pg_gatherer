@@ -1,5 +1,5 @@
 plugin_name      = 'pg.alerts'
-local every      = 5
+local every      = 60
 
 -- list of files
 local files, err = filepath.glob(filepath.join(plugin:dir(), "*.lua"))
