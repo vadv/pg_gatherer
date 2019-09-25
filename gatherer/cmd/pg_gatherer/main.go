@@ -21,11 +21,11 @@ import (
 
 var (
 	version        = `unknown`
-	hostConfigFile = flag.String(`host-config`, `host.yaml`, `Path to config file with host configurations.`)
-	pluginDir      = flag.String(`plugins`, `./plugins`, `Path to plugins directory`)
-	cacheDir       = flag.String(`cache`, `./cache`, `Path to cache directory`)
+	hostConfigFile = flag.String(`host-config-file`, `host.yaml`, `Path to config file with host configurations.`)
+	pluginDir      = flag.String(`plugins-dir`, `./plugins`, `Path to plugins directory`)
+	cacheDir       = flag.String(`cache-dir`, `./cache`, `Path to cache directory`)
 	httpListen     = flag.String(`http-listen`, `:8080`, `Lister address`)
-	secretsFile    = flag.String(`secrets`, ``, `Path to yaml file with secrets (key:value)`)
+	secretsFile    = flag.String(`secret-file`, ``, `Path to yaml file with secrets (key:value)`)
 	versionFlag    = flag.Bool(`version`, false, `Print version and exit`)
 )
 

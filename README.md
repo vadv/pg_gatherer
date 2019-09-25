@@ -48,7 +48,7 @@ then you get additional statistics, for example link `/proc/{pid}/io` stats with
 
 ```bash
 go get github.com/vadv/pg_gatherer/gatherer/cmd/pg_gatherer
-pg_gatherer --config host-config.yaml --plugins /etc/pg_gatherer/plugins --cache /var/cache --http-listen 8080
+pg_gatherer --host-config-file host-config.yaml --plugins-dir /etc/pg_gatherer/plugins --cache-dir /var/cache --http-listen 8080
 ```
 
 Host config example:
