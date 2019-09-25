@@ -4018,14 +4018,14 @@
                "steppedLine": false,
                "targets": [
                   {
-                     "expr": "avg_over_time(aws_rds_freeable_memory_average{dbinstance_identifier=\"$host\"}[10m])",
+                     "expr": "avg_over_time(aws_rds_freeable_memory_average{dbinstance_identifier=\"$host\"}[$__interval])",
                      "format": "time_series",
                      "intervalFactor": 2,
                      "legendFormat": "Freeable",
                      "refId": "A"
                   },
                   {
-                     "expr": "avg_over_time(aws_rds_memory_total{dbinstance_identifier=\"$host\"}[10m])",
+                     "expr": "avg_over_time(aws_rds_memory_total{dbinstance_identifier=\"$host\"}[$__interval])",
                      "format": "time_series",
                      "intervalFactor": 2,
                      "legendFormat": "Total",
@@ -4107,7 +4107,7 @@
                "steppedLine": false,
                "targets": [
                   {
-                     "expr": "avg_over_time(aws_rds_cpuutilization_average{dbinstance_identifier=\"$host\"}[10m]) / 100",
+                     "expr": "avg_over_time(aws_rds_cpuutilization_average{dbinstance_identifier=\"$host\"}[$__interval]) / 100",
                      "format": "time_series",
                      "intervalFactor": 2,
                      "legendFormat": "CPU",
@@ -4189,14 +4189,14 @@
                "steppedLine": false,
                "targets": [
                   {
-                     "expr": "avg_over_time(aws_rds_write_iops_average{dbinstance_identifier=\"$host\"}[10m])",
+                     "expr": "avg_over_time(aws_rds_write_iops_average{dbinstance_identifier=\"$host\"}[$__interval])",
                      "format": "time_series",
                      "intervalFactor": 2,
                      "legendFormat": "Write ops",
                      "refId": "A"
                   },
                   {
-                     "expr": "avg_over_time(aws_rds_read_iops_average{dbinstance_identifier=\"$host\"}[10m])",
+                     "expr": "avg_over_time(aws_rds_read_iops_average{dbinstance_identifier=\"$host\"}[$__interval])",
                      "format": "time_series",
                      "intervalFactor": 2,
                      "legendFormat": "Read ops",
@@ -4292,7 +4292,7 @@
                "steppedLine": false,
                "targets": [
                   {
-                     "expr": "sum(rate(pg_gatherer_plugin_errors{}[10m])) by (plugin)",
+                     "expr": "sum(rate(pg_gatherer_plugin_errors{}[$__interval])) by (plugin)",
                      "format": "time_series",
                      "intervalFactor": 2,
                      "legendFormat": "{{plugin}}",
@@ -4374,7 +4374,7 @@
                "steppedLine": false,
                "targets": [
                   {
-                     "expr": "sum(rate(pg_gatherer_plugin_errors{}[10m])) by (host)",
+                     "expr": "sum(rate(pg_gatherer_plugin_errors{}[$__interval])) by (host)",
                      "format": "time_series",
                      "intervalFactor": 2,
                      "legendFormat": "{{host}}",

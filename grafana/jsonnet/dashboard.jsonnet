@@ -332,10 +332,10 @@ local rdsRow = grafana.row.new(title='RDS metrics', height='600px', collapse=tru
             legend_show=true, legend_values=true, legend_min=true, legend_max=true, legend_avg=true,
             ).addTargets([
                 grafana.prometheus.target(
-                    'avg_over_time(aws_rds_freeable_memory_average{dbinstance_identifier="$host"}[10m])',
+                    'avg_over_time(aws_rds_freeable_memory_average{dbinstance_identifier="$host"}[$__interval])',
                         legendFormat='Freeable'),
                 grafana.prometheus.target(
-                    'avg_over_time(aws_rds_memory_total{dbinstance_identifier="$host"}[10m])',
+                    'avg_over_time(aws_rds_memory_total{dbinstance_identifier="$host"}[$__interval])',
                         legendFormat='Total'),
             ]),
         grafana.graphPanel.new(title='CPU',
@@ -344,7 +344,7 @@ local rdsRow = grafana.row.new(title='RDS metrics', height='600px', collapse=tru
             legend_show=true, legend_values=true, legend_min=true, legend_max=true, legend_avg=true,
             ).addTarget(
                 grafana.prometheus.target(
-                    'avg_over_time(aws_rds_cpuutilization_average{dbinstance_identifier="$host"}[10m]) / 100',
+                    'avg_over_time(aws_rds_cpuutilization_average{dbinstance_identifier="$host"}[$__interval]) / 100',
                         legendFormat='CPU'),
             ),
         grafana.graphPanel.new(title='IOPS',
@@ -353,10 +353,10 @@ local rdsRow = grafana.row.new(title='RDS metrics', height='600px', collapse=tru
             legend_show=true, legend_values=true, legend_min=true, legend_max=true, legend_avg=true,
             ).addTargets([
                 grafana.prometheus.target(
-                    'avg_over_time(aws_rds_write_iops_average{dbinstance_identifier="$host"}[10m])',
+                    'avg_over_time(aws_rds_write_iops_average{dbinstance_identifier="$host"}[$__interval])',
                         legendFormat='Write ops'),
                 grafana.prometheus.target(
-                    'avg_over_time(aws_rds_read_iops_average{dbinstance_identifier="$host"}[10m])',
+                    'avg_over_time(aws_rds_read_iops_average{dbinstance_identifier="$host"}[$__interval])',
                         legendFormat='Read ops'),
             ]),
     ]);
@@ -369,7 +369,7 @@ local pluginRow = grafana.row.new(title='Common metrics of plugins', height='600
             legend_show=true, legend_values=true, legend_min=true, legend_max=true, legend_avg=true,
             ).addTargets([
                 grafana.prometheus.target(
-                    'sum(rate(pg_gatherer_plugin_errors{}[10m])) by (plugin)',
+                    'sum(rate(pg_gatherer_plugin_errors{}[$__interval])) by (plugin)',
                         legendFormat='{{plugin}}')
             ]),
         grafana.graphPanel.new(title='Errors by host',
@@ -378,7 +378,7 @@ local pluginRow = grafana.row.new(title='Common metrics of plugins', height='600
             legend_show=true, legend_values=true, legend_min=true, legend_max=true, legend_avg=true,
             ).addTargets([
                 grafana.prometheus.target(
-                    'sum(rate(pg_gatherer_plugin_errors{}[10m])) by (host)',
+                    'sum(rate(pg_gatherer_plugin_errors{}[$__interval])) by (host)',
                         legendFormat='{{host}}')
             ]),
     ]);
