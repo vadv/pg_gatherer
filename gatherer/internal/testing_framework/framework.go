@@ -2,11 +2,13 @@ package testing_framework
 
 import (
 	"github.com/vadv/pg_gatherer/gatherer/internal/plugins"
+	"github.com/vadv/pg_gatherer/gatherer/internal/secrets"
 	lua "github.com/yuin/gopher-lua"
 )
 
 type framework struct {
 	pool       *plugins.Pool
+	secrets    *secrets.Storage
 	pluginName string
 	host       string
 }
@@ -44,6 +46,7 @@ func New(L *lua.LState, rootDir, cacheDir, pluginName, host, dbname, user, passw
 		pool:       pool,
 		pluginName: pluginName,
 		host:       pluginName,
+		secrets:    secrets.New(``),
 	}
 	pool.RegisterHost(f.host, connections)
 	ud := L.NewUserData()

@@ -8,6 +8,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/vadv/pg_gatherer/gatherer/internal/secrets"
+
 	"github.com/vadv/pg_gatherer/gatherer/internal/cache"
 
 	"github.com/vadv/pg_gatherer/gatherer/internal/connection"
@@ -57,6 +59,7 @@ type pluginConfig struct {
 	pluginName     string // directory name of plugin
 	globalCacheDir string // cache directory
 	connections    map[string]*Connection
+	secrets        *secrets.Storage
 }
 
 func createPlugin(config *pluginConfig) (*plugin, error) {
@@ -70,12 +73,12 @@ func createPlugin(config *pluginConfig) (*plugin, error) {
 			Host:       config.host,
 		},
 	}
-	if _, err := os.Stat(filepath.Join(config.rootDir, config.pluginName, "plugin.lua")); err == nil {
-		result.fileName = filepath.Join(config.rootDir, config.pluginName, "plugin.lua")
+	pluginFile := filepath.Join(config.rootDir, config.pluginName, "plugin.lua")
+	if _, err := os.Stat(pluginFile); err == nil {
+		result.fileName = pluginFile
 	}
 	if result.fileName == "" {
-		return nil, fmt.Errorf("plugin.lua file in directory '%s' or 'embedded/%s' in '%s' is not found",
-			config.pluginName, config.pluginName, config.rootDir)
+		return nil, fmt.Errorf("file %s not found", pluginFile)
 	}
 	result.statistics.PluginFileName = result.fileName
 	return result, nil
@@ -105,6 +108,8 @@ func (p *plugin) prepareState() error {
 	pluginUD.Value = p
 	state.SetMetatable(pluginUD, state.GetTypeMetatable(`plugin_status_ud`))
 	state.SetGlobal(`plugin`, pluginUD)
+	secrets.Preload(state)
+	p.config.secrets.Register(state, `secrets`)
 	libs.Preload(state)
 	if err := state.DoFile(filepath.Join(p.config.rootDir, "init.lua")); err != nil {
 		return fmt.Errorf("while load init.lua: %s", err.Error())

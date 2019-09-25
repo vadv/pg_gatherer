@@ -19,7 +19,7 @@ func checkUserDataFramework(L *lua.LState, n int) *framework {
 
 func createPlugin(L *lua.LState) int {
 	ud := checkUserDataFramework(L, 1)
-	if err := ud.pool.AddPluginToHost(ud.pluginName, ud.host); err != nil {
+	if err := ud.pool.AddPluginToHost(ud.pluginName, ud.host, ud.secrets); err != nil {
 		L.RaiseError("register error: %s", err.Error())
 	}
 	return 0

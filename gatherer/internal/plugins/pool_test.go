@@ -7,6 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/vadv/pg_gatherer/gatherer/internal/secrets"
+
 	"github.com/vadv/pg_gatherer/gatherer/internal/plugins"
 )
 
@@ -25,44 +27,45 @@ func TestPool(t *testing.T) {
 	connections[`target`] = conn
 	connections[`storage`] = conn
 	pool.RegisterHost(hostname, connections)
+	secretStorage := secrets.New(``)
 
 	// delete caches
 	os.RemoveAll("./tests/cache")
 
 	// add pl_cache
-	if err := pool.AddPluginToHost("pl_cache", hostname); err != nil {
+	if err := pool.AddPluginToHost("pl_cache", hostname, secretStorage); err != nil {
 		t.Fatalf("add plugin: %s\n", err.Error())
 	}
 
 	// add pl_restarts
-	if err := pool.AddPluginToHost("pl_restarts", hostname); err != nil {
+	if err := pool.AddPluginToHost("pl_restarts", hostname, secretStorage); err != nil {
 		t.Fatalf("add plugin: %s\n", err.Error())
 	}
 
 	// add pl_pg
-	if err := pool.AddPluginToHost("pl_pg", hostname); err != nil {
+	if err := pool.AddPluginToHost("pl_pg", hostname, secretStorage); err != nil {
 		t.Fatalf("add plugin: %s\n", err.Error())
 	}
 
 	// add pl_rds
-	if err := pool.AddPluginToHost("pl_rds", hostname); err != nil {
+	if err := pool.AddPluginToHost("pl_rds", hostname, secretStorage); err != nil {
 		t.Fatalf("add plugin: %s\n", err.Error())
 	}
 
 	// add pl_run_every
-	if err := pool.AddPluginToHost("pl_run_every", hostname); err != nil {
+	if err := pool.AddPluginToHost("pl_run_every", hostname, secretStorage); err != nil {
 		t.Fatalf("add plugin: %s\n", err.Error())
 	}
 
 	// add pl_stat
-	if err := pool.AddPluginToHost("pl_stat", hostname); err != nil {
+	if err := pool.AddPluginToHost("pl_stat", hostname, secretStorage); err != nil {
 		t.Fatalf("add plugin: %s\n", err.Error())
 	}
 
 	// add pl_stop
 	os.RemoveAll("./tests/pl_stop/must_exist.txt")
 	os.RemoveAll("./tests/pl_stop/must_not_exist.txt")
-	if err := pool.AddPluginToHost("pl_stop", hostname); err != nil {
+	if err := pool.AddPluginToHost("pl_stop", hostname, secretStorage); err != nil {
 		t.Fatalf("add plugin: %s\n", err.Error())
 	}
 

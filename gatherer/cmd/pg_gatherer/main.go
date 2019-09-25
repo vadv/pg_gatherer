@@ -3,26 +3,26 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
+	"github.com/vadv/pg_gatherer/gatherer/internal/secrets"
+
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/vadv/pg_gatherer/gatherer/internal/plugins"
-
-	"gopkg.in/yaml.v2"
 )
 
 var (
 	version        = `unknown`
-	hostConfigFile = flag.String(`host-config`, `host.yaml`, `Path to config file with host configurations.`)
-	pluginDir      = flag.String(`plugins`, `./plugins`, `Path to plugins directory`)
-	cacheDir       = flag.String(`cache`, `./cache`, `Path to cache directory`)
+	hostConfigFile = flag.String(`host-config-file`, `host.yaml`, `Path to config file with host configurations.`)
+	pluginDir      = flag.String(`plugins-dir`, `./plugins`, `Path to plugins directory`)
+	cacheDir       = flag.String(`cache-dir`, `./cache`, `Path to cache directory`)
 	httpListen     = flag.String(`http-listen`, `:8080`, `Lister address`)
+	secretsFile    = flag.String(`secret-file`, ``, `Path to yaml file with secrets (key:value)`)
 	versionFlag    = flag.Bool(`version`, false, `Print version and exit`)
 )
 
@@ -37,18 +37,9 @@ func main() {
 		os.Exit(0)
 	}
 
-	data, err := ioutil.ReadFile(*hostConfigFile)
-	if err != nil {
-		log.Printf("[FATAL] read config '%s': %s\n", *hostConfigFile, err.Error())
-		os.Exit(1)
-	}
-	config := new(Config)
-	if errMarshal := yaml.Unmarshal(data, &config); errMarshal != nil {
-		log.Printf("[FATAL] parse config '%s': %s\n", *hostConfigFile, errMarshal.Error())
-		os.Exit(1)
-	}
-	if errConfig := config.validate(); errConfig != nil {
-		log.Printf("[FATAL] config has error: %s\n", errConfig.Error())
+	config, errConfig := readConfig(*hostConfigFile)
+	if errConfig != nil {
+		log.Printf("[FATAL] config file error: %s\n", errConfig.Error())
 		os.Exit(1)
 	}
 
@@ -64,19 +55,14 @@ func main() {
 		}
 	}()
 
+	// secrets for pool
+	secretStorage := secrets.New(*secretsFile)
+	// pool of plugins
 	pool := plugins.NewPool(*pluginDir, *cacheDir)
-	// register
-	for host, hostConfig := range *config {
-		log.Printf("[INFO] register host: '%s'\n", host)
-		pool.RegisterHost(host, hostConfig.Connections)
-		for _, pl := range hostConfig.Plugins {
-			log.Printf("[INFO] register plugin '%s' for host: '%s'\n", pl, host)
-			if errPl := pool.AddPluginToHost(pl, host); errPl != nil {
-				log.Printf("[FATAL] register plugin '%s' for host '%s': %s\n",
-					pl, host, errPl.Error())
-				os.Exit(3)
-			}
-		}
+	// register plugins
+	if errRegister := config.registerHostsAndPlugins(pool, secretStorage); errRegister != nil {
+		log.Printf("[FATAL] register: %s\n", errRegister.Error())
+		os.Exit(3)
 	}
 	go prometheusCollectPoolStatistics(pool)
 	log.Printf("[INFO] started\n")
@@ -89,22 +75,24 @@ func main() {
 		switch s {
 		case syscall.SIGHUP:
 			// reload
-			log.Printf("[INFO] reload\n")
-			for host, hostConfig := range *config {
-				for _, pl := range hostConfig.Plugins {
-					log.Printf("[INFO] unregister plugin '%s' for host: '%s'\n", pl, host)
-					if errRemove := pool.StopAndRemovePluginFromHost(pl, host); errRemove != nil {
-						log.Printf("[FATAL] stop plugin '%s' for host '%s': %s\n", pl, host, errRemove.Error())
-						os.Exit(3)
-					}
-					log.Printf("[INFO] register plugin '%s' for host: '%s'\n", pl, host)
-					if errPl := pool.AddPluginToHost(pl, host); errPl != nil {
-						log.Printf("[FATAL] register plugin '%s' for host '%s': %s\n",
-							pl, host, errPl.Error())
-						os.Exit(3)
-					}
-				}
+			log.Printf("[INFO] reloading\n")
+			secretStorage.Read()
+			newConfig, errConfigReRead := readConfig(*hostConfigFile)
+			if errConfigReRead != nil {
+				log.Printf("[FATAL] config file error: %s\n", errConfigReRead.Error())
+				os.Exit(4)
 			}
+			if errUnRegister := config.unregisterAll(pool); errUnRegister != nil {
+				log.Printf("[FATAL] unregister error: %s\n", errUnRegister.Error())
+				os.Exit(5)
+			}
+			if errRegister := newConfig.registerHostsAndPlugins(pool, secretStorage); errRegister != nil {
+				// TODO: rollback
+				log.Printf("[FATAL] register error: %s\n", errRegister.Error())
+				os.Exit(5)
+			}
+			config = newConfig
+			log.Printf("[INFO] reloaded\n")
 		case syscall.SIGINT, syscall.SIGTERM:
 			// stop
 			log.Printf("[INFO] shutdown\n")
