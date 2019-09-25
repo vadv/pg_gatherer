@@ -376,8 +376,8 @@
       value_jsonb->>'full_table_name' as "table",
       max( (value_jsonb->>'relpages')::bigint)*8*1024  as "size",
       max( (value_jsonb->>'reltuples')::bigint ) as "rows",
-      round(100* max((value_jsonb->>'n_dead_tup')::float8) / ( max((value_jsonb->>'n_dead_tup')::float8 ) + max((value_jsonb->>'n_live_tup')::float8)))/100 as "% deleted",
-      round(100* max((value_jsonb->>'n_live_tup')::float8) / ( max((value_jsonb->>'n_dead_tup')::float8 ) + max((value_jsonb->>'n_live_tup')::float8)))/100 as "% live"
+      round(100* max((value_jsonb->>'n_dead_tup')::float8) / ( max((value_jsonb->>'n_dead_tup')::float8 ) + max((value_jsonb->>'n_live_tup')::float8)))/100 as "rows % deleted",
+      round(100* max((value_jsonb->>'n_live_tup')::float8) / ( max((value_jsonb->>'n_dead_tup')::float8 ) + max((value_jsonb->>'n_live_tup')::float8)))/100 as "rows % live"
       from data
       group by 1
       having ( max((value_jsonb->>'n_dead_tup')::float8 ) + max((value_jsonb->>'n_live_tup')::float8)) > 0
@@ -400,7 +400,7 @@
       min( (value_jsonb->>'relpages')::bigint)*8*1024  as "size min",
       max( (value_jsonb->>'reltuples')::bigint ) as "rows max",
       min( (value_jsonb->>'reltuples')::bigint ) as "rows min",
-      max( (value_jsonb->>'reltuples')::bigint) - min( (value_jsonb->>'reltuples')::bigint) as "rows change"
+      max( (value_jsonb->>'reltuples')::bigint) - min( (value_jsonb->>'reltuples')::bigint) as "rows changed"
       from data
       group by 1
       order by max( (value_jsonb->>'reltuples')::bigint) - min( (value_jsonb->>'reltuples')::bigint) desc, 2 desc
