@@ -8,6 +8,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/vadv/pg_gatherer/gatherer/internal/secrets"
+
 	"github.com/vadv/pg_gatherer/gatherer/internal/cache"
 
 	"github.com/vadv/pg_gatherer/gatherer/internal/connection"
@@ -57,6 +59,7 @@ type pluginConfig struct {
 	pluginName     string // directory name of plugin
 	globalCacheDir string // cache directory
 	connections    map[string]*Connection
+	secrets        *secrets.Storage
 }
 
 func createPlugin(config *pluginConfig) (*plugin, error) {
@@ -105,6 +108,8 @@ func (p *plugin) prepareState() error {
 	pluginUD.Value = p
 	state.SetMetatable(pluginUD, state.GetTypeMetatable(`plugin_status_ud`))
 	state.SetGlobal(`plugin`, pluginUD)
+	secrets.Preload(state)
+	p.config.secrets.Register(state, `secrets`)
 	libs.Preload(state)
 	if err := state.DoFile(filepath.Join(p.config.rootDir, "init.lua")); err != nil {
 		return fmt.Errorf("while load init.lua: %s", err.Error())

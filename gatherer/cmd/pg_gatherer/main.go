@@ -10,6 +10,8 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/vadv/pg_gatherer/gatherer/internal/secrets"
+
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/vadv/pg_gatherer/gatherer/internal/plugins"
@@ -23,6 +25,7 @@ var (
 	pluginDir      = flag.String(`plugins`, `./plugins`, `Path to plugins directory`)
 	cacheDir       = flag.String(`cache`, `./cache`, `Path to cache directory`)
 	httpListen     = flag.String(`http-listen`, `:8080`, `Lister address`)
+	secretsFile    = flag.String(`secrets`, ``, `Path to yaml file with secrets (key:value)`)
 	versionFlag    = flag.Bool(`version`, false, `Print version and exit`)
 )
 
@@ -64,6 +67,9 @@ func main() {
 		}
 	}()
 
+	// secrets
+	secretStorage := secrets.New(*secretsFile)
+
 	pool := plugins.NewPool(*pluginDir, *cacheDir)
 	// register
 	for host, hostConfig := range *config {
@@ -71,7 +77,7 @@ func main() {
 		pool.RegisterHost(host, hostConfig.Connections)
 		for _, pl := range hostConfig.Plugins {
 			log.Printf("[INFO] register plugin '%s' for host: '%s'\n", pl, host)
-			if errPl := pool.AddPluginToHost(pl, host); errPl != nil {
+			if errPl := pool.AddPluginToHost(pl, host, secretStorage); errPl != nil {
 				log.Printf("[FATAL] register plugin '%s' for host '%s': %s\n",
 					pl, host, errPl.Error())
 				os.Exit(3)
@@ -90,6 +96,7 @@ func main() {
 		case syscall.SIGHUP:
 			// reload
 			log.Printf("[INFO] reload\n")
+			secretStorage.Read()
 			for host, hostConfig := range *config {
 				for _, pl := range hostConfig.Plugins {
 					log.Printf("[INFO] unregister plugin '%s' for host: '%s'\n", pl, host)
@@ -98,7 +105,7 @@ func main() {
 						os.Exit(3)
 					}
 					log.Printf("[INFO] register plugin '%s' for host: '%s'\n", pl, host)
-					if errPl := pool.AddPluginToHost(pl, host); errPl != nil {
+					if errPl := pool.AddPluginToHost(pl, host, secretStorage); errPl != nil {
 						log.Printf("[FATAL] register plugin '%s' for host '%s': %s\n",
 							pl, host, errPl.Error())
 						os.Exit(3)

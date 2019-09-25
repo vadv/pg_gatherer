@@ -5,6 +5,8 @@ import (
 	"log"
 	"sync"
 	"time"
+
+	"github.com/vadv/pg_gatherer/gatherer/internal/secrets"
 )
 
 // Pool of plugins
@@ -88,7 +90,7 @@ func (p *Pool) RemoveHostAndPlugins(host string) {
 }
 
 // AddPluginToHost add plugin to host
-func (p *Pool) AddPluginToHost(pluginName, host string) error {
+func (p *Pool) AddPluginToHost(pluginName, host string, secrets *secrets.Storage) error {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 	// check
@@ -106,6 +108,7 @@ func (p *Pool) AddPluginToHost(pluginName, host string) error {
 		rootDir:        p.rootDir,
 		pluginName:     pluginName,
 		globalCacheDir: p.globalCacheDir,
+		secrets:        secrets,
 		connections:    p.hosts[host].connections,
 	}
 	pl, err := createPlugin(plConfig)

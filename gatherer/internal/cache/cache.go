@@ -15,7 +15,7 @@ type cacheUserData struct {
 	cache
 }
 
-// Preload is the preloader of user data connection_ud.
+// Preload is the preloader of user data cache_ud.
 func Preload(L *lua.LState) int {
 	connectionUd := L.NewTypeMetatable(`cache_ud`)
 	L.SetGlobal(`cache_ud`, connectionUd)
