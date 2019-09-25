@@ -1350,7 +1350,7 @@
                "targets": [
                   {
                      "format": "table",
-                     "rawSql": "select\n   value_jsonb->>'datname' as \"name\",\n   pg_catalog.pg_size_pretty((max(value_jsonb->>'size')::bigint)) as \"size\",\n   max( (value_jsonb->>'age')::bigint ) as \"age\",\n   sum( (value_jsonb->>'conflicts')::float8 ) as \"conflicts\",\n   sum( (value_jsonb->>'temp_files')::float8 ) as \"temp files\",\n   TO_CHAR(( sum( (value_jsonb->>'blk_read_time')::float8  )  * interval '1 millisecond' ) , 'HH24:MI:SS') as \"read time\",\n   TO_CHAR(( sum( (value_jsonb->>'blk_write_time')::float8  )  * interval '1 millisecond' ) , 'HH24:MI:SS') as \"write time\",\n   round( avg( (value_jsonb->>'xact_commit')::numeric ), 2) as \"commits\",\n   round( avg( (value_jsonb->>'xact_rollback')::numeric ), 2) as \"rollback\"\nfrom metric where\n   $__unixEpochFilter(ts) AND\n   host = md5('$host')::uuid AND\n   plugin = md5('pg.databases')::uuid\ngroup by 1\norder by 1\n",
+                     "rawSql": "select\n   value_jsonb->>'datname' as \"name\",\n   pg_catalog.pg_size_pretty((max(value_jsonb->>'size')::bigint)) as \"size\",\n   max( (value_jsonb->>'age')::bigint ) as \"age\",\n   sum( (value_jsonb->>'conflicts')::float8 ) as \"conflicts\",\n   sum( (value_jsonb->>'temp_files')::float8 ) as \"temp files\",\n   TO_CHAR(( sum( (value_jsonb->>'blk_read_time')::float8  )  * interval '1 millisecond' ) , 'HH24:MI:SS') as \"read time\",\n   TO_CHAR(( sum( (value_jsonb->>'blk_write_time')::float8  )  * interval '1 millisecond' ) , 'HH24:MI:SS') as \"write time\",\n   round( avg( (value_jsonb->>'xact_commit')::numeric ), 2) as \"commits/s\",\n   round( avg( (value_jsonb->>'xact_rollback')::numeric ), 2) as \"rollback/s\"\nfrom metric where\n   $__unixEpochFilter(ts) AND\n   host = md5('$host')::uuid AND\n   plugin = md5('pg.databases')::uuid\ngroup by 1\norder by 1\n",
                      "refId": "A"
                   }
                ],
@@ -1370,6 +1370,86 @@
       {
          "collapse": true,
          "collapsed": true,
+         "height": "300px",
+         "panels": [
+            {
+               "columns": [ ],
+               "datasource": "$POSTGRES_DS",
+               "id": 20,
+               "span": 12,
+               "styles": [
+                  {
+                     "decimals": 2,
+                     "pattern": "/size/",
+                     "type": "number",
+                     "unit": "decbytes"
+                  },
+                  {
+                     "decimals": 2,
+                     "pattern": "/(deleted|live)/",
+                     "type": "number",
+                     "unit": "percentunit"
+                  },
+                  {
+                     "decimals": 2,
+                     "pattern": "/.*/",
+                     "type": "number",
+                     "unit": "short"
+                  }
+               ],
+               "targets": [
+                  {
+                     "format": "table",
+                     "rawSql": "with data as (\n     select\n         snapshot,\n         jsonb_array_elements(value_jsonb) as value_jsonb\n     from metric where\n         $__unixEpochFilter(ts) AND\n         host = md5('$host')::uuid AND\n         plugin = md5('pg.user_tables')::uuid\n )\n select\n     value_jsonb->>'full_table_name' as \"table\",\n     max( (value_jsonb->>'relpages')::bigint)*8*1024  as \"size\",\n     max( (value_jsonb->>'reltuples')::bigint ) as \"rows\",\n     round(100* max((value_jsonb->>'n_dead_tup')::float8) / ( max((value_jsonb->>'n_dead_tup')::float8 ) + max((value_jsonb->>'n_live_tup')::float8)))/100 as \"% deleted\",\n     round(100* max((value_jsonb->>'n_live_tup')::float8) / ( max((value_jsonb->>'n_dead_tup')::float8 ) + max((value_jsonb->>'n_live_tup')::float8)))/100 as \"% live\"\n     from data\n     group by 1\n     having ( max((value_jsonb->>'n_dead_tup')::float8 ) + max((value_jsonb->>'n_live_tup')::float8)) > 0\n     order by 2 desc\nlimit 20;\n",
+                     "refId": "A"
+                  }
+               ],
+               "title": "biggest tables",
+               "transform": "table",
+               "type": "table"
+            },
+            {
+               "columns": [ ],
+               "datasource": "$POSTGRES_DS",
+               "id": 21,
+               "span": 12,
+               "styles": [
+                  {
+                     "decimals": 2,
+                     "pattern": "/size/",
+                     "type": "number",
+                     "unit": "decbytes"
+                  },
+                  {
+                     "decimals": 2,
+                     "pattern": "/.*/",
+                     "type": "number",
+                     "unit": "short"
+                  }
+               ],
+               "targets": [
+                  {
+                     "format": "table",
+                     "rawSql": "with data as (\n     select\n         snapshot,\n         jsonb_array_elements(value_jsonb) as value_jsonb\n     from metric where\n         $__unixEpochFilter(ts) AND\n         host = md5('$host')::uuid AND\n         plugin = md5('pg.user_tables')::uuid\n )\n select\n     value_jsonb->>'full_table_name' as \"table\",\n     max( (value_jsonb->>'relpages')::bigint)*8*1024  as \"size max\",\n     min( (value_jsonb->>'relpages')::bigint)*8*1024  as \"size min\",\n     max( (value_jsonb->>'reltuples')::bigint ) as \"rows max\",\n     min( (value_jsonb->>'reltuples')::bigint ) as \"rows min\",\n     max( (value_jsonb->>'reltuples')::bigint) - min( (value_jsonb->>'reltuples')::bigint) as \"rows change\"\n     from data\n     group by 1\n     order by max( (value_jsonb->>'reltuples')::bigint) - min( (value_jsonb->>'reltuples')::bigint) desc, 2 desc\nlimit 20;\n",
+                     "refId": "A"
+                  }
+               ],
+               "title": "most changed tables",
+               "transform": "table",
+               "type": "table"
+            }
+         ],
+         "repeat": null,
+         "repeatIteration": null,
+         "repeatRowId": null,
+         "showTitle": true,
+         "title": "Tables",
+         "titleSize": "h6",
+         "type": "row"
+      },
+      {
+         "collapse": true,
+         "collapsed": true,
          "height": "400px",
          "panels": [
             {
@@ -1380,7 +1460,7 @@
                "datasource": "$POSTGRES_DS",
                "fill": 1,
                "height": "400px",
-               "id": 20,
+               "id": 22,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -1460,7 +1540,7 @@
                "datasource": "$POSTGRES_DS",
                "fill": 1,
                "height": "400px",
-               "id": 21,
+               "id": 23,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -1554,7 +1634,7 @@
                "datasource": "$POSTGRES_DS",
                "fill": 1,
                "height": "400px",
-               "id": 22,
+               "id": 24,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -1634,7 +1714,7 @@
                "datasource": "$POSTGRES_DS",
                "fill": 1,
                "height": "400px",
-               "id": 23,
+               "id": 25,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -1714,7 +1794,7 @@
                "datasource": "$POSTGRES_DS",
                "fill": 1,
                "height": "400px",
-               "id": 24,
+               "id": 26,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -1803,7 +1883,7 @@
             {
                "columns": [ ],
                "datasource": "$POSTGRES_DS",
-               "id": 25,
+               "id": 27,
                "span": 12,
                "styles": [
                   {
@@ -1839,7 +1919,7 @@
             {
                "columns": [ ],
                "datasource": "$POSTGRES_DS",
-               "id": 26,
+               "id": 28,
                "span": 12,
                "styles": [
                   {
@@ -1875,7 +1955,7 @@
             {
                "columns": [ ],
                "datasource": "$POSTGRES_DS",
-               "id": 27,
+               "id": 29,
                "span": 12,
                "styles": [
                   {
@@ -1905,7 +1985,7 @@
             {
                "columns": [ ],
                "datasource": "$POSTGRES_DS",
-               "id": 28,
+               "id": 30,
                "span": 12,
                "styles": [
                   {
@@ -1949,7 +2029,7 @@
             {
                "columns": [ ],
                "datasource": "$POSTGRES_DS",
-               "id": 29,
+               "id": 31,
                "span": 12,
                "styles": [
                   {
@@ -1985,7 +2065,7 @@
             {
                "columns": [ ],
                "datasource": "$POSTGRES_DS",
-               "id": 30,
+               "id": 32,
                "span": 12,
                "styles": [
                   {
@@ -2033,7 +2113,7 @@
             {
                "columns": [ ],
                "datasource": "$POSTGRES_DS",
-               "id": 31,
+               "id": 33,
                "span": 6,
                "styles": [
                   {
@@ -2063,7 +2143,7 @@
             {
                "columns": [ ],
                "datasource": "$POSTGRES_DS",
-               "id": 32,
+               "id": 34,
                "span": 6,
                "styles": [
                   {
@@ -2107,7 +2187,7 @@
             {
                "columns": [ ],
                "datasource": "$POSTGRES_DS",
-               "id": 33,
+               "id": 35,
                "span": 12,
                "styles": [
                   {
@@ -2167,7 +2247,7 @@
                "datasource": "$POSTGRES_DS",
                "fill": 1,
                "height": "400px",
-               "id": 34,
+               "id": 36,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -2247,7 +2327,7 @@
                "datasource": "$POSTGRES_DS",
                "fill": 1,
                "height": "300px",
-               "id": 35,
+               "id": 37,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -2327,7 +2407,7 @@
                "datasource": "$POSTGRES_DS",
                "fill": 1,
                "height": "300px",
-               "id": 36,
+               "id": 38,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -2407,7 +2487,7 @@
                "datasource": "$POSTGRES_DS",
                "fill": 1,
                "height": "300px",
-               "id": 37,
+               "id": 39,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -2487,7 +2567,7 @@
                "datasource": "$POSTGRES_DS",
                "fill": 1,
                "height": "300px",
-               "id": 38,
+               "id": 40,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -2581,7 +2661,7 @@
                "datasource": "$POSTGRES_DS",
                "fill": 1,
                "height": "600px",
-               "id": 39,
+               "id": 41,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -2661,7 +2741,7 @@
                "datasource": "$POSTGRES_DS",
                "fill": 1,
                "height": "600px",
-               "id": 40,
+               "id": 42,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -2741,7 +2821,7 @@
                "datasource": "$POSTGRES_DS",
                "fill": 1,
                "height": "600px",
-               "id": 41,
+               "id": 43,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -2821,7 +2901,7 @@
                "datasource": "$POSTGRES_DS",
                "fill": 1,
                "height": "600px",
-               "id": 42,
+               "id": 44,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -2901,7 +2981,7 @@
                "datasource": "$POSTGRES_DS",
                "fill": 1,
                "height": "600px",
-               "id": 43,
+               "id": 45,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -2981,7 +3061,7 @@
                "datasource": "$POSTGRES_DS",
                "fill": 1,
                "height": "600px",
-               "id": 44,
+               "id": 46,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -3075,7 +3155,7 @@
                "datasource": "$POSTGRES_DS",
                "fill": 1,
                "height": "400px",
-               "id": 45,
+               "id": 47,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -3155,7 +3235,7 @@
                "datasource": "$POSTGRES_DS",
                "fill": 1,
                "height": "400px",
-               "id": 46,
+               "id": 48,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -3235,7 +3315,7 @@
                "datasource": "$POSTGRES_DS",
                "fill": 1,
                "height": "400px",
-               "id": 47,
+               "id": 49,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -3315,7 +3395,7 @@
                "datasource": "$POSTGRES_DS",
                "fill": 1,
                "height": "400px",
-               "id": 48,
+               "id": 50,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -3395,7 +3475,7 @@
                "datasource": "$POSTGRES_DS",
                "fill": 1,
                "height": "400px",
-               "id": 49,
+               "id": 51,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -3489,7 +3569,7 @@
                "datasource": "$POSTGRES_DS",
                "fill": 1,
                "height": "400px",
-               "id": 50,
+               "id": 52,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -3569,7 +3649,7 @@
                "datasource": "$POSTGRES_DS",
                "fill": 1,
                "height": "400px",
-               "id": 51,
+               "id": 53,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -3654,7 +3734,7 @@
                "datasource": "$POSTGRES_DS",
                "fill": 1,
                "height": "400px",
-               "id": 52,
+               "id": 54,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -3734,7 +3814,7 @@
                "datasource": "$POSTGRES_DS",
                "fill": 1,
                "height": "400px",
-               "id": 53,
+               "id": 55,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -3814,7 +3894,7 @@
                "datasource": "$POSTGRES_DS",
                "fill": 1,
                "height": "400px",
-               "id": 54,
+               "id": 56,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -3908,7 +3988,7 @@
                "datasource": "$PROMETHEUS_DS",
                "fill": 1,
                "height": "400px",
-               "id": 55,
+               "id": 57,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -3997,7 +4077,7 @@
                "datasource": "$PROMETHEUS_DS",
                "fill": 1,
                "height": "400px",
-               "id": 56,
+               "id": 58,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -4079,7 +4159,7 @@
                "datasource": "$PROMETHEUS_DS",
                "fill": 1,
                "height": "400px",
-               "id": 57,
+               "id": 59,
                "legend": {
                   "alignAsTable": true,
                   "avg": true,
@@ -4166,6 +4246,184 @@
          "repeatRowId": null,
          "showTitle": true,
          "title": "RDS metrics",
+         "titleSize": "h6",
+         "type": "row"
+      },
+      {
+         "collapse": true,
+         "collapsed": true,
+         "height": "600px",
+         "panels": [
+            {
+               "aliasColors": { },
+               "bars": false,
+               "dashLength": 10,
+               "dashes": false,
+               "datasource": "$PROMETHEUS_DS",
+               "fill": 1,
+               "height": "400px",
+               "id": 60,
+               "legend": {
+                  "alignAsTable": true,
+                  "avg": true,
+                  "current": false,
+                  "max": true,
+                  "min": true,
+                  "rightSide": false,
+                  "show": true,
+                  "sort": "max",
+                  "sortDesc": true,
+                  "total": false,
+                  "values": true
+               },
+               "lines": true,
+               "linewidth": 1,
+               "links": [ ],
+               "nullPointMode": "null",
+               "percentage": false,
+               "pointradius": 5,
+               "points": false,
+               "renderer": "flot",
+               "repeat": null,
+               "seriesOverrides": [ ],
+               "spaceLength": 10,
+               "span": 6,
+               "stack": false,
+               "steppedLine": false,
+               "targets": [
+                  {
+                     "expr": "sum(rate(pg_gatherer_plugin_errors{}[10m])) by (plugin)",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "{{plugin}}",
+                     "refId": "A"
+                  }
+               ],
+               "thresholds": [ ],
+               "timeFrom": null,
+               "timeShift": null,
+               "title": "Errors by plugin",
+               "tooltip": {
+                  "shared": true,
+                  "sort": 0,
+                  "value_type": "individual"
+               },
+               "transparent": true,
+               "type": "graph",
+               "xaxis": {
+                  "buckets": null,
+                  "mode": "time",
+                  "name": null,
+                  "show": true,
+                  "values": [ ]
+               },
+               "yaxes": [
+                  {
+                     "format": "ops",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": 0,
+                     "show": true
+                  },
+                  {
+                     "format": "ops",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": 0,
+                     "show": true
+                  }
+               ]
+            },
+            {
+               "aliasColors": { },
+               "bars": false,
+               "dashLength": 10,
+               "dashes": false,
+               "datasource": "$PROMETHEUS_DS",
+               "fill": 1,
+               "height": "400px",
+               "id": 61,
+               "legend": {
+                  "alignAsTable": true,
+                  "avg": true,
+                  "current": false,
+                  "max": true,
+                  "min": true,
+                  "rightSide": false,
+                  "show": true,
+                  "sort": "max",
+                  "sortDesc": true,
+                  "total": false,
+                  "values": true
+               },
+               "lines": true,
+               "linewidth": 1,
+               "links": [ ],
+               "nullPointMode": "null",
+               "percentage": false,
+               "pointradius": 5,
+               "points": false,
+               "renderer": "flot",
+               "repeat": null,
+               "seriesOverrides": [ ],
+               "spaceLength": 10,
+               "span": 6,
+               "stack": false,
+               "steppedLine": false,
+               "targets": [
+                  {
+                     "expr": "sum(rate(pg_gatherer_plugin_errors{}[10m])) by (host)",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "{{host}}",
+                     "refId": "A"
+                  }
+               ],
+               "thresholds": [ ],
+               "timeFrom": null,
+               "timeShift": null,
+               "title": "Errors by host",
+               "tooltip": {
+                  "shared": true,
+                  "sort": 0,
+                  "value_type": "individual"
+               },
+               "transparent": true,
+               "type": "graph",
+               "xaxis": {
+                  "buckets": null,
+                  "mode": "time",
+                  "name": null,
+                  "show": true,
+                  "values": [ ]
+               },
+               "yaxes": [
+                  {
+                     "format": "ops",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": 0,
+                     "show": true
+                  },
+                  {
+                     "format": "ops",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": 0,
+                     "show": true
+                  }
+               ]
+            }
+         ],
+         "repeat": null,
+         "repeatIteration": null,
+         "repeatRowId": null,
+         "showTitle": true,
+         "title": "Common metrics of plugins",
          "titleSize": "h6",
          "type": "row"
       }

@@ -353,14 +353,58 @@
     sum( (value_jsonb->>'temp_files')::float8 ) as "temp files",
     TO_CHAR(( sum( (value_jsonb->>'blk_read_time')::float8  )  * interval '1 millisecond' ) , 'HH24:MI:SS') as "read time",
     TO_CHAR(( sum( (value_jsonb->>'blk_write_time')::float8  )  * interval '1 millisecond' ) , 'HH24:MI:SS') as "write time",
-    round( avg( (value_jsonb->>'xact_commit')::numeric ), 2) as "commits",
-    round( avg( (value_jsonb->>'xact_rollback')::numeric ), 2) as "rollback"
+    round( avg( (value_jsonb->>'xact_commit')::numeric ), 2) as "commits/s",
+    round( avg( (value_jsonb->>'xact_rollback')::numeric ), 2) as "rollback/s"
  from metric where
     $__unixEpochFilter(ts) AND
     host = md5('$host')::uuid AND
     plugin = md5('pg.databases')::uuid
  group by 1
  order by 1
+|||,
+    row_tables_big: |||
+ with data as (
+      select
+          snapshot,
+          jsonb_array_elements(value_jsonb) as value_jsonb
+      from metric where
+          $__unixEpochFilter(ts) AND
+          host = md5('$host')::uuid AND
+          plugin = md5('pg.user_tables')::uuid
+  )
+  select
+      value_jsonb->>'full_table_name' as "table",
+      max( (value_jsonb->>'relpages')::bigint)*8*1024  as "size",
+      max( (value_jsonb->>'reltuples')::bigint ) as "rows",
+      round(100* max((value_jsonb->>'n_dead_tup')::float8) / ( max((value_jsonb->>'n_dead_tup')::float8 ) + max((value_jsonb->>'n_live_tup')::float8)))/100 as "% deleted",
+      round(100* max((value_jsonb->>'n_live_tup')::float8) / ( max((value_jsonb->>'n_dead_tup')::float8 ) + max((value_jsonb->>'n_live_tup')::float8)))/100 as "% live"
+      from data
+      group by 1
+      having ( max((value_jsonb->>'n_dead_tup')::float8 ) + max((value_jsonb->>'n_live_tup')::float8)) > 0
+      order by 2 desc
+ limit 20;
+|||,
+    row_tables_change: |||
+ with data as (
+      select
+          snapshot,
+          jsonb_array_elements(value_jsonb) as value_jsonb
+      from metric where
+          $__unixEpochFilter(ts) AND
+          host = md5('$host')::uuid AND
+          plugin = md5('pg.user_tables')::uuid
+  )
+  select
+      value_jsonb->>'full_table_name' as "table",
+      max( (value_jsonb->>'relpages')::bigint)*8*1024  as "size max",
+      min( (value_jsonb->>'relpages')::bigint)*8*1024  as "size min",
+      max( (value_jsonb->>'reltuples')::bigint ) as "rows max",
+      min( (value_jsonb->>'reltuples')::bigint ) as "rows min",
+      max( (value_jsonb->>'reltuples')::bigint) - min( (value_jsonb->>'reltuples')::bigint) as "rows change"
+      from data
+      group by 1
+      order by max( (value_jsonb->>'reltuples')::bigint) - min( (value_jsonb->>'reltuples')::bigint) desc, 2 desc
+ limit 20;
 |||,
     row_backend_states: |||
  SELECT

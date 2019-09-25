@@ -75,6 +75,23 @@ local databasesRow = grafana.row.new(title='Databases', height='300px', collapse
         ).addTarget(grafana.sql.target(sql.row_databases, format='table')),
     ]);
 
+local tablesRow = grafana.row.new(title='Tables', height='300px', collapse=true)
+    .addPanels([
+        grafana.tablePanel.new('biggest tables', span=12, datasource='$POSTGRES_DS',
+        styles=[
+             {pattern: '/size/', type: 'number', unit: 'decbytes', decimals: 2},
+             {pattern: '/(deleted|live)/', type: 'number', unit: 'percentunit', decimals: 2},
+             {pattern: '/.*/', type: 'number', unit: 'short', decimals: 2},
+        ],
+        ).addTarget(grafana.sql.target(sql.row_tables_big, format='table')),
+        grafana.tablePanel.new('most changed tables', span=12, datasource='$POSTGRES_DS',
+        styles=[
+             {pattern: '/size/', type: 'number', unit: 'decbytes', decimals: 2},
+             {pattern: '/.*/', type: 'number', unit: 'short', decimals: 2},
+        ],
+        ).addTarget(grafana.sql.target(sql.row_tables_change, format='table')),
+    ]);
+
 local operationsRow = grafana.row.new(title='Operations', height='400px', collapse=true)
     .addPanels([
         grafana.graphPanel.new(title='Queries/s ($host)',
@@ -344,7 +361,29 @@ local rdsRow = grafana.row.new(title='RDS metrics', height='600px', collapse=tru
             ]),
     ]);
 
+local pluginRow = grafana.row.new(title='Common metrics of plugins', height='600px', collapse=true)
+    .addPanels([
+        grafana.graphPanel.new(title='Errors by plugin',
+            datasource='$PROMETHEUS_DS', linewidth=1, format='ops', stack=false, fill=1, legend_sort='max', legend_sortDesc=true,
+            lines=true, transparent=true, min=0, legend_alignAsTable=true, span=6, height='400px',
+            legend_show=true, legend_values=true, legend_min=true, legend_max=true, legend_avg=true,
+            ).addTargets([
+                grafana.prometheus.target(
+                    'sum(rate(pg_gatherer_plugin_errors{}[10m])) by (plugin)',
+                        legendFormat='{{plugin}}')
+            ]),
+        grafana.graphPanel.new(title='Errors by host',
+            datasource='$PROMETHEUS_DS', linewidth=1, format='ops', stack=false, fill=1, legend_sort='max', legend_sortDesc=true,
+            lines=true, transparent=true, min=0, legend_alignAsTable=true, span=6, height='400px',
+            legend_show=true, legend_values=true, legend_min=true, legend_max=true, legend_avg=true,
+            ).addTargets([
+                grafana.prometheus.target(
+                    'sum(rate(pg_gatherer_plugin_errors{}[10m])) by (host)',
+                        legendFormat='{{host}}')
+            ]),
+    ]);
+
 dashboard.addRow(statInstanceRow).addRow(statQueriesRow).addRow(statBufferRow)
-    .addRow(databasesRow).addRow(operationsRow).addRow(backendsRow).addRow(statementsStatRow)
+    .addRow(databasesRow).addRow(tablesRow).addRow(operationsRow).addRow(backendsRow).addRow(statementsStatRow)
     .addRow(loggedQueriesRow).addRow(seqScanRow).addRow(bufferPoolRow).addRow(tableRow)
-    .addRow(walRow).addRow(systemRow).addRow(rdsRow)
+    .addRow(walRow).addRow(systemRow).addRow(rdsRow).addRow(pluginRow)
