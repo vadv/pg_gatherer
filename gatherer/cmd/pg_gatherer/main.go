@@ -82,15 +82,16 @@ func main() {
 				log.Printf("[FATAL] config file error: %s\n", errConfigReRead.Error())
 				os.Exit(4)
 			}
-			config = newConfig
 			if errUnRegister := config.unregisterAll(pool); errUnRegister != nil {
 				log.Printf("[FATAL] unregister error: %s\n", errUnRegister.Error())
 				os.Exit(5)
 			}
-			if errRegister := config.registerHostsAndPlugins(pool, secretStorage); errRegister != nil {
+			if errRegister := newConfig.registerHostsAndPlugins(pool, secretStorage); errRegister != nil {
+				// TODO: rollback
 				log.Printf("[FATAL] register error: %s\n", errRegister.Error())
 				os.Exit(5)
 			}
+			config = newConfig
 			log.Printf("[INFO] reloaded\n")
 		case syscall.SIGINT, syscall.SIGTERM:
 			// stop
