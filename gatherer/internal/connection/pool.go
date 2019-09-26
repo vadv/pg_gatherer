@@ -10,7 +10,7 @@ var (
 		mutex: sync.Mutex{},
 		pool:  make(map[string]*sql.DB),
 	}
-	maxOpenConns = uint(3)
+	maxOpenConns = uint(5)
 )
 
 // SetMaxOpenConns set max open connections
