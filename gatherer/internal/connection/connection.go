@@ -69,7 +69,7 @@ func BuildConnectionString(host, dbname string, port int, user, password string,
 			kvs = append(kvs, k+"="+escaper.Replace(v))
 		}
 	}
-	// await random map iteration
+	// prevent random map iteration
 	paramKeys := make([]string, 0, len(params))
 	for k := range params {
 		paramKeys = append(paramKeys, k)
