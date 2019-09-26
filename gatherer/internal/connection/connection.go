@@ -4,12 +4,14 @@ import (
 	"database/sql"
 	"fmt"
 	"strings"
+	"sync"
 
 	lua "github.com/yuin/gopher-lua"
 )
 
 // connection to PostgreSQL
 type connection struct {
+	mutexAddDB     sync.Mutex
 	db             *sql.DB
 	host           string
 	dbname         string
