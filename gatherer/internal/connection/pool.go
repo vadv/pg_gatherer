@@ -3,15 +3,24 @@ package connection
 import (
 	"database/sql"
 	"sync"
+	"sync/atomic"
 )
 
 var (
+	connectionPool    *connPool
+	poolDatabasesOpen *int32 // for testing
+	maxOpenConns      uint
+)
+
+func init() {
+	maxOpenConns = 5
 	connectionPool = &connPool{
 		mutex: sync.Mutex{},
 		pool:  make(map[string]*sql.DB),
 	}
-	maxOpenConns = uint(5)
-)
+	zero := int32(0)
+	poolDatabasesOpen = &zero
+}
 
 // SetMaxOpenConns set max open connections
 func SetMaxOpenConns(i uint) {
@@ -20,6 +29,7 @@ func SetMaxOpenConns(i uint) {
 	defer connectionPool.mutex.Unlock()
 	for _, db := range connectionPool.pool {
 		db.SetMaxOpenConns(int(maxOpenConns))
+		db.SetMaxIdleConns(int(maxOpenConns))
 	}
 }
 
@@ -29,11 +39,12 @@ type connPool struct {
 }
 
 func newPostgresConnection(connectionString string) (*sql.DB, error) {
-	db, err := sql.Open(`postgres`, connectionString)
+	atomic.AddInt32(poolDatabasesOpen, 1)
+	db, err := sql.Open(`gatherer-pq`, connectionString)
 	if err != nil {
 		return nil, err
 	}
-	db.SetMaxIdleConns(1)
+	db.SetMaxIdleConns(int(maxOpenConns))
 	db.SetMaxOpenConns(int(maxOpenConns))
 	return db, err
 }
