@@ -3,15 +3,14 @@ package connection
 import (
 	"database/sql"
 	"fmt"
+	"sort"
 	"strings"
-	"sync"
 
 	lua "github.com/yuin/gopher-lua"
 )
 
 // connection to PostgreSQL
 type connection struct {
-	mutexAddDB     sync.Mutex
 	db             *sql.DB
 	host           string
 	dbname         string
@@ -70,8 +69,14 @@ func BuildConnectionString(host, dbname string, port int, user, password string,
 			kvs = append(kvs, k+"="+escaper.Replace(v))
 		}
 	}
-	for k, v := range params {
-		accrue(k, v)
+	// await random map iteration
+	paramKeys := make([]string, 0, len(params))
+	for k := range params {
+		paramKeys = append(paramKeys, k)
+	}
+	sort.Strings(paramKeys)
+	for _, k := range paramKeys {
+		accrue(k, params[k])
 	}
 	return fmt.Sprintf("host='%s' port=%d dbname='%s' user='%s' password='%s' %s",
 		host, port, dbname, user, password, strings.Join(kvs, " "))

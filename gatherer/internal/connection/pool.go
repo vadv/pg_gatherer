@@ -42,8 +42,6 @@ func newPostgresConnection(connectionString string) (*sql.DB, error) {
 func getDBFromPool(c *connection) (*sql.DB, error) {
 	connectionPool.mutex.Lock()
 	defer connectionPool.mutex.Unlock()
-	c.mutexAddDB.Lock()
-	defer c.mutexAddDB.Unlock()
 	if db, ok := connectionPool.pool[c.connectionString()]; ok {
 		return db, nil
 	} else {
