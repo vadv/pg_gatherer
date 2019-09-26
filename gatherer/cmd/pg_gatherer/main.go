@@ -9,6 +9,8 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/vadv/pg_gatherer/gatherer/internal/connection"
+
 	"github.com/vadv/pg_gatherer/gatherer/internal/secrets"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -23,6 +25,7 @@ var (
 	cacheDir       = flag.String(`cache-dir`, `./cache`, `Path to cache directory`)
 	httpListen     = flag.String(`http-listen`, `:8080`, `Lister address`)
 	secretsFile    = flag.String(`secret-file`, ``, `Path to yaml file with secrets (key:value)`)
+	maxOpenConns   = flag.Uint(`max-open-conns`, 1, `Set max open connections`)
 	versionFlag    = flag.Bool(`version`, false, `Print version and exit`)
 )
 
@@ -36,6 +39,8 @@ func main() {
 		fmt.Printf("version: %s\n", version)
 		os.Exit(0)
 	}
+
+	connection.SetMaxOpenConns(*maxOpenConns)
 
 	config, errConfig := readConfig(*hostConfigFile)
 	if errConfig != nil {

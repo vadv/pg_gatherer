@@ -5,9 +5,22 @@ import (
 	"sync"
 )
 
-var connectionPool = &connPool{
-	mutex: sync.Mutex{},
-	pool:  make(map[string]*sql.DB),
+var (
+	connectionPool = &connPool{
+		mutex: sync.Mutex{},
+		pool:  make(map[string]*sql.DB),
+	}
+	maxOpenConns = uint(3)
+)
+
+// SetMaxOpenConns set max open connections
+func SetMaxOpenConns(i uint) {
+	maxOpenConns = i
+	connectionPool.mutex.Lock()
+	defer connectionPool.mutex.Unlock()
+	for _, db := range connectionPool.pool {
+		db.SetMaxOpenConns(int(maxOpenConns))
+	}
 }
 
 type connPool struct {
@@ -21,7 +34,7 @@ func newPostgresConnection(connectionString string) (*sql.DB, error) {
 		return nil, err
 	}
 	db.SetMaxIdleConns(1)
-	db.SetMaxOpenConns(5)
+	db.SetMaxOpenConns(int(maxOpenConns))
 	return db, err
 }
 

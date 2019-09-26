@@ -5,10 +5,11 @@ Creates lua user data `connection_ud`.
 ```go
 	state := lua.NewState()
 	connection.Preload(state)
+	connection.SetMaxOpenConns(1)
 	// register user data "test"
 	connection.New(state, "test", "/tmp", "gatherer-db-test", 5432, "gatherer-user-test", "gatherer-password", params map[string]string)
-	// register user data "connection"
-	connection.New(state, "connection", "/tmp", "gatherer-db", 5432, "gatherer-user", "gatherer-password", params map[string]string)
+	// register user data "new"
+	connection.New(state, "new", "/tmp", "gatherer-db", 5432, "gatherer-user", "gatherer-password", params map[string]string)
 ```
 
 # Lua
