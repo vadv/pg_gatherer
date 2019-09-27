@@ -1,6 +1,6 @@
 # Install
 
-Import dashboard json file [dashboard.json](dashboard.json)
+Import dashboard json file [dashboard.json](dashboard.json) and configure storage-db as datasource.
 
 # Build
 
@@ -20,11 +20,14 @@ make dashboard
 ![tables](images/3.png)
 ## operations
 ![operations](images/4.png)
+## buffer pool
+![buffer pool-1](images/14.png)
+![buffer pool-2](images/15.png)
 ## backend states
 ![backend states](images/5.png)
 ## stat statements
-![statements -1](images/6.png)
-![statements 2](images/7.png)
+![statements-1](images/6.png)
+![statements-2](images/7.png)
 ## logged statements
 ![logs](images/8.png)
 ## vacuum

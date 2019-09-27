@@ -32,7 +32,7 @@ PostgreSQL database (recommended use [TimescaleDB](https://docs.timescale.com/la
 
 ## Agent pg_gatherer
 
-The agent is golang-binary, with plugins written in Lua (without any system dependencies).
+The agent is golang-binary, with plugins written in [Gopher-lua](https://github.com/yuin/gopher-lua) (without any system dependencies).
 
 You can run agent locally on machine `Target`,
 then you get additional statistics, for example link `/proc/{pid}/io` stats with query.
@@ -44,7 +44,8 @@ There are a lot of monitoring systems in the world that are known and proven. Wh
 The answers:
 * firstly pg_gatherer does not claim to be a full-fledged monitoring system, it developed as a tool for in-depth analysis.
 * it seems natural to me to store different information (not only float/int metrics with tags) but also queries texts in the database.
-* system should be easily extensible with plugins.
+* system should be easily extensible with [plugins](/plugins).
+* keep integration with [Grafana](/grafana).
 
 ## Installation
 
