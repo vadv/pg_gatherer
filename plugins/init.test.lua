@@ -32,7 +32,7 @@ function run_plugin_test(timeout, success_exit_function, check_error_function)
   check_error_function = check_error_function or plugin_check_error
   success_exit_function = success_exit_function or function() return false end
   tested_plugin:create()
-  timeout = 120 or timeout
+  timeout = timeout or 120
   while timeout > 0 do
     check_error_function()
     if success_exit_function() then
