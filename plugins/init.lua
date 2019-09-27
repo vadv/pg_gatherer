@@ -44,13 +44,17 @@ function get_unix_ts(conn)
 end
 
 -- insert metric with plugin:host()
+local count_empty_metrics = 0
 function storage_insert_metric(metric)
   if not (metric.host) then metric.host = plugin:host() end
   if (metric.int == nil) and (metric.float == nil) and not (metric.json == nil) then
     local jsonb, err = json.decode(metric.json)
     if err then error(err) end
     if next(jsonb) == nil then
-      plugin_log:printf("[ERROR] plugin '%s' on host '%s': empty metric\n", plugin:name(), plugin:host())
+      count_empty_metrics = count_empty_metrics + 1
+      if (count_empty_metrics % 10) == 0 then
+        plugin_log:printf("[ERROR] plugin '%s' on host '%s': empty metric (%d times)\n", plugin:name(), plugin:host(), count_empty_metrics)
+      end
       return
     end
   end
@@ -91,15 +95,17 @@ function run_every(f, every)
         plugin_log:printf("[ERROR] plugin '%s' on host '%s' execution timeout: %.2f s\n", plugin:name(), plugin:host(), exec_time)
         time.sleep(1)
       else
-        plugin_log:printf("[INFO] plugin '%s' on host '%s' execution time: %.2f s\n", plugin:name(), plugin:host(), exec_time)
+        if exec_time > 1 then
+          plugin_log:printf("[INFO] plugin '%s' on host '%s' execution time: %.2f s\n", plugin:name(), plugin:host(), exec_time)
+        end
       end
     else
-      -- wait random seconds, for decrease CPU spikes
-      local rand = every / 10
-      time.sleep(math.random(rand))
+      -- wait random seconds, for decrease CPU spikes ((0..every)/10 + 1)s
+      local rand = tonumber(string.format("%.0f", every / 10) +1)
+      time.sleep(rand)
     end
   end
 end
 
--- wait random seconds, for decrease CPU spikes
-time.sleep(math.random(5))
+-- wait random seconds, for decrease CPU spikes (0-1s)
+time.sleep(math.random(100)/100)

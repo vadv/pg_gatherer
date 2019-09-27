@@ -1,5 +1,5 @@
 local plugin_name    = 'pg.statements'
-local every          = 60
+local every          = 300
 
 local sql_statements = read_file_in_plugin_dir("statements.sql")
 
