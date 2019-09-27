@@ -15,7 +15,7 @@ local routing_keys = {
 }
 
 -- return routing
-local function routing(host, alert_key, custom_details, created_at)
+local function routing(alert)
   return {severity=dict.critical, key=routing_keys[dict.critical]}
 end
 
