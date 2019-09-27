@@ -1,24 +1,24 @@
 -- this file loaded on first start of plugin
 
-filepath = require("filepath")
-time = require("time")
-inspect = require("inspect")
-json = require("json")
-ioutil = require("ioutil")
-crypto = require("crypto")
-goos = require("goos")
-log = require("log")
-humanize = require("humanize")
-strings = require("strings")
+filepath   = require("filepath")
+time       = require("time")
+inspect    = require("inspect")
+json       = require("json")
+ioutil     = require("ioutil")
+crypto     = require("crypto")
+goos       = require("goos")
+log        = require("log")
+humanize   = require("humanize")
+strings    = require("strings")
 
 plugin_log = log.new()
-plugin_log:set_flags({date=true, time=true})
+plugin_log:set_flags({ date = true, time = true })
 
 -- current directory (root)
-root = filepath.dir(debug.getinfo(1).source)
+root          = filepath.dir(debug.getinfo(1).source)
 
-HOST_DEV_DIR = os.getenv('HOST_DEV_DIR') or '/dev'
-HOST_SYS_DIR = os.getenv('HOST_SYS_DIR') or '/sys'
+HOST_DEV_DIR  = os.getenv('HOST_DEV_DIR') or '/dev'
+HOST_SYS_DIR  = os.getenv('HOST_SYS_DIR') or '/sys'
 HOST_PROC_DIR = os.getenv('HOST_PROC_DIR') or '/proc'
 
 -- read file in plugin dir
@@ -30,10 +30,10 @@ end
 
 -- return true if database hosted on rds
 function is_rds()
-  return not(not(
-          pcall(function()
-              target:query("show rds.extensions")
-          end)
+  return not (not (
+      pcall(function()
+        target:query("show rds.extensions")
+      end)
   ))
 end
 
@@ -45,8 +45,8 @@ end
 
 -- insert metric with plugin:host()
 function storage_insert_metric(metric)
-  if not(metric.host) then metric.host = plugin:host() end
-  if (metric.int == nil) and (metric.float == nil) and not(metric.json == nil) then
+  if not (metric.host) then metric.host = plugin:host() end
+  if (metric.int == nil) and (metric.float == nil) and not (metric.json == nil) then
     local jsonb, err = json.decode(metric.json)
     if err then error(err) end
     if next(jsonb) == nil then
@@ -55,12 +55,12 @@ function storage_insert_metric(metric)
     end
   end
   storage:insert_metric(metric)
-  end
+end
 
 -- return postgresql version
 function get_pg_server_version()
   if pg_server_version then return pg_server_version end
-  local version = target:query("show server_version")
+  local version     = target:query("show server_version")
   pg_server_version = tonumber(version.rows[1][1])
   return pg_server_version
 end
@@ -94,9 +94,12 @@ function run_every(f, every)
         plugin_log:printf("[INFO] plugin '%s' on host '%s' execution time: %.2f s\n", plugin:name(), plugin:host(), exec_time)
       end
     else
-      -- wait random seconds
+      -- wait random seconds, for decrease CPU spikes
       local rand = every / 10
-      time.sleep( math.random(rand) )
+      time.sleep(math.random(rand))
     end
   end
 end
+
+-- wait random seconds, for decrease CPU spikes
+time.sleep(math.random(5))
