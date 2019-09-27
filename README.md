@@ -45,7 +45,7 @@ The answers:
 * firstly pg_gatherer does not claim to be a full-fledged monitoring system, it developed as a tool for in-depth analysis.
 * it seems natural to me to store different information (not only float/int metrics with tags) but also queries texts in the database.
 * system should be easily extensible with [plugins](/plugins).
-* keep integration with [Grafana]((/grafana)).
+* keep integration with [Grafana](/grafana).
 
 ## Installation
 
