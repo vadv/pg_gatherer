@@ -96,7 +96,7 @@ peripheral-db-1: # name of target in storage-db
 
 ## Plugins
 
-More information here [plugins](/plugins)
+More information here: [plugins](/plugins)
 
 ## Build status
 

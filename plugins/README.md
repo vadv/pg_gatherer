@@ -1,7 +1,10 @@
 # Plugin
 
-The plugin is the directory where the plugin.lua file must be located.
-Each plugin lives in a separate lua-state, before starting it reads [init.lua](init.lua).
+* The plugin is the directory where the plugin.lua file must be located.
+* If plugin raise error, it will automatically restart.
+* Each plugin lives in a separate lua-state.
+* Before each start of plugin [init.lua](init.lua) is execute.
+
 
 Lua 5.1 and all libraries from [glua-libs](https://github.com/vadv/gopher-lua-libs) are available in plugin.
 
