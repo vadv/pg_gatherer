@@ -17,7 +17,6 @@ local get_routing = dofile(routing_file)
 local http        = require("http")
 local crypto      = require("crypto")
 local http_client = http.client({})
-local sql         = read_file_in_plugin_dir("list_of_alerts.sql")
 
 local function send(info)
   local jsonb, err = json.encode(info)
@@ -37,8 +36,7 @@ end
 
 local function process_alert_row(alert)
   local cache_key     = alert.host .. alert.key .. "pagerduty"
-  local _, silence_to = cache:get(cache_key)
-  silence_to          = silence_to or 0
+  local silence_to = cache:get(cache_key) or 0
   if time.unix() > silence_to then
     local routing = get_routing(alert)
     local jsonb   = {
@@ -50,7 +48,7 @@ local function process_alert_row(alert)
         source         = "pg_gatherer for " .. alert.host,
         severity       = routing.severity,
         component      = "postgresql",
-        custom_details = json.decode(alert.custom_details)
+        custom_details = json.decode(alert.custom_details or '{}')
       }
     }
     send(jsonb)
@@ -59,4 +57,4 @@ local function process_alert_row(alert)
   end
 end
 
-return process_alert_row()
+return process_alert_row

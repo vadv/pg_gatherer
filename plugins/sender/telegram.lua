@@ -27,8 +27,7 @@ Description:  <code>{{ description }}</code>
 
 function process_alert_row(alert)
   local cache_key                  = alert.key .. alert.host .. "telegram"
-  local silence_to                 = cache:get(cache_key)
-  silence_to                       = silence_to or 0
+  local silence_to                 = cache:get(cache_key) or 0
   -- send message
   if time.unix() > silence_to then
     alert.created_at    = alert.created_at or alert.ts

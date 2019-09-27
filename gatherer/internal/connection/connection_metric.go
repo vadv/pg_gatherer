@@ -23,7 +23,7 @@ func insertMetric(L *lua.LState) int {
 		L.RaiseError("parse metric: %s", err.Error())
 		return 0
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	_, err = ud.db.ExecContext(ctx, queryInsert,
 		m.host, m.plugin, m.snapshot, m.valueInteger, m.valueFloat64, m.valueJson)
