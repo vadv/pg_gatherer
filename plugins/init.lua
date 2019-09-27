@@ -81,13 +81,10 @@ end
 -- this function run in plugin context, then we use cache key `last_run`
 function run_every(f, every)
   while true do
-
-    local _, updated_at = cache:get("last_run")
-    updated_at = updated_at or 0
-
-    if time.unix() >= updated_at + every then
+    local last_run_at = cache:get("last_run") or 0
+    if time.unix() >= last_run_at + every then
       local start_at = time.unix()
-      cache:set("last_run", 0)
+      cache:set("last_run", start_at)
       f()
       local exec_time = (time.unix() - start_at)
       if exec_time > every then
@@ -97,10 +94,9 @@ function run_every(f, every)
         plugin_log:printf("[INFO] plugin '%s' on host '%s' execution time: %.2f s\n", plugin:name(), plugin:host(), exec_time)
       end
     else
-      -- wait random
+      -- wait random seconds
       local rand = every / 10
       time.sleep( math.random(rand) )
     end
-
   end
 end
