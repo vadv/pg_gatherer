@@ -37,7 +37,7 @@ The agent is golang-binary, with plugins written in Lua (without any system depe
 You can run agent locally on machine `Target`,
 then you get additional statistics, for example link `/proc/{pid}/io` stats with query.
 
-# Why?
+## Why?
 
 There are a lot of monitoring systems in the world that are known and proven. Why make another system?
 
@@ -87,8 +87,17 @@ peripheral-db-1: # name of target in storage-db
       dbname: gatherer
       username: storage
       port: 5432
+    replica: # another target agent connection
+      host: 192.168.1.2
+      dbname: your_database
+      username: monitor
+      port: 5432
 ```
 
-# Build status
+## Plugins
+
+More information here [plugins](/plugins)
+
+## Build status
 
 [![Travis](https://travis-ci.org/vadv/pg_gatherer.svg)](https://travis-ci.org/vadv/pg_gatherer)
