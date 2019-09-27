@@ -30,7 +30,7 @@ Targets databases, which agent monitoring.
 
 PostgreSQL database (recommended use [TimescaleDB](https://docs.timescale.com/latest/introduction) extension) in which information is stored.
 
-## Pg_Gatherer
+## Agent pg_gatherer
 
 The agent is golang-binary, with plugins written in Lua (without any system dependencies).
 
