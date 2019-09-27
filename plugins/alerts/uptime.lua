@@ -5,7 +5,6 @@ local function check(host, unix_ts)
   local result = storage:query(sql, host, unix_ts)
   if not (result.rows[1] == nil) and not (result.rows[1][1] == nil) then
     local uptime = result.rows[1][1]
-    print("uptime: ", host, uptime)
     if uptime < 300 then
       local jsonb      = {
         host           = host,
