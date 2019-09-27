@@ -1,3 +1,17 @@
+# Install
+
+Import dashboard json file [dashboard.json](dashboard.json)
+
+# Build
+
+Requires jsonnet binary.
+
+```bash
+go get github.com/google/go-jsonnet/cmd/jsonnet
+make dashboard
+```
+
+# Examples
 ## status indicators
 ![status indicators](images/1.png)
 ## databases
