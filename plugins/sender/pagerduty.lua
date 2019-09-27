@@ -35,24 +35,22 @@ local function send(info)
   end
 end
 
-local function process_alert_row(row)
-  local key, host                  = row[1], row[3]
-  local custom_details, created_at = row[4], row[5]
-  local cache_key                  = crypto.md5(host .. key .. "pagerduty")
-  local _, silence_to              = cache:get(cache_key)
-  silence_to                       = silence_to or 0
+local function process_alert_row(alert)
+  local cache_key     = alert.host .. alert.key .. "pagerduty"
+  local _, silence_to = cache:get(cache_key)
+  silence_to          = silence_to or 0
   if time.unix() > silence_to then
-    local routing = get_routing(host, key, custom_details, created_at)
+    local routing = get_routing(alert)
     local jsonb   = {
       routing_key  = routing.key,
-      dedup_key    = crypto.md5(key .. host),
+      dedup_key    = crypto.md5(alert.key .. alert.host),
       event_action = "trigger",
       payload      = {
-        summary        = key .. " [" .. host .. "]",
-        source         = "pg_gatherer for " .. host,
+        summary        = alert.key .. " [" .. alert.host .. "]",
+        source         = "pg_gatherer for " .. alert.host,
         severity       = routing.severity,
         component      = "postgresql",
-        custom_details = json.decode(custom_details)
+        custom_details = json.decode(alert.custom_details)
       }
     }
     send(jsonb)
@@ -61,19 +59,4 @@ local function process_alert_row(row)
   end
 end
 
--- process function
-local function process()
-  local result = storage:query("select name from host where not maintenance")
-  for _, rowHost in pairs(result.rows) do
-    local host   = rowHost[1]
-    local result = storage:query(sql, host, get_unix_ts(storage))
-    for _, row in pairs(result.rows) do
-      local status, err = pcall(process_alert_row, row)
-      if not status then
-        plugin_log:printf("[ERROR] while process row %s plugin '%s' on host '%s' error: %s\n", inspect(row), plugin:name(), plugin:host(), err)
-      end
-    end
-  end
-end
-
-return process()
+return process_alert_row()

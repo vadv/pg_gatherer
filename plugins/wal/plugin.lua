@@ -6,9 +6,9 @@ local function get_sql()
   if get_pg_is_in_recovery() then
     -- slave
     if get_pg_server_version() >= 10 then
-      filename = "wal_slave_10.sql"
+      filename = "wal_replica_10.sql"
     else
-      filename = "wal_slave_9.sql"
+      filename = "wal_replica_9.sql"
     end
   else
     -- master
