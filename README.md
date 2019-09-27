@@ -24,7 +24,7 @@ The project is designed to collect and store statistical data of PostgreSQL into
 
 ## Targets
 
-Targets databases, which agent monitoring.
+Target databases, which agent is monitored.
 
 ## Storage
 
@@ -36,6 +36,15 @@ The agent is golang-binary, with plugins written in Lua (without any system depe
 
 You can run agent locally on machine `Target`,
 then you get additional statistics, for example link `/proc/{pid}/io` stats with query.
+
+# Why?
+
+There are a lot of monitoring systems in the world that are known and proven. Why make another system?
+
+The answers:
+* firstly pg_gatherer does not claim to be a full-fledged monitoring system, it developed as a tool for in-depth analysis.
+* it seems natural to me to store different information (not only float/int metrics with tags) but also queries texts in the database.
+* system should be easily extensible with plugins.
 
 ## Installation
 
