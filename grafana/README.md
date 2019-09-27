@@ -1,13 +1,25 @@
-![1](images/1.png)
-![2](images/2.png)
-![3](images/3.png)
-![4](images/4.png)
-![5](images/5.png)
-![6](images/6.png)
-![7](images/7.png)
-![8](images/8.png)
-![9](images/9.png)
-![10](images/10.png)
-![11](images/11.png)
-![12](images/12.png)
-![13](images/13.png)
+## status indicators
+![status indicators](images/1.png)
+## databases
+![databases](images/2.png)
+## tables
+![tables](images/3.png)
+## operations
+![operations](images/4.png)
+## backend states
+![backend states](images/5.png)
+## stat statements
+![statements -1](images/6.png)
+![statements 2](images/7.png)
+## logged statements
+![logs](images/8.png)
+## vacuum
+![vacuum](images/9.png)
+## sequential scans
+![seq scans](images/10.png)
+## tuples/blocks access
+![tuples](images/11.png)
+## wal
+![wal](images/12.png)
+## rds
+![rds](images/13.png)
