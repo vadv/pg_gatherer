@@ -3,6 +3,7 @@ package plugins
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"sync"
 	"time"
 
@@ -50,7 +51,11 @@ func (p *Pool) supervisor() error {
 							host, pl.config.pluginName, plErr.Error())
 					}
 					if err := pl.prepareState(); err == nil {
-						go pl.execute()
+						go func() {
+							n := rand.Intn(1000) // 0-1s
+							time.Sleep(time.Duration(n)*time.Millisecond + time.Second)
+							pl.execute()
+						}()
 					} else {
 						log.Printf("[ERROR] host: %s, plugin: %s can't start: %s\n",
 							host, pl.config.pluginName, err.Error())

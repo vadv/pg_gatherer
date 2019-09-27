@@ -97,8 +97,9 @@ function run_every(f, every)
         plugin_log:printf("[INFO] plugin '%s' on host '%s' execution time: %.2f s\n", plugin:name(), plugin:host(), exec_time)
       end
     else
-      -- wait
-      time.sleep(1)
+      -- wait random
+      local rand = every / 10
+      time.sleep( math.random(rand) )
     end
 
   end
