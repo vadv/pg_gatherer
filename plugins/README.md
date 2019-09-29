@@ -45,3 +45,14 @@ cache:diff_and_set(key, value)
 cache:speed_and_set(key, value)
 -- returns speed (current-previous)/(current_time - previous_time): float, or nil if previous value was doesn't set.
 ```
+
+## Plugin alerts
+
+This is a special plugin that must be run in one instance, for example, on storage.
+The plugin analyzes the information which saved other plugins and creates entries in the storage database,
+which will be sent using the sender plugin.
+
+## Plugin sender
+
+This plugin integrates with other types of monitoring: currently it sends information from `alerts` plugin to [PagerDuty](https://pagerduty.com)
+and also sends messages to [telegram im](http://telegram.org) if you need it.

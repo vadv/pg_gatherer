@@ -2278,7 +2278,7 @@
                "targets": [
                   {
                      "format": "time_series",
-                     "rawSql": "with data as (\n  SELECT\n      m.snapshot as \"time\",\n      j.key as \"relation\",\n      sum(coalesce((j.value->>'buffers')::bigint, 0)*8*1024) as \"size\"\n  FROM metric m\n  CROSS JOIN LATERAL jsonb_each((m.value_jsonb->>'per_relation_stat')::jsonb) j\n  WHERE\n    $__unixEpochFilter(m.ts) AND\n    m.host = md5('$host')::uuid AND\n    m.plugin = md5('pg.buffercache')::uuid\n  GROUP BY 1,2\n  ORDER BY 1,2\n)\n, big_relations as (\n  SELECT\n      d.relation as relation,\n      sum(d.size) as size\n  FROM data d\n  GROUP BY 1\n  ORDER BY 2 DESC\n  LIMIT 20\n)\nSELECT\n  time_bucket('\"$interval\"'::interval, to_timestamp(d.time) AT TIME ZONE 'UTC' ) AS \"time\",\n  d.relation,\n  avg(d.size)\nFROM data d\nINNER JOIN big_relations t ON t.relation = d.relation\nGROUP BY 1,2\nORDER BY 1,2\n",
+                     "rawSql": "with data as (\n  SELECT\n      m.ts as \"time\",\n      j.key as \"relation\",\n      sum(coalesce((j.value->>'buffers')::bigint, 0)*8*1024) as \"size\"\n  FROM metric m\n  CROSS JOIN LATERAL jsonb_each((m.value_jsonb->>'per_relation_stat')::jsonb) j\n  WHERE\n    $__unixEpochFilter(m.ts) AND\n    m.host = md5('$host')::uuid AND\n    m.plugin = md5('pg.buffercache')::uuid\n  GROUP BY 1,2\n  ORDER BY 1,2\n)\n, big_relations as (\n  SELECT\n      d.relation as relation,\n      sum(d.size) as size\n  FROM data d\n  GROUP BY 1\n  ORDER BY 2 DESC\n  LIMIT 20\n)\nSELECT\n  time_bucket('\"$interval\"'::interval, to_timestamp(d.time) AT TIME ZONE 'UTC' ) AS \"time\",\n  d.relation,\n  avg(d.size)\nFROM data d\nINNER JOIN big_relations t ON t.relation = d.relation\nGROUP BY 1,2\nORDER BY 1,2\n",
                      "refId": "A"
                   }
                ],
@@ -2358,7 +2358,7 @@
                "targets": [
                   {
                      "format": "time_series",
-                     "rawSql": "with data as (\nSELECT\n  m.snapshot,\n  sum(COALESCE( (m.value_jsonb->>'dirty_count')::bigint, 0 ) * 8 * 1024) as \"dirty\",\n  m.value_jsonb->>'datname' as \"database\"\nFROM metric m\nWHERE\n  $__unixEpochFilter(m.ts) AND\n  m.host = md5('$host')::uuid AND\n  m.plugin = md5('pg.buffercache')::uuid\nGROUP BY 1, 3\nORDER BY 1\n)\nSELECT\n    time_bucket('\"$interval\"'::interval, to_timestamp(d.snapshot) AT TIME ZONE 'UTC' ) AS \"time\",\n    avg( d.dirty ),\n    d.database\nFROM data d\nGROUP BY 1,3\nORDER BY 1\n",
+                     "rawSql": "with data as (\nSELECT\n  m.ts,\n  sum(COALESCE( (m.value_jsonb->>'dirty_count')::bigint, 0 ) * 8 * 1024) as \"dirty\",\n  m.value_jsonb->>'datname' as \"database\"\nFROM metric m\nWHERE\n  $__unixEpochFilter(m.ts) AND\n  m.host = md5('$host')::uuid AND\n  m.plugin = md5('pg.buffercache')::uuid\nGROUP BY 1, 3\nORDER BY 1\n)\nSELECT\n    time_bucket('\"$interval\"'::interval, to_timestamp(d.ts) AT TIME ZONE 'UTC' ) AS \"time\",\n    avg( d.dirty ),\n    d.database\nFROM data d\nGROUP BY 1,3\nORDER BY 1\n",
                      "refId": "A"
                   }
                ],
@@ -2438,7 +2438,7 @@
                "targets": [
                   {
                      "format": "time_series",
-                     "rawSql": "with data as (\nSELECT\n  m.snapshot AS \"time\",\n  sum(COALESCE( (m.value_jsonb->>'usage_count_0')::bigint, 0 ) * 8 * 1024) as \"usage\",\n  m.value_jsonb->>'datname' as \"database\"\nFROM metric m\nWHERE\n  $__unixEpochFilter(m.ts) AND\n  m.host = md5('$host')::uuid AND\n  m.plugin = md5('pg.buffercache')::uuid\nGROUP BY 1, m.value_jsonb->>'datname'\nORDER BY 1\n)\nSELECT\n    time_bucket('\"$interval\"'::interval, to_timestamp(d.time) AT TIME ZONE 'UTC' ) AS \"time\",\n    avg( d.usage ),\n    d.database\nFROM data d\nGROUP BY 1,3\nORDER BY 1,3\n",
+                     "rawSql": "with data as (\nSELECT\n  m.ts AS \"time\",\n  sum(COALESCE( (m.value_jsonb->>'usage_count_0')::bigint, 0 ) * 8 * 1024) as \"usage\",\n  m.value_jsonb->>'datname' as \"database\"\nFROM metric m\nWHERE\n  $__unixEpochFilter(m.ts) AND\n  m.host = md5('$host')::uuid AND\n  m.plugin = md5('pg.buffercache')::uuid\nGROUP BY 1, m.value_jsonb->>'datname'\nORDER BY 1\n)\nSELECT\n    time_bucket('\"$interval\"'::interval, to_timestamp(d.time) AT TIME ZONE 'UTC' ) AS \"time\",\n    avg( d.usage ),\n    d.database\nFROM data d\nGROUP BY 1,3\nORDER BY 1,3\n",
                      "refId": "A"
                   }
                ],
@@ -2518,7 +2518,7 @@
                "targets": [
                   {
                      "format": "time_series",
-                     "rawSql": "with data as (\nSELECT\n  m.snapshot AS \"time\",\n  sum(COALESCE( (m.value_jsonb->>'usage_count_3')::bigint, 0 ) * 8 * 1024) as \"usage\",\n  m.value_jsonb->>'datname' as \"database\"\nFROM metric m\nWHERE\n  $__unixEpochFilter(m.ts) AND\n  m.host = md5('$host')::uuid AND\n  m.plugin = md5('pg.buffercache')::uuid\nGROUP BY 1, m.value_jsonb->>'datname'\nORDER BY 1\n)\n\nSELECT\n    time_bucket('\"$interval\"'::interval, to_timestamp(d.time) AT TIME ZONE 'UTC' ) AS \"time\",\n    avg( d.usage ),\n    d.database\nFROM data d\nGROUP BY 1,3\nORDER BY 1,3\n",
+                     "rawSql": "with data as (\nSELECT\n  m.ts AS \"time\",\n  sum(COALESCE( (m.value_jsonb->>'usage_count_3')::bigint, 0 ) * 8 * 1024) as \"usage\",\n  m.value_jsonb->>'datname' as \"database\"\nFROM metric m\nWHERE\n  $__unixEpochFilter(m.ts) AND\n  m.host = md5('$host')::uuid AND\n  m.plugin = md5('pg.buffercache')::uuid\nGROUP BY 1, m.value_jsonb->>'datname'\nORDER BY 1\n)\n\nSELECT\n    time_bucket('\"$interval\"'::interval, to_timestamp(d.time) AT TIME ZONE 'UTC' ) AS \"time\",\n    avg( d.usage ),\n    d.database\nFROM data d\nGROUP BY 1,3\nORDER BY 1,3\n",
                      "refId": "A"
                   }
                ],
@@ -2598,7 +2598,7 @@
                "targets": [
                   {
                      "format": "time_series",
-                     "rawSql": "with data as (\nSELECT\n  m.snapshot AS \"time\",\n  sum(COALESCE( (m.value_jsonb->>'buffers_count')::bigint, 0 ) * 8 * 1024) as \"usage\",\n  m.value_jsonb->>'datname' as \"database\"\nFROM metric m\nWHERE\n  $__unixEpochFilter(m.ts) AND\n  m.host = md5('$host')::uuid AND\n  m.plugin = md5('pg.buffercache')::uuid\nGROUP BY 1, m.value_jsonb->>'datname'\nORDER BY 1\n)\n\nSELECT\n    time_bucket('\"$interval\"'::interval, to_timestamp(d.time) AT TIME ZONE 'UTC' ) AS \"time\",\n    avg( d.usage ),\n    d.database\nFROM data d\nGROUP BY 1,3\nORDER BY 1,3\n",
+                     "rawSql": "with data as (\nSELECT\n  m.ts AS \"time\",\n  sum(COALESCE( (m.value_jsonb->>'buffers_count')::bigint, 0 ) * 8 * 1024) as \"usage\",\n  m.value_jsonb->>'datname' as \"database\"\nFROM metric m\nWHERE\n  $__unixEpochFilter(m.ts) AND\n  m.host = md5('$host')::uuid AND\n  m.plugin = md5('pg.buffercache')::uuid\nGROUP BY 1, m.value_jsonb->>'datname'\nORDER BY 1\n)\n\nSELECT\n    time_bucket('\"$interval\"'::interval, to_timestamp(d.time) AT TIME ZONE 'UTC' ) AS \"time\",\n    avg( d.usage ),\n    d.database\nFROM data d\nGROUP BY 1,3\nORDER BY 1,3\n",
                      "refId": "A"
                   }
                ],

@@ -739,7 +739,7 @@
     row_buffer_pool_relation: |||
  with data as (
    SELECT
-       m.snapshot as "time",
+       m.ts as "time",
        j.key as "relation",
        sum(coalesce((j.value->>'buffers')::bigint, 0)*8*1024) as "size"
    FROM metric m
@@ -772,7 +772,7 @@
     row_buffer_pool_dirty: |||
  with data as (
  SELECT
-   m.snapshot,
+   m.ts,
    sum(COALESCE( (m.value_jsonb->>'dirty_count')::bigint, 0 ) * 8 * 1024) as "dirty",
    m.value_jsonb->>'datname' as "database"
  FROM metric m
@@ -784,7 +784,7 @@
  ORDER BY 1
  )
  SELECT
-     time_bucket('"$interval"'::interval, to_timestamp(d.snapshot) AT TIME ZONE 'UTC' ) AS "time",
+     time_bucket('"$interval"'::interval, to_timestamp(d.ts) AT TIME ZONE 'UTC' ) AS "time",
      avg( d.dirty ),
      d.database
  FROM data d
@@ -794,7 +794,7 @@
     row_buffer_pool_usagecount_0: |||
  with data as (
  SELECT
-   m.snapshot AS "time",
+   m.ts AS "time",
    sum(COALESCE( (m.value_jsonb->>'usage_count_0')::bigint, 0 ) * 8 * 1024) as "usage",
    m.value_jsonb->>'datname' as "database"
  FROM metric m
@@ -816,7 +816,7 @@
     row_buffer_pool_usagecount_3: |||
  with data as (
  SELECT
-   m.snapshot AS "time",
+   m.ts AS "time",
    sum(COALESCE( (m.value_jsonb->>'usage_count_3')::bigint, 0 ) * 8 * 1024) as "usage",
    m.value_jsonb->>'datname' as "database"
  FROM metric m
@@ -839,7 +839,7 @@
     row_buffer_pool_database: |||
  with data as (
  SELECT
-   m.snapshot AS "time",
+   m.ts AS "time",
    sum(COALESCE( (m.value_jsonb->>'buffers_count')::bigint, 0 ) * 8 * 1024) as "usage",
    m.value_jsonb->>'datname' as "database"
  FROM metric m
