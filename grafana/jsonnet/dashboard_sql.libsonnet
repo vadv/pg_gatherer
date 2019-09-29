@@ -1109,33 +1109,23 @@
  ORDER BY 1
 |||,
     row_wal_slot: |||
- with slots as (
-  select
-   distinct(jsonb_object_keys(value_jsonb)) as name
-  from metric where
-   $__unixEpochFilter(ts) AND
-   host = md5('$host')::uuid AND
-   plugin = md5('pg.replication_slots')::uuid
- )
- , data2 as (SELECT
+ with data as (select
    ts as "ts",
-   sum(coalesce((m.value_jsonb->>(s.name))::bigint, 0)) as "value",
-   s.name
- from metric m, slots s
+   f.key::text as name,
+   f.value::text::bigint as value
+ from metric m, jsonb_each(m.value_jsonb) f
  where
-   $__unixEpochFilter(ts) AND
-   host = md5('$host')::uuid AND
-   plugin = md5('pg.replication_slots')::uuid
- group by ts, s.name
- order by ts, s.name
+   $__unixEpochFilter(m.ts) AND
+   m.host = md5('$host')::uuid AND
+   m.plugin = md5('pg.replication_slots')::uuid
  )
- SELECT
+ select
      time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
      avg(value),
      name
- from data2
- GROUP BY 1,3
- ORDER BY 1,3
+ from data
+ group by 1,3
+ order by 1,3
 |||,
     row_wal_buffers: |||
  with data as (SELECT
