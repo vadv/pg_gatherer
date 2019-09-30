@@ -1,7 +1,7 @@
 local cloudwatch  = require("cloudwatch")
 local plugin_name = 'pg.cloudwatch'
 local every       = 5 * 60
-local last_time   = time.unix() - 5 * 60
+local last_time   = time.unix() - every - 60
 local metrics     = {
   burst_balance               = "BurstBalance", cpu_credit_balance = "CPUCreditBalance",
   cpu_credit_usage            = "CPUCreditUsage", cpu_surplus_credit_balance = "CPUSurplusCreditBalance",
@@ -36,7 +36,7 @@ for name, metric in pairs(metrics) do
 end
 
 function collect()
-  local end_time    = time.unix()
+  local end_time    = time.unix() - 60
   local result, err = clw:get_metric_data({
     start_time = last_time,
     end_time   = end_time,
