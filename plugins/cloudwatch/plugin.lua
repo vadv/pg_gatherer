@@ -13,12 +13,11 @@ local metrics     = {
   free_storage_space          = "FreeStorageSpace",
   freeable_memory             = "FreeableMemory",
   network_receive_throughput  = "NetworkReceiveThroughput", network_transmit_throughput = "NetworkTransmitThroughput",
-  read_iops                   = "ReadIOPS", read_latency = "ReadLatency",
-  read_throudhput             = "ReadThroughput",
-  replication_slot_disk_usage = "ReplicationSlotDiskUsage", swap_usage = "SwapUsage",
+  read_iops                   = "ReadIOPS", read_latency = "ReadLatency", read_throudhput = "ReadThroughput",
+  replication_slot_disk_usage = "ReplicationSlotDiskUsage",
   transaction_logs_disk_usage = "TransactionLogsDiskUsage",
-  write_iops                  = "WriteIOPS", write_latency = "WriteLatency",
-  write_throughput            = "WriteThroughput",
+  swap_usage                  = "SwapUsage",
+  write_iops                  = "WriteIOPS", write_latency = "WriteLatency", write_throughput = "WriteThroughput",
 }
 
 local clw, err    = cloudwatch.new()
