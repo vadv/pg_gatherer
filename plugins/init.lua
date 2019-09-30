@@ -38,9 +38,10 @@ function is_rds()
 end
 
 -- return unix ts from connection
-function get_unix_ts(conn)
+function get_unix_ts(conn, ts)
   conn = conn or target
-  return conn:query("select extract(epoch from now())::int").rows[1][1]
+  ts = ts or 1
+  return conn:query("select extract(epoch from now())::int - (extract(epoch from now())::int % $1)", ts).rows[1][1]
 end
 
 -- insert metric with plugin:host()
