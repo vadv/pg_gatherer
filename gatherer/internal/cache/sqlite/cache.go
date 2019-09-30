@@ -58,14 +58,16 @@ func New(path string) (*Cache, error) {
 		if err != nil {
 			return nil, err
 		}
-		if _, err := newDB.Exec(`PRAGMA synchronous = 0`); err != nil {
+		if _, errSync := newDB.Exec(`PRAGMA synchronous = 0`); errSync != nil {
 			newDB.Close()
-			return nil, err
+			return nil, errSync
 		}
-		if _, err := newDB.Exec(`PRAGMA journal_mode = OFF`); err != nil {
+		if _, errJournal := newDB.Exec(`PRAGMA journal_mode = OFF`); errJournal != nil {
 			newDB.Close()
-			return nil, err
+			return nil, errJournal
 		}
+		newDB.SetMaxOpenConns(1)
+		newDB.SetMaxIdleConns(1)
 		listOfOpenCaches.list[path] = newDB
 		result.db = newDB
 		go result.rotateOldTablesRoutine()
