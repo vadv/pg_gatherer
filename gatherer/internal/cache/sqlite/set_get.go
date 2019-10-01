@@ -1,6 +1,7 @@
 package sqlite
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"time"
@@ -36,7 +37,9 @@ func (c *Cache) Set(key string, value float64) error {
 		return err
 	}
 	// query
-	_, err := c.db.Exec(fmt.Sprintf(setQuery, c.currentTableName()), key, value, time.Now().Unix())
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	_, err := c.db.ExecContext(ctx, fmt.Sprintf(setQuery, c.currentTableName()), key, value, time.Now().Unix())
 	return err
 }
 
@@ -46,7 +49,9 @@ func (c *Cache) getFromTable(key, tableName string) (float64, int64, bool, error
 		return 0, 0, false, err
 	}
 	query := fmt.Sprintf(getQuery, tableName)
-	row := c.db.QueryRow(query, key)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	row := c.db.QueryRowContext(ctx, query, key)
 	var value, updatedAt float64
 	err := row.Scan(&value, &updatedAt)
 	if err != nil && err == sql.ErrNoRows {
@@ -71,11 +76,13 @@ func (c *Cache) Get(key string) (value float64, updatedAt int64, found bool, err
 // Delete value by key
 func (c *Cache) Delete(key string) error {
 	query := fmt.Sprintf(deleteQuery, c.currentTableName())
-	if _, err := c.db.Exec(query, key); err != nil {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	if _, err := c.db.ExecContext(ctx, query, key); err != nil {
 		return err
 	}
 	query = fmt.Sprintf(deleteQuery, c.prevTableName())
-	if _, err := c.db.Exec(query, key); err != nil {
+	if _, err := c.db.ExecContext(ctx, query, key); err != nil {
 		return err
 	}
 	return nil

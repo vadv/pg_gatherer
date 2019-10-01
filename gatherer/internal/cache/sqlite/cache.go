@@ -1,6 +1,7 @@
 package sqlite
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
@@ -66,7 +67,7 @@ func New(path string) (*Cache, error) {
 			newDB.Close()
 			return nil, errJournal
 		}
-		newDB.SetMaxOpenConns(1)
+		newDB.SetMaxOpenConns(5)
 		newDB.SetMaxIdleConns(1)
 		listOfOpenCaches.list[path] = newDB
 		result.db = newDB
@@ -105,6 +106,8 @@ func (c *Cache) prevTableName() string {
 }
 
 func (c *Cache) createTable(tableName string) error {
-	_, err := c.db.Exec(fmt.Sprintf(createQuery, tableName))
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	_, err := c.db.ExecContext(ctx, fmt.Sprintf(createQuery, tableName))
 	return err
 }
