@@ -67,7 +67,7 @@ func New(path string) (*Cache, error) {
 			newDB.Close()
 			return nil, errJournal
 		}
-		newDB.SetMaxOpenConns(1)
+		newDB.SetMaxOpenConns(5)
 		newDB.SetMaxIdleConns(1)
 		listOfOpenCaches.list[path] = newDB
 		result.db = newDB
