@@ -45,6 +45,7 @@ function collect()
   if err then error(err) end
   for name, time_value in pairs(result) do
     for t, v in pairs(time_value) do
+      -- print(name, t, v)
       storage_insert_metric({ plugin = plugin_name .. "." .. name, snapshot = t, float = v })
     end
   end

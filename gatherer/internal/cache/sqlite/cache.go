@@ -1,6 +1,7 @@
 package sqlite
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
@@ -105,6 +106,8 @@ func (c *Cache) prevTableName() string {
 }
 
 func (c *Cache) createTable(tableName string) error {
-	_, err := c.db.Exec(fmt.Sprintf(createQuery, tableName))
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	_, err := c.db.ExecContext(ctx, fmt.Sprintf(createQuery, tableName))
 	return err
 }
