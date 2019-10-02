@@ -9,11 +9,11 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+
 	"github.com/vadv/pg_gatherer/gatherer/internal/connection"
 
 	"github.com/vadv/pg_gatherer/gatherer/internal/secrets"
-
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/vadv/pg_gatherer/gatherer/internal/plugins"
 )
@@ -49,12 +49,10 @@ func main() {
 	}
 
 	// http
-	m := http.NewServeMux()
-	httpServer := &http.Server{Addr: *httpListen, Handler: m}
-	m.Handle("/", http.RedirectHandler("/metrics", http.StatusFound))
-	m.Handle("/metrics", promhttp.Handler())
+	http.HandleFunc("/", handleHTTP)
+	http.Handle("/metrics", promhttp.Handler())
 	go func() {
-		if errListen := httpServer.ListenAndServe(); errListen != nil {
+		if errListen := http.ListenAndServe(*httpListen, nil); errListen != nil {
 			log.Printf("[FATAL] http listen: %s\n", errListen.Error())
 			os.Exit(2)
 		}
