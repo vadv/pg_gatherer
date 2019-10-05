@@ -364,14 +364,14 @@
     sum( (value_jsonb->>'temp_files')::float8 ) as "temp files",
     TO_CHAR(( sum( (value_jsonb->>'blk_read_time')::float8  )  * interval '1 millisecond' ) , 'HH24:MI:SS') as "read time",
     TO_CHAR(( sum( (value_jsonb->>'blk_write_time')::float8  )  * interval '1 millisecond' ) , 'HH24:MI:SS') as "write time",
-    round( avg( (value_jsonb->>'xact_commit')::numeric ), 2) as "commits/s",
-    round( avg( (value_jsonb->>'xact_rollback')::numeric ), 2) as "rollback/s"
+    round( max( (value_jsonb->>'xact_commit')::numeric ), 2) as "commits/s",
+    round( max( (value_jsonb->>'xact_rollback')::numeric ), 2) as "rollback/s"
  from metric where
     $__unixEpochFilter(ts) AND
     host = md5('$host')::uuid AND
     plugin = md5('pg.databases')::uuid
  group by 1
- order by 1
+ order by 1s
 |||,
     row_tables_big: |||
  with data as (
@@ -497,16 +497,16 @@
  )
  , data2 as (SELECT
    snapshot as "ts",
-   sum((value_jsonb->>'calls')::float8) / 60 as "value"
+   sum((value_jsonb->>'calls')::float8) as "value"
  from data
  group by snapshot
  order by snapshot)
- SELECT
+ select
      time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
-     avg(value) as qps
+     (value) / (ts - lag(ts) over w) as "qps"
  from data2
- GROUP BY 1
- ORDER BY 1
+ window w as (order by ts)
+ order by 1
 |||,
     row_operations_tx: |||
  with data as (SELECT
