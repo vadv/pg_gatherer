@@ -13,7 +13,7 @@
     stat_size:: |||
  with data as (
  select
-   ts,
+   snapshot as ts,
    sum( coalesce((value_jsonb->>'size')::float8, 0) ) as value
  from metric where
    $__unixEpochFilter(ts) AND
@@ -23,8 +23,8 @@
  order by 1
  )
  select
-     time_bucket_gapfill('"$interval"'::interval, to_timestamp(data.ts) AT TIME ZONE 'UTC', $__timeFrom(), $__timeTo() ) AS "time",
-     locf( avg(value) )
+     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+     avg(value)
  from data
  group by 1
  order by 1
@@ -118,15 +118,15 @@
  )
  , data2 as (select
    snapshot as "ts",
-   sum((value_jsonb->>'calls')::float8) / 60 as "value"
+   sum((value_jsonb->>'calls')::bigint) as "value"
  from data
  group by snapshot
  order by snapshot)
  select
      time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
-     avg(value) as qps
+     (value) / (ts - lag(ts) over w) as "qps"
  from data2
- group by 1
+ window w as (order by ts)
  order by 1
 |||,
     stat_errors: |||
@@ -240,13 +240,18 @@
    coalesce((value_jsonb->>'relpages')::bigint, 0)> (256*1024*1024) / (8*1024)
  group by snapshot
  order by snapshot)
-
- select
-     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
-     avg(value)
+ , data3 as (SELECT
+   ts,
+   (value) / (ts - lag(ts) over w) as "value_per_second"
  from data2
-  group by 1
-  order by 1
+ window w as (order by ts)
+ order by 1)
+ SELECT
+    time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+    avg(value_per_second)
+ from data3
+ group by 1
+ order by 1
 |||,
     stat_bloat: |||
  with data as (
@@ -886,12 +891,26 @@
  INNER JOIN data m ON t.table = m.value_jsonb->>'full_table_name'
  GROUP BY 1,2
  ORDER BY 1,2)
- SELECT
-     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
-     "table", avg(value)
+ , data3 as (SELECT
+     ts,
+     "table",
+     sum(value) as value
  from data2
  GROUP BY 1,2
- ORDER BY 1,2
+ ORDER BY 1,2)
+ , data4 as (SELECT
+   ts,
+   "table",
+   (value) / (ts - lag(ts) over(partition by "table" order by ts) ) as "value_per_second"
+ from data3
+ order by 1,2)
+ SELECT
+    time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+    "table",
+    avg(value_per_second)
+ from data4
+ group by 1,2
+ order by 1,2
 |||,
     row_table_index: |||
  with data as (
@@ -920,13 +939,26 @@
  INNER JOIN tables t ON t.table = m.value_jsonb->>'full_table_name'
  GROUP BY 1,2
  ORDER BY 1,2)
-
- SELECT
-     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
-     "table", avg(value)
+ , data3 as (SELECT
+     ts,
+     "table",
+     sum(value) as value
  from data2
  GROUP BY 1,2
- ORDER BY 1,2
+ ORDER BY 1,2)
+ , data4 as (SELECT
+   ts,
+   "table",
+   (value) / (ts - lag(ts) over(partition by "table" order by ts) ) as "value_per_second"
+ from data3
+ order by 1,2)
+ SELECT
+    time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+    "table",
+    avg(value_per_second)
+ from data4
+ group by 1,2
+ order by 1,2
 |||,
     row_table_changed: |||
  with data as (
@@ -954,13 +986,26 @@
  INNER JOIN tables t ON t.table = m.value_jsonb->>'full_table_name'
  GROUP BY 1,2
  ORDER BY 1,2)
-
- SELECT
-     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
-     "table", avg(value)
+ , data3 as (SELECT
+     ts,
+     "table",
+     sum(value) as value
  from data2
  GROUP BY 1,2
- ORDER BY 1,2
+ ORDER BY 1,2)
+ , data4 as (SELECT
+   ts,
+   "table",
+   (value) / (ts - lag(ts) over(partition by "table" order by ts) ) as "value_per_second"
+ from data3
+ order by 1,2)
+ SELECT
+    time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+    "table",
+    avg(value_per_second)
+ from data4
+ group by 1,2
+ order by 1,2
 |||,
     row_table_heap_read_bps: |||
  with data as (
@@ -990,14 +1035,26 @@
  INNER JOIN tables t ON t.table = m.value_jsonb->>'full_table_name'
  GROUP BY 1,2
  ORDER BY 1 )
-
- SELECT
-     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+ , data3 as (SELECT
+     ts,
      "table",
-     avg(value)
+     sum(value) as value
  from data2
  GROUP BY 1,2
- ORDER BY 1,2
+ ORDER BY 1,2)
+ , data4 as (SELECT
+   ts,
+   "table",
+   (value) / (ts - lag(ts) over(partition by "table" order by ts) ) as "value_per_second"
+ from data3
+ order by 1,2)
+ SELECT
+    time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+    "table",
+    avg(value_per_second)
+ from data4
+ group by 1,2
+ order by 1,2
 |||,
     row_table_index_read_bps: |||
  with data as (
@@ -1028,13 +1085,26 @@
  GROUP BY 1,2
  ORDER BY 1
  )
-
- SELECT
-     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
-     "table", avg(value)
+ , data3 as (SELECT
+     ts,
+     "table",
+     sum(value) as value
  from data2
  GROUP BY 1,2
- ORDER BY 1,2
+ ORDER BY 1,2)
+ , data4 as (SELECT
+   ts,
+   "table",
+   (value) / (ts - lag(ts) over(partition by "table" order by ts) ) as "value_per_second"
+ from data3
+ order by 1,2)
+ SELECT
+    time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+    "table",
+    avg(value_per_second)
+ from data4
+ group by 1,2
+ order by 1,2
 |||,
     row_table_toast_read_bps: |||
  with data as (
@@ -1063,13 +1133,26 @@
  INNER JOIN tables t ON t.table = m.value_jsonb->>'full_table_name'
  GROUP BY 1,2
  ORDER BY 1)
-
- SELECT
-     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
-     "table", avg(value)
+ , data3 as (SELECT
+     ts,
+     "table",
+     sum(value) as value
  from data2
  GROUP BY 1,2
- ORDER BY 1,2
+ ORDER BY 1,2)
+ , data4 as (SELECT
+   ts,
+   "table",
+   (value) / (ts - lag(ts) over(partition by "table" order by ts) ) as "value_per_second"
+ from data3
+ order by 1,2)
+ SELECT
+    time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+    "table",
+    avg(value_per_second)
+ from data4
+ group by 1,2
+ order by 1,2
 |||,
     row_wal_checkpoint_count: |||
  SELECT

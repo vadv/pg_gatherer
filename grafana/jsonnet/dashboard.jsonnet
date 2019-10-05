@@ -61,7 +61,7 @@ local statBufferRow = grafana.row.new( title='Buffers stat', height='100px', col
             sparklineShow=true, valueName='max', colorBackground=true, thresholds='0.1,0.2',
         ).addTarget(grafana.sql.target(sql.stat_dirty)),
         grafana.singlestat.new('Relation seq scans (>256MB)', format='ops', span=2, decimals=2, datasource='$POSTGRES_DS',
-            sparklineShow=true, valueName='max', colorBackground=true, thresholds='10,20',
+            sparklineShow=true, valueName='max', colorBackground=true, thresholds='0.1,1',
         ).addTarget(grafana.sql.target(sql.stat_seq_scans)),
         grafana.singlestat.new('Bloat tables', format='percentunit', span=2, decimals=2, datasource='$POSTGRES_DS',
             sparklineShow=true, valueName='max', colorBackground=true, thresholds='0.05,0.2',
