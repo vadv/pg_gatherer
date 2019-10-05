@@ -764,7 +764,7 @@
                "targets": [
                   {
                      "format": "time_series",
-                     "rawSql": "with data as (select\n  ts as \"ts\",\n  sum( coalesce((value_jsonb->>'xact_commit')::float8, 0) + coalesce((value_jsonb->>'xact_rollback')::float8, 0) ) as value\nfrom metric where\n  $__unixEpochFilter(ts) AND\n  host = md5('$host')::uuid AND\n  plugin = md5('pg.databases')::uuid\ngroup by 1\norder by 1)\nselect\n    time_bucket('\"$interval\"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS \"time\",\n    avg(value)\nfrom data\ngroup by 1\norder by 1\n",
+                     "rawSql": "with data as (select\n  snapshot as \"ts\",\n  sum( coalesce((value_jsonb->>'xact_commit')::float8, 0) + coalesce((value_jsonb->>'xact_rollback')::float8, 0) ) as value\nfrom metric where\n  $__unixEpochFilter(ts) AND\n  host = md5('$host')::uuid AND\n  plugin = md5('pg.databases')::uuid\ngroup by 1\norder by 1)\n, data2 as (select\n    ts,\n    sum(value) as value\nfrom data\ngroup by 1\norder by 1)\nselect\n   time_bucket('\"$interval\"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS \"time\",\n   avg(value)\nfrom data2\n group by 1\norder by 1\n",
                      "refId": "A"
                   }
                ],
@@ -1153,7 +1153,7 @@
                "targets": [
                   {
                      "format": "time_series",
-                     "rawSql": "WITH dirty as (\nSELECT\n  m.snapshot AS \"time\",\n  sum(COALESCE( (m.value_jsonb->>'dirty_count')::bigint, 0 ) * 8 * 1024) as \"size\"\nFROM metric m\nWHERE\n  $__unixEpochFilter(m.ts) AND\n  m.host = md5('$host')::uuid AND\n  m.plugin = md5('pg.buffercache')::uuid\nGROUP BY 1\nORDER BY 1\n),\ntotal as (\nSELECT\n  m.snapshot AS \"time\",\n  sum(COALESCE( (m.value_jsonb->>'buffers_count')::bigint, 0 ) * 8 * 1024) as \"size\"\nFROM metric m\nWHERE\n  $__unixEpochFilter(m.ts) AND\n  m.host = md5('$host')::uuid AND\n  m.plugin = md5('pg.buffercache')::uuid\nGROUP BY 1\nORDER BY 1\n)\n, data as (SELECT\n    total.time as \"ts\",\n    (dirty.size / (total.size + 1)) as \"value\"\nFROM total\nINNER JOIN dirty on dirty.time = total.time)\n\nSELECT\n    time_bucket('\"$interval\"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS \"time\",\n    avg(value)\nfrom data\nGROUP BY 1\nORDER BY 1\n",
+                     "rawSql": "WITH dirty as (\nSELECT\n  m.snapshot AS \"time\",\n  sum(COALESCE( (m.value_jsonb->>'dirty_count')::bigint, 0 ) * 8 * 1024) as \"size\"\nFROM metric m\nWHERE\n  $__unixEpochFilter(m.ts) AND\n  m.host = md5('$host')::uuid AND\n  m.plugin = md5('pg.buffercache')::uuid\nGROUP BY 1\nORDER BY 1\n),\ntotal as (\nSELECT\n  m.snapshot AS \"time\",\n  sum(COALESCE( (m.value_jsonb->>'buffers_count')::bigint, 0 ) * 8 * 1024) as \"size\"\nFROM metric m\nWHERE\n  $__unixEpochFilter(m.ts) AND\n  m.host = md5('$host')::uuid AND\n  m.plugin = md5('pg.buffercache')::uuid\nGROUP BY 1\nORDER BY 1\n)\n, data as (SELECT\n    total.time as \"ts\",\n    (dirty.size / (total.size + 1)) as \"value\"\nFROM total\nINNER JOIN dirty on dirty.time = total.time)\n\nSELECT\n    time_bucket('\"$interval\"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS \"time\",\n    avg(value)*60\nfrom data\nGROUP BY 1\nORDER BY 1\n",
                      "refId": "A"
                   }
                ],
@@ -1181,7 +1181,7 @@
                ],
                "datasource": "$POSTGRES_DS",
                "decimals": 2,
-               "format": "ops",
+               "format": "opm",
                "gauge": {
                   "maxValue": 100,
                   "minValue": 0,
@@ -1232,7 +1232,7 @@
                      "refId": "A"
                   }
                ],
-               "thresholds": "0.1,1",
+               "thresholds": "0.8,2",
                "title": "Relation seq scans (>256MB)",
                "type": "singlestat",
                "valueFontSize": "80%",

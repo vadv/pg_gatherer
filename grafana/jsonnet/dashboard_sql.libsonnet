@@ -91,7 +91,7 @@
 |||,
     stat_tps: |||
  with data as (select
-   ts as "ts",
+   snapshot as "ts",
    sum( coalesce((value_jsonb->>'xact_commit')::float8, 0) + coalesce((value_jsonb->>'xact_rollback')::float8, 0) ) as value
  from metric where
    $__unixEpochFilter(ts) AND
@@ -99,11 +99,17 @@
    plugin = md5('pg.databases')::uuid
  group by 1
  order by 1)
- select
-     time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
-     avg(value)
+ , data2 as (select
+     ts,
+     sum(value) as value
  from data
  group by 1
+ order by 1)
+ select
+    time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
+    avg(value)
+ from data2
+  group by 1
  order by 1
 |||,
     stat_qps: |||
@@ -304,7 +310,7 @@
 
  SELECT
      time_bucket('"$interval"'::interval, to_timestamp(ts) AT TIME ZONE 'UTC' ) AS "time",
-     avg(value)
+     avg(value)*60
  from data
  GROUP BY 1
  ORDER BY 1
