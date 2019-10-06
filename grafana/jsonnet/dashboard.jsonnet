@@ -265,11 +265,11 @@ local tableRow = grafana.row.new(title='Table read/modify (tuples/disk)', height
 local walRow = grafana.row.new(title='WAL', height='600px', collapse=true)
     .addPanels([
         grafana.graphPanel.new(title='Checkponts (count)',
-            datasource='$POSTGRES_DS', linewidth=1, format='none', stack=true, fill=1, legend_sort='max', legend_sortDesc=true,
+            datasource='$POSTGRES_DS', linewidth=1, format='ops', stack=true, fill=1, legend_sort='max', legend_sortDesc=true,
             bars=true, lines=false, transparent=true, min=0, legend_alignAsTable=true, span=6, height='400px',
             legend_show=true, legend_values=true, legend_min=true, legend_max=true, legend_avg=true,
         ).addTarget(grafana.sql.target(sql.row_wal_checkpoint_count)),
-        grafana.graphPanel.new(title='Checkponts (time)',
+        grafana.graphPanel.new(title='Checkponts (time/per second)',
             datasource='$POSTGRES_DS', linewidth=1, format='ms', stack=true, fill=1, legend_sort='max', legend_sortDesc=true,
             bars=true, lines=false, transparent=true, min=0, legend_alignAsTable=true, span=6, height='400px',
             legend_show=true, legend_values=true, legend_min=true, legend_max=true, legend_avg=true,
