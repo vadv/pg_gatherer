@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -60,6 +61,15 @@ type pluginConfig struct {
 	globalCacheDir string // cache directory
 	connections    map[string]*Connection
 	secrets        *secrets.Storage
+}
+
+func (p *pluginConfig) getCachePrefix() string {
+	result := fmt.Sprintf("%s_%s", p.host, p.pluginName)
+	result = strings.Replace(result, `sqlite_`, `__`, -1)
+	result = strings.Replace(result, `"`, `_`, -1)
+	result = strings.Replace(result, `;`, `_`, -1)
+	result = strings.Replace(result, `'`, `_`, -1)
+	return result
 }
 
 func createPlugin(config *pluginConfig) (*plugin, error) {
@@ -122,8 +132,8 @@ func (p *plugin) prepareState() error {
 	}
 	// cache
 	cache.Preload(state)
-	cachePath := filepath.Join(p.config.globalCacheDir, p.config.host, p.config.pluginName, "cache.sqlite")
-	if err := cache.NewSqlite(state, `cache`, cachePath); err != nil {
+	cachePath := filepath.Join(p.config.globalCacheDir, "pg_gatherer_cache.sqlite")
+	if err := cache.NewSqlite(state, `cache`, cachePath, p.config.getCachePrefix()); err != nil {
 		return err
 	}
 	p.state = state

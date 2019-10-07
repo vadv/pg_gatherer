@@ -1,6 +1,7 @@
 package sqlite
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"time"
@@ -24,8 +25,10 @@ func (c *Cache) rotateOldTablesRoutine() {
 }
 
 func (c *Cache) rotateOldTables() error {
-	query := fmt.Sprintf(listTablesQuery, cacheTableNamePrefix)
-	rows, err := c.db.Query(query)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	query := fmt.Sprintf(listTablesQuery, c.getCacheTableNamePrefix())
+	rows, err := c.db.QueryContext(ctx, query)
 	if err != nil {
 		return err
 	}
@@ -41,9 +44,9 @@ func (c *Cache) rotateOldTables() error {
 			if errExec != nil {
 				return errExec
 			}
-			c.mutex.Lock()
+			c.tableMutex.Lock()
 			delete(c.tables, tableName)
-			c.mutex.Unlock()
+			c.tableMutex.Unlock()
 		}
 	}
 	return rows.Err()
