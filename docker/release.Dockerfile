@@ -1,4 +1,4 @@
-FROM golang:1.13 as builder
+FROM golang:1.12 as builder
 
 WORKDIR /go/github.com/vadv/pg_gatherer
 

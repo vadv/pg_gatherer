@@ -19,7 +19,7 @@ import (
 )
 
 var (
-	version        = `unknown`
+	version        = `v1.0.0`
 	hostConfigFile = flag.String(`host-config-file`, `host.yaml`, `Path to config file with host configurations.`)
 	pluginDir      = flag.String(`plugins-dir`, `./plugins`, `Path to plugins directory`)
 	cacheDir       = flag.String(`cache-dir`, `./cache`, `Path to cache directory`)
