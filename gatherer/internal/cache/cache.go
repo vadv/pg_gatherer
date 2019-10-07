@@ -28,12 +28,12 @@ func Preload(L *lua.LState) int {
 	return 0
 }
 
-func NewSqlite(L *lua.LState, userDataName, fileName string) error {
-	s, err := sqlite.New(fileName)
+func NewSqlite(L *lua.LState, userDataName, fileName, prefix string) error {
+	s, err := sqlite.New(fileName, prefix)
 	if err != nil {
 		return err
 	}
-	c := &cacheUserData{s}
+	c := &cacheUserData{cache: s}
 	ud := L.NewUserData()
 	ud.Value = c
 	L.SetMetatable(ud, L.GetTypeMetatable(`cache_ud`))

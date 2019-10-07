@@ -4,9 +4,9 @@ import (
 	"os"
 	"testing"
 
+	"github.com/vadv/pg_gatherer/gatherer/internal/cache"
 	"github.com/vadv/gopher-lua-libs/inspect"
 	"github.com/vadv/gopher-lua-libs/time"
-	"github.com/vadv/pg_gatherer/gatherer/internal/cache"
 	lua "github.com/yuin/gopher-lua"
 )
 
@@ -15,7 +15,7 @@ func TestCache(t *testing.T) {
 	state := lua.NewState()
 	cache.Preload(state)
 	os.RemoveAll("./tests/db.sqlite")
-	if err := cache.NewSqlite(state, "cache", "./tests/db.sqlite"); err != nil {
+	if err := cache.NewSqlite(state, "cache", "./tests/db.sqlite", "prefix_"); err != nil {
 		t.Fatalf(err.Error())
 	}
 	time.Preload(state)
@@ -31,7 +31,7 @@ func TestCacheRotate(t *testing.T) {
 	state := lua.NewState()
 	cache.Preload(state)
 	os.RemoveAll("./tests/rotate.sqlite")
-	if err := cache.NewSqlite(state, "cache", "./tests/rotate.sqlite"); err != nil {
+	if err := cache.NewSqlite(state, "cache", "./tests/rotate.sqlite", "prefix_"); err != nil {
 		t.Fatalf(err.Error())
 	}
 	time.Preload(state)

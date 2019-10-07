@@ -23,16 +23,16 @@ const (
 	EnvCacheRotateTable = `CACHE_ROTATE_TABLE`
 	// DefaultCacheRotateTable default value for rotate tables
 	DefaultCacheRotateTable = int64(60 * 60 * 24)
-	cacheTableNamePrefix    = `table_`
-	createQuery             = `create table if not exists %s (key text primary key, value real, updated_at real)`
+	createQuery             = `create table if not exists "%s" (key text primary key, value real, updated_at real)`
 )
 
 // Cache sqlite cache
 type Cache struct {
-	path   string
-	db     *sql.DB
-	tables map[string]bool
-	mutex  sync.Mutex
+	path       string
+	prefix     string
+	db         *sql.DB
+	tables     map[string]bool
+	tableMutex sync.Mutex
 }
 
 var listOfOpenCaches = &listOfCaches{list: make(map[string]*sql.DB, 0)}
@@ -42,12 +42,16 @@ type listOfCaches struct {
 	list  map[string]*sql.DB
 }
 
+func (c *Cache) getCacheTableNamePrefix() string {
+	return c.prefix
+}
+
 // New init new cache
-func New(path string) (*Cache, error) {
+func New(path, prefix string) (*Cache, error) {
 	if err := os.MkdirAll(filepath.Dir(path), 0750); err != nil {
 		return nil, err
 	}
-	result := &Cache{path: path, tables: make(map[string]bool, 0)}
+	result := &Cache{path: path, prefix: prefix, tables: make(map[string]bool, 0)}
 	listOfOpenCaches.mutex.Lock()
 	defer listOfOpenCaches.mutex.Unlock()
 	db, ok := listOfOpenCaches.list[path]
@@ -67,7 +71,7 @@ func New(path string) (*Cache, error) {
 			newDB.Close()
 			return nil, errJournal
 		}
-		newDB.SetMaxOpenConns(5)
+		newDB.SetMaxOpenConns(1)
 		newDB.SetMaxIdleConns(1)
 		listOfOpenCaches.list[path] = newDB
 		result.db = newDB
@@ -96,13 +100,13 @@ func (c *Cache) getCacheRotateTable() int64 {
 // current table name
 func (c *Cache) currentTableName() string {
 	now := time.Now().Unix()
-	return fmt.Sprintf("%s_%d", cacheTableNamePrefix, now-(now%c.getCacheRotateTable()))
+	return fmt.Sprintf("%s_%d", c.getCacheTableNamePrefix(), now-(now%c.getCacheRotateTable()))
 }
 
 // prev table name
 func (c *Cache) prevTableName() string {
 	now := time.Now().Unix()
-	return fmt.Sprintf("%s_%d", cacheTableNamePrefix, now-(now%c.getCacheRotateTable())-c.getCacheRotateTable())
+	return fmt.Sprintf("%s_%d", c.getCacheTableNamePrefix(), now-(now%c.getCacheRotateTable())-c.getCacheRotateTable())
 }
 
 func (c *Cache) createTable(tableName string) error {

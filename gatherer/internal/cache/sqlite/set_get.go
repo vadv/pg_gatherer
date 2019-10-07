@@ -10,18 +10,18 @@ import (
 const (
 	setQuery = `
 insert
-	into %s (key, value, updated_at)
+	into "%s" (key, value, updated_at)
 values (?, ?, ?) on conflict (key) do
 	update set value=excluded.value, updated_at=excluded.updated_at
 `
-	getQuery    = `select value, updated_at from %s where key = ?`
-	deleteQuery = `delete from %s where key = ?`
+	getQuery    = `select value, updated_at from "%s" where key = ?`
+	deleteQuery = `delete from "%s" where key = ?`
 )
 
 func (c *Cache) checkTableExists(tableName string) error {
 	// check to table is created
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+	c.tableMutex.Lock()
+	defer c.tableMutex.Unlock()
 	if _, ok := c.tables[tableName]; !ok {
 		if err := c.createTable(tableName); err != nil {
 			return err
