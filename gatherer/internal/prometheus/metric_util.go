@@ -10,11 +10,18 @@ import (
 	lua "github.com/yuin/gopher-lua"
 )
 
+const (
+	// DefaultNamespace is default namespace for prometheus
+	DefaultNamespace = `pg`
+	// DefaultSubsystem is default subsystem for prometheus
+	DefaultSubsystem = `gatherer`
+)
+
 // convert lua table to luaPrometheusMetricConfig
 func luaTableToMetricConfig(config *lua.LTable, L *lua.LState) *luaPrometheusMetricConfig {
 	result := &luaPrometheusMetricConfig{
-		namespace: "pg",
-		subsystem: "gatherer",
+		namespace: DefaultNamespace,
+		subsystem: DefaultSubsystem,
 	}
 	config.ForEach(func(k lua.LValue, v lua.LValue) {
 		switch k.String() {

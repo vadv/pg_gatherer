@@ -10,8 +10,8 @@ local sql_waits    = read_file_in_plugin_dir("waits.sql")
 
 local helpers      = dofile(filepath.join(plugin:dir(), "linux_helper_proc_stat.lua"))
 
-local states_gauge = prometheus:gauge({ name = "activity_states", labels = { "state" } })
-local waits_gauge  = prometheus:gauge({ name   = "activity_waits",
+local states_gauge = prometheus_gauge({ name = "activity_states", labels = { "state" } })
+local waits_gauge  = prometheus_gauge({ name   = "activity_waits",
                                         labels = { "state", "wait_event", "wait_event_type" } })
 
 -- process states
