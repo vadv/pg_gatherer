@@ -12,7 +12,10 @@ import (
 
 // convert lua table to luaPrometheusMetricConfig
 func luaTableToMetricConfig(config *lua.LTable, L *lua.LState) *luaPrometheusMetricConfig {
-	result := &luaPrometheusMetricConfig{}
+	result := &luaPrometheusMetricConfig{
+		namespace: "pg",
+		subsystem: "gatherer",
+	}
 	config.ForEach(func(k lua.LValue, v lua.LValue) {
 		switch k.String() {
 		case `namespace`:
