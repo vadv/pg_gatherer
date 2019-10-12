@@ -25,7 +25,7 @@ connection_name:insert_metric()
 
 ## Cache
 
-For each plugin, an table in sqlite is created in which it is possible to store information in a key-value format.
+For each plugin, an table in sqlite      is created in which it is possible to store information in a key-value format.
 `cache` is registered as global user-data.
 
 ```lua

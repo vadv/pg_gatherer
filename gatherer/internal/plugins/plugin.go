@@ -9,6 +9,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/vadv/pg_gatherer/gatherer/internal/prometheus"
+
 	"github.com/vadv/pg_gatherer/gatherer/internal/secrets"
 
 	"github.com/vadv/pg_gatherer/gatherer/internal/cache"
@@ -120,6 +122,7 @@ func (p *plugin) prepareState() error {
 	state.SetGlobal(`plugin`, pluginUD)
 	secrets.Preload(state)
 	p.config.secrets.Register(state, `secrets`)
+	prometheus.Preload(state)
 	libs.Preload(state)
 	if err := state.DoFile(filepath.Join(p.config.rootDir, "init.lua")); err != nil {
 		return fmt.Errorf("while load init.lua: %s", err.Error())
