@@ -2,11 +2,6 @@ package prometheus
 
 import lua "github.com/yuin/gopher-lua"
 
-var api = map[string]lua.LGFunction{
-	"prometheus_counter": Counter,
-	"prometheus_gauge":   Gauge,
-}
-
 // Preload is the preloader of user data prometheus_metric_ud.
 func Preload(L *lua.LState) int {
 	prometheusUD := L.NewTypeMetatable(`prometheus_metric_ud`)
@@ -16,6 +11,7 @@ func Preload(L *lua.LState) int {
 		"get": Inc,
 		"add": Add,
 	}))
-	L.RegisterModule(`prometheus`, api)
+	L.SetGlobal("prometheus_counter", L.NewFunction(Counter))
+	L.SetGlobal("prometheus_gauge", L.NewFunction(Gauge))
 	return 0
 }
