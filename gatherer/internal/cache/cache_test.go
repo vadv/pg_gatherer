@@ -1,12 +1,13 @@
 package cache_test
 
 import (
+	"io/ioutil"
 	"os"
 	"testing"
 
-	"github.com/vadv/pg_gatherer/gatherer/internal/cache"
 	"github.com/vadv/gopher-lua-libs/inspect"
 	"github.com/vadv/gopher-lua-libs/time"
+	"github.com/vadv/pg_gatherer/gatherer/internal/cache"
 	lua "github.com/yuin/gopher-lua"
 )
 
@@ -40,4 +41,21 @@ func TestCacheRotate(t *testing.T) {
 		t.Fatalf("error: %s\n", err.Error())
 	}
 
+}
+
+func TestCorrupt(t *testing.T) {
+	state := lua.NewState()
+	cache.Preload(state)
+	os.RemoveAll("./tests/corrupt.sqlite")
+	if err := ioutil.WriteFile("./tests/corrupt.sqlite", []byte("<bug>"), 0600); err != nil {
+		t.Fatalf(err.Error())
+	}
+	if err := cache.NewSqlite(state, "cache", "./tests/corrupt.sqlite", "prefix_"); err != nil {
+		t.Fatalf(err.Error())
+	}
+	time.Preload(state)
+	inspect.Preload(state)
+	if err := state.DoFile("./tests/cache.lua"); err != nil {
+		t.Fatalf("error: %s\n", err.Error())
+	}
 }
