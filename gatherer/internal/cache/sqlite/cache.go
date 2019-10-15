@@ -59,17 +59,31 @@ func New(path, prefix string) (*Cache, error) {
 		result.db = db
 		return result, nil
 	} else {
+		retries := 0
+	OpenSqlite:
+		if retries > 3 {
+			return nil, fmt.Errorf("too many errors while prepare sqlite database")
+		}
 		newDB, err := sql.Open(`sqlite3`, path)
 		if err != nil {
-			return nil, err
+			log.Printf("[ERROR] delete db %s, because: %s while open\n", path, err.Error())
+			os.RemoveAll(path)
+			retries++
+			goto OpenSqlite
 		}
 		if _, errSync := newDB.Exec(`PRAGMA synchronous = 0`); errSync != nil {
 			newDB.Close()
-			return nil, errSync
+			log.Printf("[ERROR] delete db %s, because: %s while set async\n", path, errSync.Error())
+			os.RemoveAll(path)
+			retries++
+			goto OpenSqlite
 		}
 		if _, errJournal := newDB.Exec(`PRAGMA journal_mode = OFF`); errJournal != nil {
 			newDB.Close()
-			return nil, errJournal
+			log.Printf("[ERROR] delete db %s, because: %s while disable journal\n", path, errJournal.Error())
+			os.RemoveAll(path)
+			retries++
+			goto OpenSqlite
 		}
 		newDB.SetMaxOpenConns(1)
 		newDB.SetMaxIdleConns(1)
