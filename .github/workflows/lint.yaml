@@ -2,7 +2,7 @@ name: lint
 on: [push]
 jobs:
   golint:
-    name: runner / golint
+    name: golint
     runs-on: ubuntu-latest
     steps:
       - name: Check out code into the Go module directory

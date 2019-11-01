@@ -9,4 +9,4 @@ jobs:
     - name: Build test docker image
       run: docker build -t pg_gatherer_test . -f ./docker/test.Dockerfile
     - name: Test in docker image
-      run: docker build -t pg_gatherer_test . -f ./docker/test.Dockerfile
+      run: docker run -ti --rm pg_gatherer_test bash -ec "make test_in_docker"
