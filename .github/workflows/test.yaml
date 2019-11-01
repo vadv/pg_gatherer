@@ -15,7 +15,9 @@ jobs:
       run: docker build -t vadv/pg_gatherer:pre_test . -f ./docker/pre-test.Dockerfile
 
     - name: Publish pre-test to registry
-      rum: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin && docker push $DOCKER_USERNAME/pg_gatherer:latest
+      run: >
+        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        docker push $DOCKER_USERNAME/pg_gatherer:latest
 
     - name: Build test docker image
       run: docker build -t pg_gatherer_test . -f ./docker/test.Dockerfile
