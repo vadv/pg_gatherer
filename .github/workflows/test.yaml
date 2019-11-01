@@ -4,9 +4,25 @@ jobs:
   build-image-and-test:
     runs-on: ubuntu-latest
     steps:
+
     - name: Checkout repo
       uses: actions/checkout@v1
+
+    - name: Pull pre-test docker image
+      run: docker pull vadv/pg_gatherer:pre_test || echo "failed"
+
+    - name: Build pre-test docker image
+      run: docker build -t vadv/pg_gatherer:pre_test . -f ./docker/pre-test.Dockerfile
+
+    - name: Publish pre-test to registry
+      uses: elgohr/Publish-Docker-Github-Action@master
+      with:
+        name: vadv/pg_gatherer:pre_test
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
     - name: Build test docker image
       run: docker build -t pg_gatherer_test . -f ./docker/test.Dockerfile
+
     - name: Test in docker image
-      run: docker run -ti --rm pg_gatherer_test bash -ec "make test_in_docker"
+      run: docker run --rm pg_gatherer_test bash -ec "make test_in_docker"
