@@ -1,6 +1,6 @@
 name: lint
 on: [push]
-  # Use golint via golangci-lint binary with "warning" level.
+jobs:
   golint:
     name: runner / golint
     runs-on: ubuntu-latest
