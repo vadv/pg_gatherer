@@ -58,40 +58,39 @@ func New(path, prefix string) (*Cache, error) {
 	if ok {
 		result.db = db
 		return result, nil
-	} else {
-		retries := 0
-	OpenSqlite:
-		if retries > 3 {
-			return nil, fmt.Errorf("too many errors while prepare sqlite database")
-		}
-		newDB, err := sql.Open(`sqlite3`, path)
-		if err != nil {
-			log.Printf("[ERROR] delete db %s, because: %s while open\n", path, err.Error())
-			os.RemoveAll(path)
-			retries++
-			goto OpenSqlite
-		}
-		if _, errSync := newDB.Exec(`PRAGMA synchronous = 0`); errSync != nil {
-			newDB.Close()
-			log.Printf("[ERROR] delete db %s, because: %s while set async\n", path, errSync.Error())
-			os.RemoveAll(path)
-			retries++
-			goto OpenSqlite
-		}
-		if _, errJournal := newDB.Exec(`PRAGMA journal_mode = OFF`); errJournal != nil {
-			newDB.Close()
-			log.Printf("[ERROR] delete db %s, because: %s while disable journal\n", path, errJournal.Error())
-			os.RemoveAll(path)
-			retries++
-			goto OpenSqlite
-		}
-		newDB.SetMaxOpenConns(1)
-		newDB.SetMaxIdleConns(1)
-		listOfOpenCaches.list[path] = newDB
-		result.db = newDB
-		go result.rotateOldTablesRoutine()
-		return result, nil
 	}
+	retries := 0
+OpenSqlite:
+	if retries > 3 {
+		return nil, fmt.Errorf("too many errors while prepare sqlite database")
+	}
+	newDB, err := sql.Open(`sqlite3`, path)
+	if err != nil {
+		log.Printf("[ERROR] delete db %s, because: %s while open\n", path, err.Error())
+		os.RemoveAll(path)
+		retries++
+		goto OpenSqlite
+	}
+	if _, errSync := newDB.Exec(`PRAGMA synchronous = 0`); errSync != nil {
+		newDB.Close()
+		log.Printf("[ERROR] delete db %s, because: %s while set async\n", path, errSync.Error())
+		os.RemoveAll(path)
+		retries++
+		goto OpenSqlite
+	}
+	if _, errJournal := newDB.Exec(`PRAGMA journal_mode = OFF`); errJournal != nil {
+		newDB.Close()
+		log.Printf("[ERROR] delete db %s, because: %s while disable journal\n", path, errJournal.Error())
+		os.RemoveAll(path)
+		retries++
+		goto OpenSqlite
+	}
+	newDB.SetMaxOpenConns(1)
+	newDB.SetMaxIdleConns(1)
+	listOfOpenCaches.list[path] = newDB
+	result.db = newDB
+	go result.rotateOldTablesRoutine()
+	return result, nil
 }
 
 // TODO: to save syscall, get variable from cache

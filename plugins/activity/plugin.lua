@@ -10,10 +10,6 @@ local sql_waits    = read_file_in_plugin_dir("waits.sql")
 
 local helpers      = dofile(filepath.join(plugin:dir(), "linux_helper_proc_stat.lua"))
 
-local states_gauge = prometheus_gauge({ name = "activity_states", labels = { "state" } })
-local waits_gauge  = prometheus_gauge({ name   = "activity_waits",
-                                        labels = { "state", "wait_event", "wait_event_type" } })
-
 -- process states
 local function states()
   local result   = target:query(sql_states, every)
@@ -22,7 +18,7 @@ local function states()
   for _, row in pairs(result.rows) do
     if not (snapshot) then snapshot = row[1] end
     jsonb[row[2]] = tonumber(row[3])
-    states_gauge:set(row[3], { state = row[2] })
+    gauge_set("activity_states", row[3], { state = row[2] })
   end
   local jsonb, err = json.encode(jsonb)
   if err then error(err) end
@@ -35,7 +31,7 @@ local function waits()
   for _, row in pairs(result.rows) do
     local jsonb, err = json.decode(row[2])
     if err then error(err) end
-    waits_gauge:set(jsonb.count,
+    gauge_set("activity_waits", jsonb.count,
         { state = jsonb.state, wait_event = jsonb.wait_event, wait_event_type = jsonb.wait_event_type })
     storage_insert_metric({ plugin = plugin_name .. ".waits", snapshot = row[1], json = row[2] })
   end
