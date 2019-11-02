@@ -15,9 +15,11 @@ jobs:
       run: docker build -t vadv/pg_gatherer:pre_test . -f ./docker/pre-test.Dockerfile
 
     - name: Publish pre-test to registry
-      run: >
-        echo "$DOCKER_PASSWORD" | docker login --username vadv --password-stdin &&
-        docker push vadv/pg_gatherer:latest
+      uses: elgohr/Publish-Docker-Github-Action@master
+      with:
+        name: vadv/pg_gatherer:latest
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Build test docker image
       run: docker build -t pg_gatherer_test . -f ./docker/test.Dockerfile
