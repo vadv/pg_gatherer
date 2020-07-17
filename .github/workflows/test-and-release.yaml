@@ -26,7 +26,7 @@ jobs:
       uses: docker/build-push-action@v1
       with:
         repository: vadv/pg_gatherer
-        tags: ${{ github.head_ref }}
+        tag_with_ref: true
         dockerfile: ./docker/release.Dockerfile
-        username: ${{ secrets.DOCKER_USERNAME }}
+        username: vadv
         password: ${{ secrets.DOCKER_PASSWORD }}
