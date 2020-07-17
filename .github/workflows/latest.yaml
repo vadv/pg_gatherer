@@ -1,5 +1,11 @@
-name: test-and-release
-on: [push]
+name: latest
+on:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: '0 0 * * *'
+
 jobs:
 
   test:
@@ -16,7 +22,7 @@ jobs:
         dockerfile: ./docker/test.Dockerfile
         username: vadv
         password: ${{ secrets.DOCKER_TOKEN }}
-        cache: true
+        cache: ${{ github.event_name != 'schedule' }}
         tags: test
 
     - name: Test in docker image
@@ -29,4 +35,5 @@ jobs:
         dockerfile: ./docker/release.Dockerfile
         username: vadv
         password: ${{ secrets.DOCKER_TOKEN }}
-        tag_names: true
+        cache: ${{ github.event_name != 'schedule' }}
+        tags: "latest"
