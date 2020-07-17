@@ -100,5 +100,3 @@ peripheral-db-1: # name of target in storage-db
 More information here: [plugins](/plugins)
 
 ## Build status
-
-[![Travis](https://travis-ci.org/vadv/pg_gatherer.svg)](https://travis-ci.org/vadv/pg_gatherer)
