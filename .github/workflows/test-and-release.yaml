@@ -25,7 +25,7 @@ jobs:
     - name: Build and push Docker images
       uses: elgohr/Publish-Docker-Github-Action@master
       with:
-        repository: vadv/pg_gatherer
+        name: vadv/pg_gatherer
         dockerfile: ./docker/release.Dockerfile
         username: vadv
         password: ${{ secrets.DOCKER_PASSWORD }}
