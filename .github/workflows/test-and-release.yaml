@@ -20,12 +20,13 @@ jobs:
     steps:
 
     - name: Checkout repo
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
 
-    - name: Publish to Registry
-      uses: HurricanKai/Publish-Docker-Github-Action@master
+    - name: Build and push Docker images
+      uses: docker/build-push-action@v1
       with:
-        name: vadv/pg_gatherer:${{ github.head_ref }}
+        repository: vadv/pg_gatherer
+        tags: ${{ github.head_ref }}
         dockerfile: ./docker/release.Dockerfile
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
