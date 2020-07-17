@@ -29,4 +29,4 @@ jobs:
         dockerfile: ./docker/release.Dockerfile
         username: vadv
         password: ${{ secrets.DOCKER_PASSWORD }}
-        tag_semver: true
+        tag_names: true
