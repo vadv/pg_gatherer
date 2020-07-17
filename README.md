@@ -100,3 +100,5 @@ peripheral-db-1: # name of target in storage-db
 More information here: [plugins](/plugins)
 
 ## Build status
+
+![Status](https://github.com/vadv/pg_gatherer/workflows/test-and-release/badge.svg)
