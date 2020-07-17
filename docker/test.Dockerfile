@@ -16,9 +16,9 @@ RUN yum install -y epel-release && \
     yum install -y @"Development tools" && \
     yum install -y sudo && \
     yum install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm && \
-    yum install -y postgresql11-server && \
-    yum install -y postgresql11-contrib && \
-    yum install -y timescaledb-postgresql-11 && \
+    yum install -y postgresql12-server && \
+    yum install -y postgresql12-contrib && \
+    yum install -y timescaledb-postgresql-12 && \
     yum clean all
 
 ENV GO111MODULE=on

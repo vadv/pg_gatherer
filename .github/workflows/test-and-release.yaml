@@ -1,0 +1,32 @@
+name: test-and-release
+on: [push]
+jobs:
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: Build test image
+      uses: elgohr/Publish-Docker-Github-Action@master
+      with:
+        name: vadv/pg_gatherer
+        dockerfile: ./docker/test.Dockerfile
+        username: vadv
+        password: ${{ secrets.DOCKER_TOKEN }}
+        cache: true
+        tags: test
+
+    - name: Test in docker image
+      run: docker run --rm vadv/pg_gatherer:test bash -ec "make test_in_docker"
+
+    - name: Build release docker image
+      uses: elgohr/Publish-Docker-Github-Action@master
+      with:
+        name: vadv/pg_gatherer
+        dockerfile: ./docker/release.Dockerfile
+        username: vadv
+        password: ${{ secrets.DOCKER_TOKEN }}
+        tag_names: true
