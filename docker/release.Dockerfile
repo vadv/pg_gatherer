@@ -12,5 +12,5 @@ RUN make build
 FROM centos:7
 
 ENV LC_ALL=en_US.UTF-8
-COPY --from=builder /go/github.com/coinsph/pg_gatherer/bin/pg_gatherer /usr/bin/pg_gatherer
-COPY --from=builder /go/github.com/coinsph/pg_gatherer/plugins /etc/pg_gatherer/plugins
+COPY --from=builder /go/github.com/vadv/pg_gatherer/bin/pg_gatherer /usr/bin/pg_gatherer
+COPY --from=builder /go/github.com/vadv/pg_gatherer/plugins /etc/pg_gatherer/plugins
