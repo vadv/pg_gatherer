@@ -12,12 +12,12 @@ jobs:
     - name: Build test image
       uses: elgohr/Publish-Docker-Github-Action@master
       with:
-        name: vadv/pg_gatherer
+        name: vadv/pg_gatherer_test
         dockerfile: ./docker/test.Dockerfile
         username: vadv
         password: ${{ secrets.DOCKER_TOKEN }}
         cache: true
-        tags: test
+        tags: latest
 
     - name: Test in docker image
       run: docker run --rm vadv/pg_gatherer:test bash -ec "make test_in_docker"
