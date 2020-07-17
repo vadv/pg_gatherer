@@ -1,0 +1,30 @@
+name: test-and-release
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout repo
+      uses: actions/checkout@v1
+
+    - name: Build pre-test docker image
+      run: docker build -t test . -f ./docker/pre-test.Dockerfile
+
+    - name: Test in docker image
+      run: docker run --rm test bash -ec "make test_in_docker"
+
+  release:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout repo
+      uses: actions/checkout@v1
+
+    - name: Publish to Registry
+      uses: HurricanKai/Publish-Docker-Github-Action@master
+      with:
+        name: vadv/pg_gatherer:${{ github.head_ref }}
+        dockerfile: ./docker/release.Dockerfile
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
