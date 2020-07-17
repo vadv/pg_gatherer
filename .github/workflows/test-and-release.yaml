@@ -28,5 +28,5 @@ jobs:
         name: vadv/pg_gatherer
         dockerfile: ./docker/release.Dockerfile
         username: vadv
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        password: ${{ secrets.DOCKER_TOKEN }}
         tag_names: true
