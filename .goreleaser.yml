@@ -1,5 +1,5 @@
 builds:
-  - main: ./gatherer/pg_gatherer
+  - main: ./gatherer/cmd/pg_gatherer
     id: "pg_gatherer"
     binary: pg_gatherer
     goos:
