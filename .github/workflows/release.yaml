@@ -1,0 +1,17 @@
+name: release
+on: [push]
+jobs:
+  build-image-and-test:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout repo
+      uses: actions/checkout@v1
+
+    - name: Publish release to registry
+      uses: elgohr/Publish-Docker-Github-Action@master
+      with:
+        name: vadv/pg_gatherer:${{ github.head_ref }}
+        dockerfile: ./docker/release.Dockerfile
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
