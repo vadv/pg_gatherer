@@ -1,0 +1,14 @@
+builds:
+  - main: ./gatherer/pg_gatherer
+    id: "pg_gatherer"
+    binary: pg_gatherer
+    goos:
+      - linux
+      - darwin
+      - windows
+changelog:
+  sort: asc
+  filters:
+    exclude:
+    - '^docs:'
+    - '^test:'
