@@ -44,7 +44,7 @@ func main() {
 	plugins, err := listOfPluginsAndTestFiles(filepath.Join(*pluginPath, "embedded"))
 	if err != nil {
 		log.Printf("[ERROR] get embedded plugins: %s\n", err.Error())
-		plugins = make(map[string]string, 0)
+		plugins = make(map[string]string)
 	}
 	// load override plugins
 	overridePlugins, errOverridePlugins := listOfPluginsAndTestFiles(*pluginPath)
@@ -57,7 +57,7 @@ func main() {
 	var wg sync.WaitGroup
 	wg.Add(len(plugins))
 	log.Printf("[INFO] test %d plugins\n", len(plugins))
-	testResultChan := make(chan *testResult, 0)
+	testResultChan := make(chan *testResult)
 
 	for plugin, testFile := range plugins {
 		go func(plugin, testFile string) {
@@ -90,7 +90,7 @@ func main() {
 				wg.Done()
 			case <-ticker.C:
 				log.Printf("[INFO] already processing\t%.0fs:\ttotal: %d\tcompleted: %d\tfailed: %d\n",
-					time.Now().Sub(startAt).Seconds(), len(plugins), completed, failed)
+					time.Since(startAt).Seconds(), len(plugins), completed, failed)
 			}
 		}
 	}()
@@ -100,7 +100,7 @@ func main() {
 		log.Printf("[ERROR] %d plugin(s) was failed\n", failed)
 		os.Exit(int(failed))
 	} else {
-		log.Printf("[INFO] was competed after: %v\n", time.Now().Sub(startAt))
+		log.Printf("[INFO] was competed after: %v\n", time.Since(startAt))
 	}
 }
 
@@ -108,8 +108,10 @@ func testPlugin(pluginDir, cacheDir, pluginName, testFile string) error {
 	state := lua.NewState()
 	libs.Preload(state)
 	testing_framework.Preload(state)
-	testing_framework.New(state, pluginDir, cacheDir, pluginName,
-		*hostName, *dbName, *userName, *password, *dbPort, nil)
+	if err := testing_framework.New(state, pluginDir, cacheDir, pluginName,
+		*hostName, *dbName, *userName, *password, *dbPort, nil); err != nil {
+		return err
+	}
 	connection.Preload(state)
 	connection.New(state, `target`,
 		*hostName, *dbName, *userName, *password, *dbPort, nil)
@@ -127,7 +129,7 @@ func listOfPluginsAndTestFiles(dir string) (map[string]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	result := make(map[string]string, 0)
+	result := make(map[string]string)
 	for _, f := range testFiles {
 		pluginDir, _ := filepath.Split(f)
 		split := strings.Split(pluginDir, string(filepath.Separator))
