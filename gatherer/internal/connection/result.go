@@ -21,7 +21,7 @@ func processQuery(L *lua.LState, db *sql.DB, ctx context.Context, query string, 
 	if err != nil {
 		return nil, err
 	}
-	defer tx.Commit()
+	defer func() { _ = tx.Commit() }()
 	sqlRows, errQuery := tx.Query(query, args...)
 	if errQuery != nil {
 		return nil, errQuery
@@ -44,7 +44,6 @@ func parseRows(sqlRows *sql.Rows, L *lua.LState) (*queryResult, error) {
 	if sqlRows == nil {
 		return nil, fmt.Errorf("rows is nil, program bug")
 	}
-	defer sqlRows.Close()
 	cols, err := sqlRows.Columns()
 	if err != nil {
 		return nil, err
@@ -106,5 +105,5 @@ func parseRows(sqlRows *sql.Rows, L *lua.LState) (*queryResult, error) {
 	return &queryResult{
 		Rows:    luaRows,
 		Columns: columns,
-	}, nil
+	}, sqlRows.Close()
 }

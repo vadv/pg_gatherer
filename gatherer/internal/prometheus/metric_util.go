@@ -93,7 +93,7 @@ func (m *luaPrometheusMetricConfig) getCounterOpts() prometheus.CounterOpts {
 
 //convert lua table to prometheus.Label
 func luaTableToPrometheusLabels(tbl *lua.LTable) prometheus.Labels {
-	result := make(map[string]string, 0)
+	result := make(map[string]string)
 	tbl.ForEach(func(k lua.LValue, v lua.LValue) {
 		result[k.String()] = v.String()
 	})

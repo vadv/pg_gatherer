@@ -12,7 +12,7 @@ type prometheusMetricList struct {
 func newPrometheusMetricList() *prometheusMetricList {
 	return &prometheusMetricList{
 		lock:  &sync.Mutex{},
-		cache: make(map[string]*luaMetric, 0),
+		cache: make(map[string]*luaMetric),
 	}
 }
 

@@ -35,7 +35,7 @@ type Cache struct {
 	tableMutex sync.Mutex
 }
 
-var listOfOpenCaches = &listOfCaches{list: make(map[string]*sql.DB, 0)}
+var listOfOpenCaches = &listOfCaches{list: make(map[string]*sql.DB)}
 
 type listOfCaches struct {
 	mutex sync.Mutex
@@ -51,7 +51,7 @@ func New(path, prefix string) (*Cache, error) {
 	if err := os.MkdirAll(filepath.Dir(path), 0750); err != nil {
 		return nil, err
 	}
-	result := &Cache{path: path, prefix: prefix, tables: make(map[string]bool, 0)}
+	result := &Cache{path: path, prefix: prefix, tables: make(map[string]bool)}
 	listOfOpenCaches.mutex.Lock()
 	defer listOfOpenCaches.mutex.Unlock()
 	db, ok := listOfOpenCaches.list[path]
