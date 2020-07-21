@@ -101,4 +101,4 @@ More information here: [plugins](/plugins)
 
 ## Build status
 
-[![Travis](https://travis-ci.org/vadv/pg_gatherer.svg)](https://travis-ci.org/vadv/pg_gatherer)
+![Status](https://github.com/vadv/pg_gatherer/workflows/test-and-release/badge.svg)

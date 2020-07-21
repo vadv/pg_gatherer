@@ -1,4 +1,4 @@
-FROM golang:1.12 as builder
+FROM golang:1.14 as builder
 
 WORKDIR /go/github.com/vadv/pg_gatherer
 
@@ -9,6 +9,8 @@ RUN go mod download
 COPY . .
 RUN make build
 
-FROM alpine
-COPY --from=builder /go/github.com/vadv/pg_gatherer/bin/pg_gatherer /app/bin/
-COPY --from=builder /go/github.com/vadv/pg_gatherer/plugins /app/plugins
+FROM centos:7
+
+ENV LC_ALL=en_US.UTF-8
+COPY --from=builder /go/github.com/vadv/pg_gatherer/bin/pg_gatherer /usr/bin/pg_gatherer
+COPY --from=builder /go/github.com/vadv/pg_gatherer/plugins /etc/pg_gatherer/plugins
