@@ -108,7 +108,7 @@ func backgroundQueryResult(L *lua.LState) int {
 		defer ud.sqlRows.Close()
 	}
 	if ud.tx != nil {
-		defer ud.tx.Commit()
+		defer func() { _ = ud.tx.Commit() }()
 	}
 	if ud.err != nil {
 		L.RaiseError("query has error: %s", ud.err.Error())

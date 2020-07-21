@@ -27,7 +27,9 @@ func createPlugin(L *lua.LState) int {
 
 func removePlugin(L *lua.LState) int {
 	ud := checkUserDataFramework(L, 1)
-	ud.pool.StopAndRemovePluginFromHost(ud.pluginName, ud.host)
+	if err := ud.pool.StopAndRemovePluginFromHost(ud.pluginName, ud.host); err != nil {
+		L.RaiseError("remove error: %s", err.Error())
+	}
 	time.Sleep(time.Second)
 	return 0
 }

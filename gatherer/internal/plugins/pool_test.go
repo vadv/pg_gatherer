@@ -23,7 +23,7 @@ func TestPool(t *testing.T) {
 		Port:     5432,
 		UserName: "gatherer",
 	}
-	connections := make(map[string]*plugins.Connection, 0)
+	connections := make(map[string]*plugins.Connection)
 	connections[`target`] = conn
 	connections[`storage`] = conn
 	pool.RegisterHost(hostname, connections)

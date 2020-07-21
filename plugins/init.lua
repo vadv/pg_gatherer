@@ -82,6 +82,19 @@ function extension_present(conn, extname)
   return (extension.rows[1][1] == 1)
 end
 
+-- prometheus_gauge:set()
+function gauge_set(name, value, labels)
+  labels = labels or {}
+  if not(labels.host) then labels.host = plugin:host() end
+  local gauge = prometheus_gauge({
+    namespace = "pg",
+    subsystem = "gatherer",
+    name = name,
+    labels = labels
+  })
+  gauge:set(value)
+end
+
 -- run function f every sec
 -- this function run in plugin context, then we use cache key `last_run`
 function run_every(f, every)

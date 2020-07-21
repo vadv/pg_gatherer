@@ -9,15 +9,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/vadv/pg_gatherer/gatherer/internal/secrets"
+	libs "github.com/vadv/gopher-lua-libs"
+	lua "github.com/yuin/gopher-lua"
 
 	"github.com/vadv/pg_gatherer/gatherer/internal/cache"
-
 	"github.com/vadv/pg_gatherer/gatherer/internal/connection"
-
-	libs "github.com/vadv/gopher-lua-libs"
-
-	lua "github.com/yuin/gopher-lua"
+	"github.com/vadv/pg_gatherer/gatherer/internal/prometheus"
+	"github.com/vadv/pg_gatherer/gatherer/internal/secrets"
 )
 
 // Connection to PostgreSQL
@@ -120,8 +118,10 @@ func (p *plugin) prepareState() error {
 	state.SetGlobal(`plugin`, pluginUD)
 	secrets.Preload(state)
 	p.config.secrets.Register(state, `secrets`)
+	prometheus.Preload(state)
 	libs.Preload(state)
 	if err := state.DoFile(filepath.Join(p.config.rootDir, "init.lua")); err != nil {
+		cancelFunc()
 		return fmt.Errorf("while load init.lua: %s", err.Error())
 	}
 	connection.Preload(state)
@@ -134,6 +134,7 @@ func (p *plugin) prepareState() error {
 	cache.Preload(state)
 	cachePath := filepath.Join(p.config.globalCacheDir, "pg_gatherer_cache.sqlite")
 	if err := cache.NewSqlite(state, `cache`, cachePath, p.config.getCachePrefix()); err != nil {
+		cancelFunc()
 		return err
 	}
 	p.state = state

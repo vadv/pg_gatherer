@@ -2,6 +2,7 @@ package connection
 
 import (
 	"database/sql"
+	"fmt"
 	"sync"
 	"testing"
 
@@ -32,7 +33,7 @@ func TestNew(t *testing.T) {
 			New(state, `connection`,
 				"/tmp", "gatherer", "gatherer", "", 5432, params)
 			if err := state.DoString(doAvailableConnections); err != nil {
-				t.Fatalf("do: %s\n", err.Error())
+				panic(fmt.Sprintf("do: %s\n", err.Error()))
 			}
 		}()
 	}

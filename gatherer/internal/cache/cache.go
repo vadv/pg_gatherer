@@ -28,6 +28,7 @@ func Preload(L *lua.LState) int {
 	return 0
 }
 
+// NewSqlite open new sqlite cache
 func NewSqlite(L *lua.LState, userDataName, fileName, prefix string) error {
 	s, err := sqlite.New(fileName, prefix)
 	if err != nil {

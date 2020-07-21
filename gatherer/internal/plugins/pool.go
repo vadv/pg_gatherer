@@ -26,7 +26,7 @@ type pluginsForHost struct {
 // NewPool return new Pool
 func NewPool(rootDir string, globalCacheDir string) *Pool {
 	result := &Pool{
-		hosts:          make(map[string]*pluginsForHost, 0),
+		hosts:          make(map[string]*pluginsForHost),
 		rootDir:        rootDir,
 		globalCacheDir: globalCacheDir,
 	}
@@ -34,7 +34,7 @@ func NewPool(rootDir string, globalCacheDir string) *Pool {
 	return result
 }
 
-func (p *Pool) supervisor() error {
+func (p *Pool) supervisor() {
 	for {
 		time.Sleep(time.Second)
 		p.mutex.Lock()
@@ -156,8 +156,8 @@ func (p *Pool) StopAndRemovePluginFromHost(pluginName, host string) error {
 // PluginStatisticPerHost statistic information about all host
 func (p *Pool) PluginStatisticPerHost() map[string][]PluginStatistic {
 	p.mutex.Lock()
-	p.mutex.Unlock()
-	result := make(map[string][]PluginStatistic, 0)
+	defer p.mutex.Unlock()
+	result := make(map[string][]PluginStatistic)
 	for host, pls := range p.hosts {
 		if _, ok := result[host]; !ok {
 			result[host] = make([]PluginStatistic, 0)

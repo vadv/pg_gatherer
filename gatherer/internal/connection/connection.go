@@ -11,14 +11,13 @@ import (
 
 // connection to PostgreSQL
 type connection struct {
-	db             *sql.DB
-	host           string
-	dbname         string
-	port           int
-	user           string
-	password       string
-	maxConnections int64
-	params         map[string]string
+	db       *sql.DB
+	host     string
+	dbname   string
+	port     int
+	user     string
+	password string
+	params   map[string]string
 }
 
 // Preload is the preloader of user data connection_ud.

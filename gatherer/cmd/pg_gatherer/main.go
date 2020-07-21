@@ -99,7 +99,7 @@ func main() {
 		case syscall.SIGINT, syscall.SIGTERM:
 			// stop
 			log.Printf("[INFO] shutdown\n")
-			for host, _ := range *config {
+			for host := range *config {
 				pool.RemoveHostAndPlugins(host)
 			}
 			log.Printf("[INFO] stopped\n")
