@@ -18,9 +18,9 @@ func prometheusCollectPoolStatistics(pool *plugins.Pool) {
 	prometheus.MustRegister(errorsVec)
 
 	for {
-		errorStat := make(map[string]map[string]int, 0)
+		errorStat := make(map[string]map[string]int)
 		for host, hostStats := range pool.PluginStatisticPerHost() {
-			errorStat[host] = make(map[string]int, 0)
+			errorStat[host] = make(map[string]int)
 			for _, stat := range hostStats {
 				errorStat[host][stat.PluginName] = stat.Errors
 			}
