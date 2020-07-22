@@ -14,9 +14,8 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	"github.com/vadv/pg_gatherer/gatherer/internal/connection"
-
 	libs "github.com/vadv/gopher-lua-libs"
+	"github.com/vadv/pg_gatherer/gatherer/internal/connection"
 	"github.com/vadv/pg_gatherer/gatherer/internal/testing_framework"
 	lua "github.com/yuin/gopher-lua"
 )
