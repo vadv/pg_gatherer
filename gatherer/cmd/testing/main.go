@@ -21,8 +21,8 @@ import (
 )
 
 var (
-	pluginPath       = flag.String(`plugin-dir`, `plugins`, `Path to plugin directory`)
-	cachePath        = flag.String(`cache-dir`, `plugins\cache`, `Path to cache directory`)
+	pluginPath       = flag.String(`plugin-dir`, `./plugins`, `Path to plugin directory`)
+	cachePath        = flag.String(`cache-dir`, `./cache`, `Path to cache directory`)
 	stopOnFirstError = flag.Bool(`stop-on-first-error`, false, `Stop on first error`)
 	hostName         = flag.String(`host`, os.Getenv(`PGHOST`), `PostgreSQL host`)
 	dbName           = flag.String(`dbname`, os.Getenv(`PGDATABASE`), `PostgreSQL database`)
@@ -30,6 +30,7 @@ var (
 	password         = flag.String(`password`, os.Getenv(`PGPASSWORD`), `PostgreSQL password`)
 	dbPort           = flag.Int(`port`, 5432, `PostgreSQL port`)
 	httpListen       = flag.String(`http-listen`, `127.0.0.1:8080`, `Lister address`)
+	params           = flag.String(`connection-params`, ``, `PostgreSQL connection parameters`)
 )
 
 type testResult struct {
@@ -117,19 +118,32 @@ func main() {
 	}
 }
 
+func connectionParameters() map[string]string {
+	if *params == `` {
+		return nil
+	}
+	result := make(map[string]string)
+	listKV := strings.Split(*params, `,`)
+	for _, l := range listKV {
+		data := strings.Split(l, `=`)
+		result[data[0]] = data[1]
+	}
+	return result
+}
+
 func testPlugin(pluginDir, cacheDir, pluginName, testFile string) error {
 	state := lua.NewState()
 	libs.Preload(state)
 	testing_framework.Preload(state)
 	if err := testing_framework.New(state, pluginDir, cacheDir, pluginName,
-		*hostName, *dbName, *userName, *password, *dbPort, nil); err != nil {
+		*hostName, *dbName, *userName, *password, *dbPort, connectionParameters()); err != nil {
 		return err
 	}
 	connection.Preload(state)
 	connection.New(state, `target`,
-		*hostName, *dbName, *userName, *password, *dbPort, nil)
+		*hostName, *dbName, *userName, *password, *dbPort, connectionParameters())
 	connection.New(state, `storage`,
-		*hostName, *dbName, *userName, *password, *dbPort, nil)
+		*hostName, *dbName, *userName, *password, *dbPort, connectionParameters())
 	if err := state.DoFile(filepath.Join(pluginDir, "init.test.lua")); err != nil {
 		return err
 	}
