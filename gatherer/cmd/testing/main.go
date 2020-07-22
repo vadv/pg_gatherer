@@ -4,12 +4,15 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/vadv/pg_gatherer/gatherer/internal/connection"
 
@@ -27,6 +30,7 @@ var (
 	userName         = flag.String(`username`, os.Getenv(`PGUSER`), `PostgreSQL user`)
 	password         = flag.String(`password`, os.Getenv(`PGPASSWORD`), `PostgreSQL password`)
 	dbPort           = flag.Int(`port`, 5432, `PostgreSQL port`)
+	httpListen       = flag.String(`http-listen`, `127.0.0.1:8080`, `Lister address`)
 )
 
 type testResult struct {
@@ -70,6 +74,16 @@ func main() {
 				err:        errTest,
 			}
 		}(plugin, testFile)
+	}
+
+	http.Handle("/metrics", promhttp.Handler())
+	go func() {
+		if errListen := http.ListenAndServe(*httpListen, nil); errListen != nil {
+			panic(errListen.Error())
+		}
+	}()
+	if err := os.Setenv("HTTP_LISTEN", *httpListen); err != nil {
+		panic(err.Error())
 	}
 
 	failed, completed := int32(0), int32(0)

@@ -9,3 +9,4 @@ local activity_metric_exists = function()
 end
 
 run_plugin_test(120, activity_metric_exists)
+prometheus_exists('pg.activity.states')

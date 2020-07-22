@@ -1,3 +1,5 @@
+local http = require("http")
+
 -- load init.lua
 local filepath = require("filepath")
 local root     = filepath.dir(debug.getinfo(1).source)
@@ -44,4 +46,15 @@ function run_plugin_test(timeout, success_exit_function, check_error_function)
   end
   tested_plugin:remove()
   error("execution timeout")
+end
+
+local http_listen = os.getenv("HTTP_LISTEN")
+local client = http.client()
+local request = http.request("GET", "http://"..http_listen.."/metrics")
+function prometheus_exists(value)
+  local result, err = client:do_request(request)
+  if err then error(err) end
+  if not(result.code == 200) then error("code: "..tostring(result.code)) end
+  if strings.contains(result.body, value) then return end
+  error(value.. ": not found in: "..tostring(result.body))
 end

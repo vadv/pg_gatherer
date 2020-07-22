@@ -48,6 +48,7 @@ end
 local count_empty_metrics = 0
 function storage_insert_metric(metric)
   if not (metric.host) then metric.host = plugin:host() end
+  -- check empty metrics
   if (metric.int == nil) and (metric.float == nil) and not (metric.json == nil) then
     local jsonb, err = json.decode(metric.json)
     if err then error(err) end
@@ -59,6 +60,7 @@ function storage_insert_metric(metric)
       return
     end
   end
+  -- set metrics
   storage:insert_metric(metric)
 end
 
