@@ -2,15 +2,15 @@ SELECT
     extract(epoch from now())::int - (extract(epoch from now())::int % $1),
     jsonb_build_object(
         'datname', current_database(),
-		'schemaname', nspname,
-		'tablename', tblname,
-		'indexname', idxname,
-		'bloat_ratio', 100 * (relpages-est_pages_ff)::float / relpages,
-		'extra_size', bs*(relpages-est_pages)::bigint,
-		'extra_ratio', 100 * (relpages-est_pages)::float / relpages,
-		'fillfactor', fillfactor,
-		'is_na', is_na,
-		'bloat_size', CASE WHEN relpages > est_pages_ff THEN bs*(relpages-est_pages_ff) ELSE 0 END
+        'schemaname', nspname,
+        'tablename', tblname,
+        'indexname', idxname,
+        'bloat_ratio', 100 * (relpages-est_pages_ff)::float / relpages,
+        'extra_size', bs*(relpages-est_pages)::bigint,
+        'extra_ratio', 100 * (relpages-est_pages)::float / relpages,
+        'fillfactor', fillfactor,
+        'is_na', is_na,
+        'bloat_size', CASE WHEN relpages > est_pages_ff THEN bs*(relpages-est_pages_ff) ELSE 0 END
       ) as result
 FROM (
   SELECT coalesce(1 +

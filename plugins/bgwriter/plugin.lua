@@ -7,6 +7,7 @@ local function collect()
   local result = target:query(sql_bgwriter, every)
   for _, row in pairs(result.rows) do
     local jsonb, err = json.decode(row[2])
+    for k, v in pairs(jsonb) do gauge_set("bgwriter_"..k, v) end
     if err then error(err) end
     jsonb.checkpoints_timed     = cache:diff_and_set("checkpoints_timed", jsonb.checkpoints_timed)
     jsonb.checkpoints_req       = cache:diff_and_set("checkpoints_req", jsonb.checkpoints_req)
