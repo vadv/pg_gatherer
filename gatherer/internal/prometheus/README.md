@@ -9,7 +9,7 @@ Creates lua user data `prometheus_metric_ud`.
 
 # Lua
 
-## local gauge = prometheus:gauge({name="",namespace="",subsystem="",name="",help=""})
+## local gauge = prometheus:gauge({name="",namespace="",subsystem="",help=""})
 
 Register prometheus `gauge`.
 

@@ -70,7 +70,7 @@ func (m *luaPrometheusMetricConfig) equal(m2 *luaPrometheusMetricConfig) bool {
 		// because labels sorted
 		return strings.Join(m.labels, "") == strings.Join(m2.labels, "")
 	}
-	return false
+	return true
 }
 
 func (m *luaPrometheusMetricConfig) getGaugeOpts() prometheus.GaugeOpts {

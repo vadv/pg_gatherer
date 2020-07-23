@@ -10,6 +10,7 @@ goos       = require("goos")
 log        = require("log")
 humanize   = require("humanize")
 strings    = require("strings")
+prometheus = require("prometheus")
 
 plugin_log = log.new()
 plugin_log:set_flags({ date = true, time = true })
@@ -40,7 +41,7 @@ end
 -- return unix ts from connection
 function get_unix_ts(conn, ts)
   conn = conn or target
-  ts = ts or 1
+  ts   = ts or 1
   return conn:query("select extract(epoch from now())::int - (extract(epoch from now())::int % $1)", ts).rows[1][1]
 end
 
@@ -87,14 +88,16 @@ end
 -- prometheus_gauge:set()
 function gauge_set(name, value, labels)
   labels = labels or {}
-  if not(labels.host) then labels.host = plugin:host() end
-  local gauge = prometheus_gauge({
+  if not (labels.host) then labels.host = plugin:host() end
+  local gauge_labels = {}; for k, _ in pairs(labels) do table.insert(gauge_labels, k) end
+  local gauge, err = prometheus_gauge({
     namespace = "pg",
     subsystem = "gatherer",
-    name = name,
-    labels = labels
+    name      = name,
+    labels    = gauge_labels
   })
-  gauge:set(value)
+  if err then error(err) end
+  gauge:set(value, labels)
 end
 
 -- run function f every sec
@@ -117,11 +120,11 @@ function run_every(f, every)
       end
     else
       -- wait random seconds, for decrease CPU spikes ((0..every)/10 + 1)s
-      local rand = tonumber(string.format("%.0f", every / 10) +1)
+      local rand = tonumber(string.format("%.0f", every / 10) + 1)
       time.sleep(rand)
     end
   end
 end
 
 -- wait random seconds, for decrease CPU spikes (0-1s)
-time.sleep(math.random(100)/100)
+time.sleep(math.random(100) / 100)

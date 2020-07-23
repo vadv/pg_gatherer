@@ -9,4 +9,4 @@ local activity_metric_exists = function()
 end
 
 run_plugin_test(120, activity_metric_exists)
-prometheus_exists('pg.activity.1111')
+prometheus_exists('pg_gatherer_activity_states{host="activity",state="active"}')

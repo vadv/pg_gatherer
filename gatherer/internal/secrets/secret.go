@@ -3,6 +3,7 @@ package secrets
 import (
 	"io/ioutil"
 	"log"
+	"os"
 	"sync"
 
 	"gopkg.in/yaml.v2"
@@ -36,6 +37,9 @@ func (s *Storage) Read() {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 	result := make(map[string]string)
+	if _, err := os.Stat(s.filename); os.IsNotExist(err) {
+		return
+	}
 	data, err := ioutil.ReadFile(s.filename)
 	if err != nil {
 		log.Printf("[ERROR] read secret file: %s\n", err.Error())
