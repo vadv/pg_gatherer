@@ -87,6 +87,7 @@ end
 
 -- prometheus_gauge:set()
 function gauge_set(name, value, labels)
+  if not value then return end
   labels = labels or {}
   if not (labels.host) then labels.host = plugin:host() end
   local gauge_labels = {}; for k, _ in pairs(labels) do table.insert(gauge_labels, k) end

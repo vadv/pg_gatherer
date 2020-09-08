@@ -73,6 +73,16 @@ local function collect_for_db(conn)
   end
   local jsonb             = database_state
   jsonb.per_relation_stat = per_relation_stat
+  gauge_set("buffercache_database_buffers_count", jsonb.buffers_count, {datname = jsonb.datname})
+  gauge_set("buffercache_database_dirty_count", jsonb.dirty_count, {datname = jsonb.datname})
+  gauge_set("buffercache_database_usage_count_0", jsonb.usage_count_0, {datname = jsonb.datname})
+  gauge_set("buffercache_database_usage_count_3", jsonb.usage_count_3, {datname = jsonb.datname})
+  for full_relation_name, jsonb in pairs(per_relation_stat) do
+    gauge_set("buffercache_relation_buffers_count", jsonb.buffers_count, {datname = jsonb.datname, relation = full_relation_name})
+    gauge_set("buffercache_relation_dirty_count", jsonb.dirty_count, {datname = jsonb.datname, relation = full_relation_name})
+    gauge_set("buffercache_relation_usage_count_0", jsonb.usage_count_0, {datname = jsonb.datname, relation = full_relation_name})
+    gauge_set("buffercache_relation_usage_count_3", jsonb.usage_count_3, {datname = jsonb.datname, relation = full_relation_name})
+  end
   local jsonb, err        = json.encode(jsonb)
   if err then error(err) end
   storage_insert_metric({ plugin = plugin_name, snapshot = snapshot, json = jsonb })
