@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -12,7 +14,7 @@ const (
 select
 	name
 from sqlite_master
-	where type = 'table' and name like '%s_%%' order by name;`
+	where type = 'table' and name like '%%_%%' order by name asc;`
 )
 
 func (c *Cache) rotateOldTablesRoutine() {
@@ -27,26 +29,33 @@ func (c *Cache) rotateOldTablesRoutine() {
 func (c *Cache) rotateOldTables() error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	query := fmt.Sprintf(listTablesQuery, c.getCacheTableNamePrefix())
-	rows, err := c.db.QueryContext(ctx, query)
+	rows, err := c.db.QueryContext(ctx, listTablesQuery)
 	if err != nil {
 		return err
 	}
 	defer rows.Close()
+	deadline := time.Now().Unix() - 2*c.getCacheRotateTable()
 	for rows.Next() {
 		tableName := ""
 		errScan := rows.Scan(&tableName)
 		if errScan != nil {
 			return errScan
 		}
-		if tableName != c.currentTableName() && tableName != c.prevTableName() {
-			_, errExec := c.db.Exec(fmt.Sprintf(`drop table %s`, tableName))
-			if errExec != nil {
-				return errExec
+		if timeSlice := strings.Split(tableName, "_"); len(timeSlice) > 0 {
+			timeStr := timeSlice[len(timeSlice)-1]
+			t, err := strconv.ParseInt(timeStr, 10, 64)
+			if err == nil {
+				if deadline > t {
+					log.Printf("[INFO] cache drop table: %#v\n", tableName)
+					_, errExec := c.db.Exec(fmt.Sprintf(`drop table %#v`, tableName))
+					if errExec != nil {
+						return errExec
+					}
+					c.tableMutex.Lock()
+					delete(c.tables, tableName)
+					c.tableMutex.Unlock()
+				}
 			}
-			c.tableMutex.Lock()
-			delete(c.tables, tableName)
-			c.tableMutex.Unlock()
 		}
 	}
 	return rows.Err()

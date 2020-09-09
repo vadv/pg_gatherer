@@ -87,15 +87,16 @@ end
 
 -- prometheus_gauge:set()
 function gauge_set(name, value, labels)
-  if not value then return end
-  labels = labels or {}
-  if not (labels.host) then labels.host = plugin:host() end
-  local gauge_labels = {}; for k, _ in pairs(labels) do table.insert(gauge_labels, k) end
+  local value = tonumber(value)
+  if (value == nil) then return end
+  local labels = labels or {}
+  if (labels.host == nil) then labels.host = plugin:host() end
+  local label_keys = {}; for k, _ in ipairs(labels) do table.insert(label_keys, k) end
   local gauge, err = prometheus_gauge({
     namespace = "pg",
     subsystem = "gatherer",
-    name      = name,
-    labels    = gauge_labels
+    name = name,
+    labels = label_keys
   })
   if err then error(err) end
   gauge:set(value, labels)
