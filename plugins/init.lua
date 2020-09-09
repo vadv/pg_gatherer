@@ -87,11 +87,12 @@ function gauge_set(name, value, labels)
   if (value == nil) then return end
   local labels = labels or {}
   if (labels.host == nil) then labels.host = plugin:host() end
+  local metric_labels = {}; for k, _ in ipairs(labels) do table.insert(metric_labels, k) end
   local gauge = prometheus_gauge({
     namespace = "pg",
     subsystem = "gatherer",
     name = name,
-    labels = labels
+    labels = metric_labels
   })
   gauge:set(name, value, labels)
 end
