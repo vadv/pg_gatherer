@@ -8,7 +8,7 @@ if os.getenv('CI') then
   local helper = dofile(filepath.join(dir, "helper_disk_stat.lua"))
   local count  = 0
   for dev, value in pairs(helper.read_diskstat()) do
-    print("disk stat:", "dev:", dev, "value:", value)
+    print("disk stat:", "dev:", dev, "value:", inspect(value))
     count = count + 1
   end
   if count == 0 then

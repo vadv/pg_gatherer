@@ -14,7 +14,7 @@ const (
 select
 	name
 from sqlite_master
-	where type = 'table' and name like '%%_%%' order by name;`
+	where type = 'table' and name like '%%_%%' order by name asc;`
 )
 
 func (c *Cache) rotateOldTablesRoutine() {
@@ -27,6 +27,7 @@ func (c *Cache) rotateOldTablesRoutine() {
 }
 
 func (c *Cache) rotateOldTables() error {
+	log.Printf("[cache] start rotate old tables\n")
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	rows, err := c.db.QueryContext(ctx, listTablesQuery)
@@ -34,6 +35,7 @@ func (c *Cache) rotateOldTables() error {
 		return err
 	}
 	defer rows.Close()
+	deadline := time.Now().Unix() - 2*c.getCacheRotateTable()
 	for rows.Next() {
 		tableName := ""
 		errScan := rows.Scan(&tableName)
@@ -44,7 +46,8 @@ func (c *Cache) rotateOldTables() error {
 			timeStr := timeSlice[len(timeSlice)-1]
 			t, err := strconv.ParseInt(timeStr, 10, 64)
 			if err == nil {
-				if (time.Now().Unix() - 2*c.getCacheRotateTable()) > t {
+				if deadline > t {
+					log.Printf("[cache] delete table: %#v\n", tableName)
 					_, errExec := c.db.Exec(fmt.Sprintf(`drop table %#v`, tableName))
 					if errExec != nil {
 						return errExec
