@@ -27,7 +27,6 @@ func (c *Cache) rotateOldTablesRoutine() {
 }
 
 func (c *Cache) rotateOldTables() error {
-	log.Printf("[cache] start rotate old tables\n")
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	rows, err := c.db.QueryContext(ctx, listTablesQuery)
@@ -47,7 +46,7 @@ func (c *Cache) rotateOldTables() error {
 			t, err := strconv.ParseInt(timeStr, 10, 64)
 			if err == nil {
 				if deadline > t {
-					log.Printf("[cache] delete table: %#v\n", tableName)
+					log.Printf("[INFO] cache drop table: %#v\n", tableName)
 					_, errExec := c.db.Exec(fmt.Sprintf(`drop table %#v`, tableName))
 					if errExec != nil {
 						return errExec
