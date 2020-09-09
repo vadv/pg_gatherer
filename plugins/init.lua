@@ -84,6 +84,7 @@ end
 
 -- prometheus_gauge:set()
 function gauge_set(name, value, labels)
+  if (value == nil) then return end
   labels = labels or {}
   if not(labels.host) then labels.host = plugin:host() end
   local gauge = prometheus_gauge({
