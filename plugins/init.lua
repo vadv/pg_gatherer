@@ -95,7 +95,7 @@ function gauge_set(name, value, labels)
     name = name,
     labels = label_keys
   })
-  gauge:set(name, value, labels)
+  gauge:set(value, labels)
 end
 
 -- run function f every sec
