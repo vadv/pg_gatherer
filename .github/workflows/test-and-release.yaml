@@ -20,7 +20,7 @@ jobs:
         tags: latest
 
     - name: Test in docker image
-      run: docker run --rm vadv/pg_gatherer:test bash -ec "make test_in_docker"
+      run: docker run --rm vadv/pg_gatherer_test bash -ec "make test_in_docker"
 
     - name: Build release docker image
       uses: elgohr/Publish-Docker-Github-Action@master

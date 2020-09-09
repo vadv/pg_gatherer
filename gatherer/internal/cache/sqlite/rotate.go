@@ -40,7 +40,7 @@ func (c *Cache) rotateOldTables() error {
 			return errScan
 		}
 		if tableName != c.currentTableName() && tableName != c.prevTableName() {
-			_, errExec := c.db.Exec(fmt.Sprintf(`drop table %s`, tableName))
+			_, errExec := c.db.Exec(fmt.Sprintf(`drop table %#v`, tableName))
 			if errExec != nil {
 				return errExec
 			}
