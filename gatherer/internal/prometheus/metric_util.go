@@ -68,6 +68,8 @@ func (m *luaPrometheusMetricConfig) equal(m2 *luaPrometheusMetricConfig) bool {
 	}
 	if (len(m.labels) != 0) && (len(m2.labels) != 0) {
 		// because labels sorted
+		sort.Strings(m.labels)
+		sort.Strings(m2.labels)
 		return strings.Join(m.labels, "") == strings.Join(m2.labels, "")
 	}
 	return false
