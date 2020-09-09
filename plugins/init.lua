@@ -85,15 +85,15 @@ end
 -- prometheus_gauge:set()
 function gauge_set(name, value, labels)
   if (value == nil) then return end
-  labels = labels or {}
-  if not(labels.host) then labels.host = plugin:host() end
+  local labels = labels or {}
+  if (labels.host == nil) then labels.host = plugin:host() end
   local gauge = prometheus_gauge({
     namespace = "pg",
     subsystem = "gatherer",
     name = name,
     labels = labels
   })
-  gauge:set(value)
+  gauge:set(name, value, labels)
 end
 
 -- run function f every sec
