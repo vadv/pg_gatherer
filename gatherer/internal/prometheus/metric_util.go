@@ -66,13 +66,15 @@ func (m *luaPrometheusMetricConfig) equal(m2 *luaPrometheusMetricConfig) bool {
 	if m.getKey() != m2.getKey() {
 		return false
 	}
-	if (len(m.labels) != 0) && (len(m2.labels) != 0) {
-		// because labels sorted
-		sort.Strings(m.labels)
-		sort.Strings(m2.labels)
-		return strings.Join(m.labels, "") == strings.Join(m2.labels, "")
+	if len(m.labels) == 0 && len(m2.labels) == 0 {
+		return true
 	}
-	return false
+	if len(m.labels) != len(m2.labels) {
+		return false
+	}
+	sort.Strings(m.labels)
+	sort.Strings(m2.labels)
+	return strings.Join(m.labels, "") == strings.Join(m2.labels, "")
 }
 
 func (m *luaPrometheusMetricConfig) getGaugeOpts() prometheus.GaugeOpts {
