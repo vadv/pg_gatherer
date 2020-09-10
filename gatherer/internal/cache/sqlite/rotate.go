@@ -27,7 +27,8 @@ func (c *Cache) rotateOldTablesRoutine() {
 }
 
 func (c *Cache) rotateOldTables() error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	time.Sleep(100 * time.Millisecond)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 	rows, err := c.db.QueryContext(ctx, listTablesQuery)
 	if err != nil {
