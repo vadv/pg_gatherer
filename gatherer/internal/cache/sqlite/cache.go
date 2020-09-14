@@ -22,7 +22,7 @@ const (
 	// EnvCacheRotateTable env value for override default value
 	EnvCacheRotateTable = `CACHE_ROTATE_TABLE`
 	// DefaultCacheRotateTable default value for rotate tables
-	DefaultCacheRotateTable = int64(60 * 60 * 24)
+	DefaultCacheRotateTable = int64(60 * 60 * 2)
 	createQuery             = `create table if not exists "%s" (key text primary key, value real, updated_at real)`
 )
 
@@ -80,8 +80,8 @@ OpenSqlite:
 		retries++
 		goto OpenSqlite
 	}
-	newDB.SetMaxOpenConns(1)
-	newDB.SetMaxIdleConns(1)
+	newDB.SetMaxOpenConns(3)
+	newDB.SetMaxIdleConns(3)
 	listOfOpenCaches.list[path] = newDB
 	result.db = newDB
 	go result.rotateOldTablesRoutine()

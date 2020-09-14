@@ -14,13 +14,15 @@ const (
 select
 	name
 from sqlite_master
-	where type = 'table' and name like '%%_%%' order by name asc;`
+	where type = 'table' and name like '%%_%%' order by name desc;`
 )
 
 func (c *Cache) rotateOldTablesRoutine() {
 	for {
 		if err := c.rotateOldTables(); err != nil {
 			log.Printf("[ERROR] cache %s rotate old tables: %s\n", c.path, err.Error())
+			time.Sleep(100 * time.Millisecond)
+			continue
 		}
 		time.Sleep(time.Second * time.Duration(c.getCacheRotateTable()/2))
 	}

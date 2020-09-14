@@ -5,11 +5,10 @@ import (
 	"io/ioutil"
 	"log"
 
-	"github.com/vadv/pg_gatherer/gatherer/internal/secrets"
-
 	"gopkg.in/yaml.v2"
 
 	"github.com/vadv/pg_gatherer/gatherer/internal/plugins"
+	"github.com/vadv/pg_gatherer/gatherer/internal/secrets"
 )
 
 // Config represent configuration of plugins
