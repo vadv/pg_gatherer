@@ -80,8 +80,8 @@ OpenSqlite:
 		retries++
 		goto OpenSqlite
 	}
-	newDB.SetMaxOpenConns(10)
-	newDB.SetMaxIdleConns(10)
+	newDB.SetMaxOpenConns(1)
+	newDB.SetMaxIdleConns(1)
 	listOfOpenCaches.list[path] = newDB
 	result.db = newDB
 	go result.rotateOldTablesRoutine()

@@ -31,13 +31,13 @@ func (c *Cache) rotateOldTablesRoutine() {
 
 func (c *Cache) rotateOldTables() error {
 	time.Sleep(100 * time.Millisecond)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
 	deadline := time.Now().Unix() - 2*c.getCacheRotateTable()
-	tables, err := listOfTables(ctx, c.db)
+	tables, err := listOfTables(c.db, time.Second)
 	if err != nil {
 		return err
 	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
 	for _, tableName := range tables {
 		if timeSlice := strings.Split(tableName, "_"); len(timeSlice) > 0 {
 			timeStr := timeSlice[len(timeSlice)-1]
@@ -59,7 +59,9 @@ func (c *Cache) rotateOldTables() error {
 	return nil
 }
 
-func listOfTables(ctx context.Context, db *sql.DB) ([]string, error) {
+func listOfTables(db *sql.DB, timeout time.Duration) ([]string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
 	rows, err := db.QueryContext(ctx, listTablesQuery)
 	if err != nil {
 		return nil, err
