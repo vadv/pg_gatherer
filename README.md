@@ -99,6 +99,10 @@ peripheral-db-1: # name of target in storage-db
 
 More information here: [plugins](/plugins)
 
+# License
+
+[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
+
 ## Build status
 
-![Status](https://github.com/vadv/pg_gatherer/workflows/test-and-release/badge.svg)
+[![Status](https://github.com/vadv/pg_gatherer/workflows/test-and-release/badge.svg)](https://github.com/vadv/pg_gatherer/actions/)
