@@ -2,10 +2,6 @@
 
 The project is designed to collect and store statistical data of PostgreSQL into other PostgreSQL.
 
-# License
-
-[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
-
 # Architecture
 
 ```
@@ -102,6 +98,10 @@ peripheral-db-1: # name of target in storage-db
 ## Plugins
 
 More information here: [plugins](/plugins)
+
+# License
+
+[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
 ## Build status
 
