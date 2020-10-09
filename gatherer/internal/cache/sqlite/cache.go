@@ -22,7 +22,7 @@ const (
 	// EnvCacheRotateTable env value for override default value
 	EnvCacheRotateTable = `CACHE_ROTATE_TABLE`
 	// DefaultCacheRotateTable default value for rotate tables
-	DefaultCacheRotateTable = int64(60 * 60 * 24)
+	DefaultCacheRotateTable = int64(60 * 60 * 2)
 	createQuery             = `create table if not exists "%s" (key text primary key, value real, updated_at real)`
 )
 
@@ -64,23 +64,18 @@ OpenSqlite:
 	if retries > 3 {
 		return nil, fmt.Errorf("too many errors while prepare sqlite database")
 	}
-	newDB, err := sql.Open(`sqlite3`, path)
+	// https://github.com/mattn/go-sqlite3/tree/v2.0.3#connection-string
+	connectionString := fmt.Sprintf("file:%s?_synchronous=0&_journal_mode=OFF", path)
+	newDB, err := sql.Open(`sqlite3`, connectionString)
 	if err != nil {
-		log.Printf("[ERROR] delete db %s, because: %s while open\n", path, err.Error())
+		log.Printf("[ERROR] delete db %#v, because: %#v while open\n", connectionString, err.Error())
 		os.RemoveAll(path)
 		retries++
 		goto OpenSqlite
 	}
-	if _, errSync := newDB.Exec(`PRAGMA synchronous = 0`); errSync != nil {
+	if _, testQuery := newDB.Exec(`select 1`); testQuery != nil {
 		newDB.Close()
-		log.Printf("[ERROR] delete db %s, because: %s while set async\n", path, errSync.Error())
-		os.RemoveAll(path)
-		retries++
-		goto OpenSqlite
-	}
-	if _, errJournal := newDB.Exec(`PRAGMA journal_mode = OFF`); errJournal != nil {
-		newDB.Close()
-		log.Printf("[ERROR] delete db %s, because: %s while disable journal\n", path, errJournal.Error())
+		log.Printf("[ERROR] delete db %#v, because: %#v while exec test query\n", connectionString, testQuery.Error())
 		os.RemoveAll(path)
 		retries++
 		goto OpenSqlite
