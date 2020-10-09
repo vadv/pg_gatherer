@@ -2,6 +2,10 @@
 
 The project is designed to collect and store statistical data of PostgreSQL into other PostgreSQL.
 
+# License
+
+[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
+
 # Architecture
 
 ```
@@ -101,4 +105,4 @@ More information here: [plugins](/plugins)
 
 ## Build status
 
-![Status](https://github.com/vadv/pg_gatherer/workflows/test-and-release/badge.svg)
+[![Status](https://github.com/vadv/pg_gatherer/workflows/test-and-release/badge.svg)](https://github.com/vadv/pg_gatherer/actions/)
