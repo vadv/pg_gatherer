@@ -12,10 +12,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/vadv/pg_gatherer/gatherer/internal/connection"
-
-	"github.com/vadv/pg_gatherer/gatherer/internal/secrets"
-
 	"github.com/vadv/pg_gatherer/gatherer/internal/plugins"
+	"github.com/vadv/pg_gatherer/gatherer/internal/secrets"
 )
 
 var (
