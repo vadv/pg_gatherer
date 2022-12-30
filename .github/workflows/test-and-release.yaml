@@ -10,7 +10,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Build test image
-      uses: elgohr/Publish-Docker-Github-Action@master
+      uses: elgohr/Publish-Docker-Github-Action@v5
       with:
         name: vadv/pg_gatherer_test
         dockerfile: ./docker/test.Dockerfile
@@ -23,7 +23,7 @@ jobs:
       run: docker run --rm vadv/pg_gatherer_test bash -ec "make test_in_docker"
 
     - name: Build release docker image
-      uses: elgohr/Publish-Docker-Github-Action@master
+      uses: elgohr/Publish-Docker-Github-Action@v5
       with:
         name: vadv/pg_gatherer
         dockerfile: ./docker/release.Dockerfile
