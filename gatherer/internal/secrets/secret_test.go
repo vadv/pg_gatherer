@@ -5,11 +5,11 @@ import (
 	"os"
 	"testing"
 
-	"github.com/vadv/pg_gatherer/gatherer/internal/secrets"
-
 	"github.com/vadv/gopher-lua-libs/inspect"
 	"github.com/vadv/gopher-lua-libs/time"
 	lua "github.com/yuin/gopher-lua"
+
+	"github.com/vadv/pg_gatherer/gatherer/internal/secrets"
 )
 
 func TestCache(t *testing.T) {
